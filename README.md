@@ -58,7 +58,7 @@ The `Audio File Read` and `Audio File Write` VIs are malleable, and accept wavef
 ## Compiling
 Under Windows, Microsoft Visual Studio Community 2019 is used to compile and test the DLL called by LabVIEW.
 
-For Linux and MacOS, cross-compilation is performed from Windows using [zig c++](https://andrewkelley.me/post/zig-cc-powerful-drop-in-replacement-gcc-clang.html). Grab the [latest zig](https://ziglang.org/download/) and place a copy in `src\C++\zig`, then run the batch file [zig-make.bat](src\C++\zig-make.bat). This will build the libraries and place them in `src\LabVIEW\G-Audio\lib`.
+For Linux and MacOS, cross-compilation is performed from Windows using [zig c++](https://andrewkelley.me/post/zig-cc-powerful-drop-in-replacement-gcc-clang.html). Grab the [latest zig](https://ziglang.org/download/) and place a copy in `src\C++\zig`, then run the batch file [zig-make.bat](src/C%2B%2B/zig-make.bat). This will build the libraries and place them in `src\LabVIEW\G-Audio\lib`.
 
 ## Libraries
 This library uses the following public domain libraries:
