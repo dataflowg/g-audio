@@ -17,33 +17,36 @@ A LabVIEW library for reading and writing audio files. Currently supports readin
 The library is designed to be cross platform, with compiled libraries available for Windows and Linux. MacOS should also work (it builds with zig c++), but is untested.
 
 ## Comparison
-                             | G-Audio | [LabVIEW Sound](https://zone.ni.com/reference/en-XX/help/371361R-01/lvconcepts/soundvis/) | [LabVIEW Audio DataPlugin](https://www.ni.com/example/25044/en/)
------------------------------|-----------|---------------|-------------------------
-Read WAV (PCM)               | YES       | YES           | YES
-Read WAV (IEEE Float)        | YES       | YES           | YES
-Read MP3                     | YES       | No            | YES
-Sample Accurate MP3 Length?  | YES       | -             | No
-Read FLAC                    | YES       | No            | No
-Read Ogg Vorbis              | YES       | No            | No
-Read WMA                     | No        | No            | YES
-Write WAV (PCM)              | YES       | YES           | YES
-Write WAV (IEEE Float)       | YES       | YES\*         | YES\*
-Write WAV (64-bit Float)     | YES       | No            | No
-Write Non-WAV formats        | No        | No            | No
-Large file support (>2GB)    | YES\*\*   | No            | No
-UTF-8 path support           | YES\*\*\* | No            | No
-Cross-platform               | YES (Win + Linux tested)  | YES\*\*\*\*   | No (Windows only)
+Feature                      | G-Audio | [LabVIEW Sound](https://zone.ni.com/reference/en-XX/help/371361R-01/lvconcepts/soundvis/) | [LabVIEW Audio DataPlugin](https://www.ni.com/example/25044/en/)
+-----------------------------|---------------------|---------------------|-------------------------
+Read WAV (PCM)               | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark:
+Read WAV (IEEE Float)        | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark:
+Read MP3                     | :heavy_check_mark:  | :x:                 | :heavy_check_mark:
+Sample Accurate MP3 Length?  | :heavy_check_mark:  | -                   | :x:
+Read FLAC                    | :heavy_check_mark:  | :x:                 | :x:
+Read Ogg Vorbis              | :heavy_check_mark:  | :x:                 | :x:
+Read WMA                     | :x:                 | :x:                 | :heavy_check_mark:
+Write WAV (PCM)              | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark:
+Write WAV (IEEE Float)       | :heavy_check_mark:  | :heavy_check_mark:¹ | :heavy_check_mark:¹
+Write WAV (64-bit Float)     | :heavy_check_mark:  | :x:                 | :x:
+Write Non-WAV formats        | :x:                 | :x:                 | :x:
+Large file support (>2GB)    | :heavy_check_mark:² | :x:                 | :x:
+UTF-8 path support           | :heavy_check_mark:³ | :x:                 | :x:
+Cross-platform               | :heavy_check_mark: (Win + Linux tested)   | :heavy_check_mark:⁴   | :x: (Windows only)
 
-\* *While LabVIEW Sound and LabVIEW Audio DataPlugin both support writing IEEE Float WAV files, writing the file and then reading it back shows they are **not** lossless. Both the read and write functions appear to be lossy (a file written by LV Sound and read with G-Audio will not be equal to the original data, as will a file written by G-Audio and read by LV Sound). dr_wav's (and by extension, G-Audio's) IEEE Float WAV write and read functions are lossless.*
-\*\* *64-bit version of LabVIEW required*
-\*\*\* *The underlying library supports UTF-8 paths, and is best used with LabVIEW NXG. Wrappers and workarounds for LabVIEW's unicode support may be added in future.*
-\*\*\*\* *While LabVIEW Sound is cross-platform, testing under Linux showed writing 32-bit IEEE Float didn't work.*
+¹ *While LabVIEW Sound and LabVIEW Audio DataPlugin both support writing IEEE Float WAV files, writing the file and then reading it back shows they are **not** lossless. Both the read and write functions appear to be lossy (a file written by LV Sound and read with G-Audio will not be equal to the original data, as will a file written by G-Audio and read by LV Sound). dr_wav's (and by extension, G-Audio's) IEEE Float WAV write and read functions are lossless.*
+
+² *64-bit version of LabVIEW required*
+
+³ *The underlying library supports UTF-8 paths, and is best used with LabVIEW NXG. Wrappers and workarounds for LabVIEW's unicode support may be added in future.*
+
+⁴ *While LabVIEW Sound is cross-platform, testing under Linux showed writing 32-bit IEEE Float didn't work.*
 
 ## License
 This library is built using public domain audio decoders and libraries. As such, this library is also made available in the public domain. See [LICENSE](LICENSE) for details.
 
 ## Usage
-See the example VIs in [Examples](Examples) to write, read, and playback audio files.
+See the example VIs in [Examples](src/LabVIEW/Examples) to write, read, and playback audio files.
 
 Unit tests are included and can be run individually, or with the [AST Unit Tester](https://www.autosofttech.net/documents/ast-unit-tester).
 
