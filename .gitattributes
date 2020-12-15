@@ -1,0 +1,44 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Custom for Visual Studio
+*.cs     diff=csharp
+
+# Standard to msysgit
+*.doc	 diff=astextplain
+*.DOC	 diff=astextplain
+*.docx diff=astextplain
+*.DOCX diff=astextplain
+*.dot  diff=astextplain
+*.DOT  diff=astextplain
+*.pdf  diff=astextplain
+*.PDF	 diff=astextplain
+*.rtf	 diff=astextplain
+*.RTF	 diff=astextplain
+
+
+
+# Taken from https://github.com/Danimoth/gitattributes/blob/master/Common.gitattributes
+# (note binary is a macro for -text -diff)
+
+# Graphics
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.tif binary
+*.tiff binary
+*.ico binary
+*.svg binary
+*.eps binary
+
+# LabVIEW
+# Forcibly treat the bitfile as binary, otherwise GitHub sees the XML header and treats it as text.
+*.lvbitx binary
+# Treat the following XML type files as binary - text based diffing and merging can break them otherwise.
+# See the section titled Managing the Project File in Source Code Control of this white paper: http://www.ni.com/white-paper/4114/en/
+*.lvproj binary
+*.lvlib binary
+*.lvclass binary
+*.xctl binary
+*.lvsc binary
