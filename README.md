@@ -7,7 +7,7 @@ A LabVIEW library for reading and writing audio files. Currently supports readin
 ## Features
 * Support for reading MP3, FLAC, Ogg Vorbis, and WAV formats
 * Support for writing WAV (PCM, IEEE Float, with Sony Wave64 support for large files)
-* UTF-8 path support
+* Internal UTF-8 path support
 * Cross-platform
 * Thread-safe
 * Simple to use API

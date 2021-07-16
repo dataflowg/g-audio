@@ -67,16 +67,18 @@
 		<Property Name="server.vi.propertiesEnabled" Type="Bool">true</Property>
 		<Property Name="specify.custom.address" Type="Bool">false</Property>
 		<Item Name="Examples" Type="Folder">
-			<Item Name="G-Audio - Continuous Output.vi" Type="VI" URL="../Examples/G-Audio - Continuous Output.vi"/>
-			<Item Name="G-Audio - IEEE Float Compare.vi" Type="VI" URL="../Examples/G-Audio - IEEE Float Compare.vi"/>
-			<Item Name="G-Audio - Write Audio File.vi" Type="VI" URL="../Examples/G-Audio - Write Audio File.vi"/>
+			<Item Name="SubVIs" Type="Folder">
+				<Item Name="Generate Signal Components.vim" Type="VI" URL="../G-Audio/Examples/SubVIs/Generate Signal Components.vim"/>
+			</Item>
+			<Item Name="Continuous Audio Output Example.vi" Type="VI" URL="../G-Audio/Examples/Continuous Audio Output Example.vi"/>
+			<Item Name="IEEE Float Compare Example.vi" Type="VI" URL="../G-Audio/Examples/IEEE Float Compare Example.vi"/>
+			<Item Name="Write Audio File Example.vi" Type="VI" URL="../G-Audio/Examples/Write Audio File Example.vi"/>
 		</Item>
 		<Item Name="G-Audio\Polymorphic Templates" Type="Folder">
 			<Item Name="Read Audio File (Polymorphic Template).vi" Type="VI" URL="../G-Audio/Polymorphic Templates/Read Audio File (Polymorphic Template).vi"/>
 			<Item Name="Write Audio File (Polymorphic Template).vi" Type="VI" URL="../G-Audio/Polymorphic Templates/Write Audio File (Polymorphic Template).vi"/>
 		</Item>
 		<Item Name="Unit Tests" Type="Folder">
-			<Item Name="Generate Signal Components.vim" Type="VI" URL="../Unit Tests/Generate Signal Components.vim"/>
 			<Item Name="Test Load FLAC.vi" Type="VI" URL="../Unit Tests/Test Load FLAC.vi"/>
 			<Item Name="Test Load MP3.vi" Type="VI" URL="../Unit Tests/Test Load MP3.vi"/>
 			<Item Name="Test Load Vorbis.vi" Type="VI" URL="../Unit Tests/Test Load Vorbis.vi"/>
