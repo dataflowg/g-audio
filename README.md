@@ -46,7 +46,7 @@ Cross-platform               | :heavy_check_mark: (Win + Linux tested)   | :heav
 This library is built using public domain audio decoders and libraries. As such, this library is also made available in the public domain. See [LICENSE](LICENSE) for details.
 
 ## Usage
-See the example VIs in [Examples](src/LabVIEW/Examples) to write, read, and playback audio files.
+See the example VIs in [Examples](src/LabVIEW/G-Audio/Examples) to write, read, and playback audio files.
 
 Unit tests are included and can be run individually, or with the [AST Unit Tester](https://www.autosofttech.net/documents/ast-unit-tester).
 
