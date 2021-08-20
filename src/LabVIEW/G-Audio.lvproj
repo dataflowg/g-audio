@@ -70,15 +70,18 @@
 			<Item Name="SubVIs" Type="Folder">
 				<Item Name="Generate Signal Components.vim" Type="VI" URL="../G-Audio/Examples/SubVIs/Generate Signal Components.vim"/>
 			</Item>
-			<Item Name="Continuous Audio Output Example.vi" Type="VI" URL="../G-Audio/Examples/Continuous Audio Output Example.vi"/>
+			<Item Name="Audio Device Capture Example (G-Audio).vi" Type="VI" URL="../G-Audio/Examples/Audio Device Capture Example (G-Audio).vi"/>
+			<Item Name="Audio Device Playback Example (G-Audio).vi" Type="VI" URL="../G-Audio/Examples/Audio Device Playback Example (G-Audio).vi"/>
+			<Item Name="Audio Device Playback Example (lvsound2).vi" Type="VI" URL="../G-Audio/Examples/Audio Device Playback Example (lvsound2).vi"/>
 			<Item Name="IEEE Float Compare Example.vi" Type="VI" URL="../G-Audio/Examples/IEEE Float Compare Example.vi"/>
+			<Item Name="Media Player Example.vi" Type="VI" URL="../G-Audio/Examples/Media Player Example.vi"/>
+			<Item Name="Playback Latency Compare Example.vi" Type="VI" URL="../G-Audio/Examples/Playback Latency Compare Example.vi"/>
+			<Item Name="Query Audio Devices Example.vi" Type="VI" URL="../G-Audio/Examples/Query Audio Devices Example.vi"/>
 			<Item Name="Write Audio File Example.vi" Type="VI" URL="../G-Audio/Examples/Write Audio File Example.vi"/>
 		</Item>
-		<Item Name="G-Audio\Polymorphic Templates" Type="Folder">
-			<Item Name="Read Audio File (Polymorphic Template).vi" Type="VI" URL="../G-Audio/Polymorphic Templates/Read Audio File (Polymorphic Template).vi"/>
-			<Item Name="Write Audio File (Polymorphic Template).vi" Type="VI" URL="../G-Audio/Polymorphic Templates/Write Audio File (Polymorphic Template).vi"/>
-		</Item>
 		<Item Name="Unit Tests" Type="Folder">
+			<Item Name="Test Default Audio Device Capture.vi" Type="VI" URL="../Unit Tests/Test Default Audio Device Capture.vi"/>
+			<Item Name="Test Default Audio Device Playback.vi" Type="VI" URL="../Unit Tests/Test Default Audio Device Playback.vi"/>
 			<Item Name="Test Load FLAC.vi" Type="VI" URL="../Unit Tests/Test Load FLAC.vi"/>
 			<Item Name="Test Load MP3.vi" Type="VI" URL="../Unit Tests/Test Load MP3.vi"/>
 			<Item Name="Test Load Vorbis.vi" Type="VI" URL="../Unit Tests/Test Load Vorbis.vi"/>
@@ -88,6 +91,7 @@
 			<Item Name="Test Open Read Close Vorbis.vi" Type="VI" URL="../Unit Tests/Test Open Read Close Vorbis.vi"/>
 			<Item Name="Test Open Read Close WAV.vi" Type="VI" URL="../Unit Tests/Test Open Read Close WAV.vi"/>
 			<Item Name="Test Open Write Close WAV.vi" Type="VI" URL="../Unit Tests/Test Open Write Close WAV.vi"/>
+			<Item Name="Test Query Audio Backends.vi" Type="VI" URL="../Unit Tests/Test Query Audio Backends.vi"/>
 			<Item Name="Waveform Array In Range Comparison.vim" Type="VI" URL="../Unit Tests/Waveform Array In Range Comparison.vim"/>
 		</Item>
 		<Item Name="G-Audio.lvlib" Type="Library" URL="../G-Audio/G-Audio.lvlib"/>
@@ -140,6 +144,8 @@
 				<Item Name="Sound File Write.vi" Type="VI" URL="/&lt;vilib&gt;/sound2/lvsound2.llb/Sound File Write.vi"/>
 				<Item Name="Sound Output Clear.vi" Type="VI" URL="/&lt;vilib&gt;/sound2/lvsound2.llb/Sound Output Clear.vi"/>
 				<Item Name="Sound Output Configure.vi" Type="VI" URL="/&lt;vilib&gt;/sound2/lvsound2.llb/Sound Output Configure.vi"/>
+				<Item Name="Sound Output Start.vi" Type="VI" URL="/&lt;vilib&gt;/sound2/lvsound2.llb/Sound Output Start.vi"/>
+				<Item Name="Sound Output Stop.vi" Type="VI" URL="/&lt;vilib&gt;/sound2/lvsound2.llb/Sound Output Stop.vi"/>
 				<Item Name="Sound Output Task ID.ctl" Type="VI" URL="/&lt;vilib&gt;/sound2/lvsound2.llb/Sound Output Task ID.ctl"/>
 				<Item Name="Sound Output Wait.vi" Type="VI" URL="/&lt;vilib&gt;/sound2/lvsound2.llb/Sound Output Wait.vi"/>
 				<Item Name="Sound Output Write (DBL Single).vi" Type="VI" URL="/&lt;vilib&gt;/sound2/lvsound2.llb/Sound Output Write (DBL Single).vi"/>
