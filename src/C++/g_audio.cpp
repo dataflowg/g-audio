@@ -1312,7 +1312,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT query_audio_backends(uint16_t* backends, uint
 	return GA_SUCCESS;
 }
 
-extern "C" LV_DLL_EXPORT GA_RESULT query_audio_devices(uint16_t backend, uint8_t* playback_device_ids, int32_t* num_playback_devices, uint8_t* capture_device_ids, int32_t* num_capture_devices)
+extern "C" LV_DLL_EXPORT GA_RESULT query_audio_devices(uint16_t backend_in, uint8_t* playback_device_ids, int32_t* num_playback_devices, uint8_t* capture_device_ids, int32_t* num_capture_devices)
 {
 	ma_context context;
 	ma_device_info* pPlaybackDeviceInfos;
@@ -1321,12 +1321,13 @@ extern "C" LV_DLL_EXPORT GA_RESULT query_audio_devices(uint16_t backend, uint8_t
 	ma_uint32 captureDeviceCount;
 	ma_result result;
 	uint32_t iDevice;
+	ma_backend backend = (ma_backend)backend_in;
 
 	// Thread safety - ma_context_init, ma_context_get_devices, ma_context_uninit are unsafe
 	lock_ga_mutex(ga_mutex_context);
 	// Can safely pass 1 as backendCount, as it's ignored when backends is NULL.
 	// The backends enum in LabVIEW adds Default after Null
-	result = ma_context_init((backend > ma_backend_null ? NULL : (ma_backend*)&backend), 1, NULL, &context);
+	result = ma_context_init((backend_in > ma_backend_null ? NULL : &backend), 1, NULL, &context);
 	if (result != MA_SUCCESS)
 	{
 		unlock_ga_mutex(ga_mutex_context);
@@ -1372,12 +1373,13 @@ extern "C" LV_DLL_EXPORT GA_RESULT query_audio_devices(uint16_t backend, uint8_t
 	return GA_SUCCESS;
 }
 
-extern "C" LV_DLL_EXPORT GA_RESULT get_audio_device_info(uint16_t backend, const uint8_t* device_id, uint16_t device_type, char* device_name)
+extern "C" LV_DLL_EXPORT GA_RESULT get_audio_device_info(uint16_t backend_in, const uint8_t* device_id, uint16_t device_type, char* device_name)
 {
 	ma_context context;
 	ma_device_id deviceId;
 	ma_device_info deviceInfo;
 	ma_result result;
+	ma_backend backend = (ma_backend)backend_in;
 
 	memcpy(&deviceId, device_id, sizeof(ma_device_id));
 
@@ -1385,7 +1387,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT get_audio_device_info(uint16_t backend, const
 	lock_ga_mutex(ga_mutex_context);
 	// Can safely pass 1 as backendCount, as it's ignored when backends is NULL.
 	// The backends enum in LabVIEW adds Default after Null
-	result = ma_context_init((backend > ma_backend_null ? NULL : (ma_backend*)&backend), 1, NULL, &context);
+	result = ma_context_init((backend_in > ma_backend_null ? NULL : &backend), 1, NULL, &context);
 	if (result != MA_SUCCESS)
 	{
 		unlock_ga_mutex(ga_mutex_context);
@@ -1414,13 +1416,14 @@ extern "C" LV_DLL_EXPORT GA_RESULT get_audio_device_info(uint16_t backend, const
 	return GA_SUCCESS;
 }
 
-extern "C" LV_DLL_EXPORT GA_RESULT configure_audio_device(uint16_t backend, const uint8_t* device_id, uint16_t device_type, uint32_t channels, uint32_t sample_rate, uint16_t format, uint8_t exclusive_mode, int32_t buffer_size, int32_t* refnum)
+extern "C" LV_DLL_EXPORT GA_RESULT configure_audio_device(uint16_t backend_in, const uint8_t* device_id, uint16_t device_type, uint32_t channels, uint32_t sample_rate, uint16_t format, uint8_t exclusive_mode, int32_t buffer_size, int32_t* refnum)
 {
 	ma_result result;
 	ma_device_id deviceId;
 	ma_format device_format_init;
 	ma_uint32 device_channels_init;
 	ma_uint32 device_internal_buffer_size = 0;
+	ma_backend backend = (ma_backend)backend_in;
 
 	uint8_t blank_device_id[sizeof(ma_device_id)] = { 0 };
 
@@ -1446,7 +1449,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT configure_audio_device(uint16_t backend, cons
 
 		// Can safely pass 1 as backendCount, as it's ignored when backends is NULL.
 		// The backends enum in LabVIEW adds Default after Null
-		result = ma_context_init((backend > ma_backend_null ? NULL : (ma_backend*)&backend), 1, &context_config, global_context);
+		result = ma_context_init((backend_in > ma_backend_null ? NULL : &backend), 1, &context_config, global_context);
 		if (result != MA_SUCCESS)
 		{
 			free(global_context);
@@ -1455,7 +1458,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT configure_audio_device(uint16_t backend, cons
 			return result + MA_ERROR_OFFSET;
 		}
 	}
-	else if ((backend <= ma_backend_null) && (global_context->backend != (ma_backend)backend))
+	else if ((backend_in <= ma_backend_null) && (global_context->backend != backend))
 	{
 		unlock_ga_mutex(ga_mutex_context);
 		return GA_E_CONTEXT_BACKEND;
