@@ -1,4 +1,4 @@
-<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2021-08-10 05:16:01" Creator="Dataflow_G" Comments="" ID="bc4c09bdc423052f5147ac89d4146d34">
+<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2021-08-23 02:43:29" Creator="Dataflow_G" Comments="" ID="7fc4c201bc9aca188d2eb271e34aa21e">
   <Library_General_Settings>
     <Package_File_Name>Dataflow_G_lib_G_Audio</Package_File_Name>
     <Library_Version>0.2.0.2</Library_Version>
@@ -22,19 +22,18 @@
       <Post-Build_VI/>
       <Pre-Install_VI/>
       <Post-Install_VI>Post-Install Custom Action.vi</Post-Install_VI>
-      <Pre-Uninstall_VI>Pre-Uninstall Custom Action.vi</Pre-Uninstall_VI>
+      <Pre-Uninstall_VI/>
       <Post-Uninstall_VI/>
     </Custom_Action_VIs>
     <VI_Package_Configuration_File>G-Audio.vipc</VI_Package_Configuration_File>
     <Description>
       <One_Line_Description_Summary>An audio library for LabVIEW.</One_Line_Description_Summary>
-      <Description>A LabVIEW library for audio device playback and capture, and for reading and writing audio files.
-
-Audio device playback and capture is supported on Windows, Linux, and macOS.
-
-Supports reading MP3, FLAC, Ogg Vorbis, and WAV encoded audio files, and writing WAV files. The library has 32-bit and 64-bit support, though only the decoders for FLAC and WAV utilize the full 64-bit address space.
+      <Description>A cross-platform LabVIEW library for audio device playback and capture, and for reading and writing audio files.
 
 &lt;b&gt;Features:&lt;/b&gt;
+* Support for audio playback
+* Support for audio capture
+* Playback and capture using selectable backends (WASAPI, DirectSound, Core Audio, PulseAudio, ALSA, etc)
 * Support for reading MP3, FLAC, Ogg Vorbis, and WAV formats
 * Support for writing WAV (PCM, IEEE Float, with Sony Wave64 support for large files)
 * Internal UTF-8 path support
@@ -44,7 +43,11 @@ Supports reading MP3, FLAC, Ogg Vorbis, and WAV encoded audio files, and writing
       <Copyright>Public domain</Copyright>
       <Packager/>
       <URL>https://github.com/dataflowg/g-audio</URL>
-      <Release_Notes>Initial release.</Release_Notes>
+      <Release_Notes>- Audio playback and capture!
+    - Continuous audio input and output
+    - Multiple audio backends supported (WASAPI, DirectSound, Core Audio, PulseAudio, ALSA, etc)
+    - Simultaneous playback and capture on multiple devices
+    - Enumerate audio devices on-the-fly</Release_Notes>
     </Description>
     <Destinations>
       <Toolkit_VIs>
@@ -134,6 +137,12 @@ Supports reading MP3, FLAC, Ogg Vorbis, and WAV encoded audio files, and writing
       </Exclusions>
       <Exclusions>
         <Path>G-Audio/Polymorphic Templates</Path>
+      </Exclusions>
+      <Exclusions>
+        <Path>G-Audio/Examples/Media Player Example.vi</Path>
+      </Exclusions>
+      <Exclusions>
+        <Path>G-Audio/Examples/Playback Latency Compare Example.vi</Path>
       </Exclusions>
       <Place_Folder_Contents>
         <Path/>
@@ -268,7 +277,7 @@ Supports reading MP3, FLAC, Ogg Vorbis, and WAV encoded audio files, and writing
         <Path>..\G-Audio\Examples</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>507029620B22E0C2D4E586B7D22889E0</GUID>
+      <GUID>8550C1DDA30A0909C63E71EEC8ACD106</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -401,7 +410,7 @@ Supports reading MP3, FLAC, Ogg Vorbis, and WAV encoded audio files, and writing
         <Path>..\G-Audio\Audio Files\Get Audio File Info.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>95FC7916E786DCFEE0D2401B672DE99B</GUID>
+      <GUID>31ED478189865086E502A08C0219C1EB</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -562,7 +571,7 @@ Supports reading MP3, FLAC, Ogg Vorbis, and WAV encoded audio files, and writing
         <Path>..\G-Audio\Audio Devices\Playback Wait.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>5951C72E56A2EB9F899A273C75E72F7E</GUID>
+      <GUID>5B045C6D9468624AEA1B1F624A9BCFB9</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -667,7 +676,7 @@ Supports reading MP3, FLAC, Ogg Vorbis, and WAV encoded audio files, and writing
         <Path>..\G-Audio\Examples\IEEE Float Compare Example.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>58AEE51ECD149293ECC48E65D02F7E88</GUID>
+      <GUID>CE88B269FA0651927B35B130613ABF49</GUID>
     </Functions_Palette_Data>
   </Library_Palette_Definition>
 </VI_Package_Builder_Settings>

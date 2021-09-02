@@ -79,9 +79,13 @@ For more information, please refer to <http://unlicense.org/>
 #include "stb_vorbis.h"
 #include "dr_wav.h"
 
-// Don't define miniaudio's encoders and decoders, as we're using the libraries separately.
+// Don't define miniaudio's encoders and decoders, as we're using those libraries separately.
 #define MA_NO_DECODING
-#define MA_NO_ENECODING
+#define MA_NO_ENCODING
+// Not using miniaudio to generate audio signals
+#define MA_NO_GENERATION
+// No null backend
+#define MA_NO_NULL
 // #define MA_DEBUG_OUTPUT
 #define MINIAUDIO_IMPLEMENTATION
 #include "miniaudio.h"

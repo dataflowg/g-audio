@@ -2,7 +2,7 @@
 <p align="center">
   <img width="300" height="115" src="images/g-audio-logo.png">
 </p>
-A library for LabVIEW providing audio playback and capture, and loading and saving audio files.
+A cross-platform LabVIEW library for audio device playback and capture, and for reading and writing audio files.
 
 ## What's New?
 * Audio playback and capture!
@@ -23,11 +23,24 @@ A library for LabVIEW providing audio playback and capture, and loading and savi
 * Thread-safe
 * Simple to use API
 
-![The G-Audio library API](images/g-audio-library.png?raw=true "The G-Audio library API")
+![The G-Audio library API](images/g-audio-palettes.png?raw=true "The G-Audio library API")
 
 The library is designed to be cross platform, with compiled libraries available for Windows, macOS, and Linux.
 
 ## Comparison
+### Audio Playback & Capture
+Feature                       | G-Audio             | [LabVIEW Sound](https://zone.ni.com/reference/en-XX/help/371361R-01/lvconcepts/soundvis/) | [WaveIO](https://www.zeitnitz.eu/scms/waveio)
+------------------------------|---------------------|-------------------------|--------------
+Selectable backend            | :heavy_check_mark:  | :x:                     | :heavy_check_mark: (WASAPI, WinMM, ASIO)
+Cross-platform                | :heavy_check_mark:  | :heavy_check_mark:¹     | :x: (Windows only)
+Runtime device enumeration    | :heavy_check_mark:  | :x:²                    | :heavy_check_mark:
+Audio device playback         | :heavy_check_mark:  | :heavy_check_mark:      | :heavy_check_mark:
+Audio device capture          | :heavy_check_mark:  | :heavy_check_mark:      | :heavy_check_mark:
+
+¹ *The backend for Linux is OSS, which was deprecated in Linux kernel version 2.5 in favor of ALSA. OSS support is not included out-of-the-box by any of the Linux distributions supported by LabVIEW 2020.*
+
+² *LabVIEW Sound only enumerates devices when lvsound2.dll is loaded, and can't detect newly added or removed devices unless the entire library is unloaded and loaded again. See [this idea exchange entry](https://forums.ni.com/t5/LabVIEW-Idea-Exchange/Update-the-lvsound2-library-Sound-Input-Sound-Output-VIs-to/idi-p/2049098?profile.language=en) for details.*
+
 ### Audio Files
 Feature                      | G-Audio | [LabVIEW Sound](https://zone.ni.com/reference/en-XX/help/371361R-01/lvconcepts/soundvis/) | [LabVIEW Audio DataPlugin](https://www.ni.com/example/25044/en/)
 -----------------------------|---------------------|---------------------|-------------------------
@@ -54,19 +67,6 @@ Cross-platform               | :heavy_check_mark:  | :heavy_check_mark:⁴ | :x:
 
 ⁴ *While LabVIEW Sound is cross-platform, testing under macOS and Linux shows writing 32-bit IEEE Float is unsupported.*
 
-### Audio Devices
-Feature                       | G-Audio             | [LabVIEW Sound](https://zone.ni.com/reference/en-XX/help/371361R-01/lvconcepts/soundvis/) | [WaveIO](https://www.zeitnitz.eu/scms/waveio)
-------------------------------|---------------------|-------------------------|--------------
-Selectable backend            | :heavy_check_mark:  | :x:                     | :heavy_check_mark: (WASAPI, WinMM, ASIO)
-Cross-platform                | :heavy_check_mark:  | :heavy_check_mark:¹     | :x: (Windows only)
-Runtime device enumeration    | :heavy_check_mark:  | :x:²                    | :heavy_check_mark:
-Audio device playback         | :heavy_check_mark:  | :heavy_check_mark:      | :heavy_check_mark:
-Audio device capture          | :heavy_check_mark:  | :heavy_check_mark:      | :heavy_check_mark:
-
-¹ *The backend for Linux is OSS, which was deprecated in Linux kernel version 2.5 in favor of ALSA. OSS support is not included out-of-the-box by any of the Linux distributions supported by LabVIEW 2020.*
-
-² *LabVIEW Sound only enumerates devices when lvsound2.dll is loaded, and can't detect newly added or removed devices unless the entire library is unloaded and loaded again. See [this idea exchange entry](https://forums.ni.com/t5/LabVIEW-Idea-Exchange/Update-the-lvsound2-library-Sound-Input-Sound-Output-VIs-to/idi-p/2049098?profile.language=en) for details.*
-
 ## License
 This library is built using public domain audio decoders and libraries. As such, this library is also made available in the public domain. See [LICENSE](LICENSE) for details.
 
@@ -81,9 +81,9 @@ The `Playback Audio`, `Capture Audio`, `Audio File Read`, and `Audio File Write`
 ![Supported data types](images/g-audio-data-types.png?raw=true "Supported data types")
 
 #### Malleable VIs and broken wires
-If you have broken wires in to a malleable VI which you know shouldn't be broken, try hold Ctrl and click the run arrow. This will force LabVIEW to recompile the VI, and should hopefully fix those broken wires.
+If a malleable VI has broken wire inputs and errors about unsupported types, even though the type is supported, try hold Ctrl and click the run arrow. This will force LabVIEW to recompile the VI, and should hopefully fix those broken wires.
 
-## Playback and Capture
+## Playback and Capture Buffering
 The underlying mechanism for playback and capture is a callback made from the backend, where it requests the next block of audio data to be sent to the audio device, or the next available block read from the audio device.
 
 The diagram below shows the audio data flow during playback. The functions `Playback Audio.vim` and the backend callback run asynchronously. The ring buffer sits between the two, and keeps track of the next block of audio to be read (by the callback) and written (from LabVIEW). It's critical sufficient audio data is written to the ring buffer during playback, and read from the buffer during capture to ensure there are no audio glitches.
@@ -98,14 +98,14 @@ Period | 10ms of audio data (sample rate / 100). Typically 441 or 480 frames.
 
 ![The G-Audio library API](images/playback.png?raw=true "The G-Audio library API")
 
-The *period size* should be regarded as the minimum buffer size when configuring the audio device. Note that the size of *period* isn't fixed between calls to the callback routine, and depends on the underlying hardware and driver.
+The *period* size should be regarded as the minimum buffer size when configuring the audio device. Note that the number of frames requested in the callback routine isn't necessarily fixed, and can be larger than a single *period*.
 
 ## Compiling
 Under Windows, Microsoft Visual Studio Community 2019 is used to compile and test the DLL called by LabVIEW.
 
 Under macOS, XCode 11.5 is used to compile the shared framework.
 
-Under Linux, g++ is used to compile a shared object library with the command `g++ -shared -fPIC -o g_audio_x64.so *.cpp -lm -lpthread -ldl`.
+Under Linux, run the `make.sh` script to compile the shared object library, or manually compile with the command `g++ -shared -fPIC -o g_audio_x64.so *.cpp -lm -lpthread -ldl`.
 
 ## Libraries
 This library uses the following public domain libraries. Massive thanks to these authors.

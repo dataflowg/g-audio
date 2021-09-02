@@ -10,7 +10,7 @@ See g_audio.h for license details.
 //////////////////////
 // Global variables //
 //////////////////////
-ma_context* context = NULL;
+ma_context* global_context = NULL;
 
 ////////////////////////////
 // LabVIEW Audio File API //
@@ -1431,30 +1431,31 @@ extern "C" LV_DLL_EXPORT GA_RESULT configure_audio_device(uint16_t backend, cons
 	lock_ga_mutex(ga_mutex_context);
 	//// START CRITICAL SECTION ////
 	// Create a context if it doesn't exist.
-	if (context == NULL)
+	if (global_context == NULL)
 	{
-		context = (ma_context*)malloc(sizeof(ma_context));
-		if (context == NULL)
+		global_context = (ma_context*)malloc(sizeof(ma_context));
+		if (global_context == NULL)
 		{
 			unlock_ga_mutex(ga_mutex_context);
 			return GA_E_MEMORY;
 		}
 
 		ma_context_config context_config = ma_context_config_init();
-		context_config.threadPriority = ma_thread_priority_realtime;
+		// TODO: Make this configurable. Don't set it for now.
+		//context_config.threadPriority = ma_thread_priority_realtime;
 
 		// Can safely pass 1 as backendCount, as it's ignored when backends is NULL.
 		// The backends enum in LabVIEW adds Default after Null
-		result = ma_context_init((backend > ma_backend_null ? NULL : (ma_backend*)&backend), 1, &context_config, context);
+		result = ma_context_init((backend > ma_backend_null ? NULL : (ma_backend*)&backend), 1, &context_config, global_context);
 		if (result != MA_SUCCESS)
 		{
-			free(context);
-			context = NULL;
+			free(global_context);
+			global_context = NULL;
 			unlock_ga_mutex(ga_mutex_context);
 			return result + MA_ERROR_OFFSET;
 		}
 	}
-	else if ((backend <= ma_backend_null) && (context->backend != (ma_backend)backend))
+	else if ((backend <= ma_backend_null) && (global_context->backend != (ma_backend)backend))
 	{
 		unlock_ga_mutex(ga_mutex_context);
 		return GA_E_CONTEXT_BACKEND;
@@ -1472,6 +1473,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT configure_audio_device(uint16_t backend, cons
 		device_config.sampleRate = sample_rate;           // Set to 0 to use the device's native sample rate.
 		device_config.dataCallback = capture_callback;
 		device_config.stopCallback = stop_callback;
+		device_config.capture.channelMixMode = ma_channel_mix_mode_simple;
 		//config.wasapi.noAutoConvertSRC = true; // Enable low latency shared mode
 		device_config.capture.shareMode = exclusive_mode ? ma_share_mode_exclusive : ma_share_mode_shared;
 		break;
@@ -1482,6 +1484,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT configure_audio_device(uint16_t backend, cons
 		device_config.sampleRate = sample_rate;           // Set to 0 to use the device's native sample rate.
 		device_config.dataCallback = playback_callback;
 		device_config.stopCallback = stop_callback;
+		device_config.playback.channelMixMode = ma_channel_mix_mode_simple;
 		//config.wasapi.noAutoConvertSRC = true; // Enable low latency shared mode
 		device_config.playback.shareMode = exclusive_mode ? ma_share_mode_exclusive : ma_share_mode_shared;
 		break;
@@ -1493,7 +1496,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT configure_audio_device(uint16_t backend, cons
 		return GA_E_MEMORY;
 	}
 
-	result = ma_device_init(context, &device_config, &pDevice->device);
+	result = ma_device_init(global_context, &device_config, &pDevice->device);
 	if (result != MA_SUCCESS)
 	{
 		free(pDevice);
@@ -1924,11 +1927,11 @@ extern "C" LV_DLL_EXPORT GA_RESULT clear_audio_backend()
 	}
 
 	lock_ga_mutex(ga_mutex_context);
-	if (context != NULL)
+	if (global_context != NULL)
 	{
-		result = ma_context_uninit(context);
-		free(context);
-		context = NULL;
+		result = ma_context_uninit(global_context);
+		free(global_context);
+		global_context = NULL;
 	}
 	unlock_ga_mutex(ga_mutex_context);
 

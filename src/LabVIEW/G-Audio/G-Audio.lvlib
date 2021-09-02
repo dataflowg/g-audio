@@ -49,6 +49,7 @@ https://github.com/dataflowg/g-audio</Property>
 	</Item>
 	<Item Name="lib" Type="Folder">
 		<Item Name="g_audio_x64.dll" Type="Document" URL="../lib/g_audio_x64.dll"/>
+		<Item Name="g_audio_x64.so" Type="Document" URL="../lib/g_audio_x64.so"/>
 		<Item Name="g_audio_x86.dll" Type="Document" URL="../lib/g_audio_x86.dll"/>
 	</Item>
 	<Item Name="Private" Type="Folder">
