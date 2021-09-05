@@ -1,4 +1,4 @@
-<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2021-08-23 02:43:29" Creator="Dataflow_G" Comments="" ID="7fc4c201bc9aca188d2eb271e34aa21e">
+<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2021-09-05 09:43:19" Creator="Dataflow_G" Comments="" ID="bb23fe7d009661be80fe2202c849a8e2">
   <Library_General_Settings>
     <Package_File_Name>Dataflow_G_lib_G_Audio</Package_File_Name>
     <Library_Version>0.2.0.2</Library_Version>
@@ -277,7 +277,7 @@
         <Path>..\G-Audio\Examples</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>8550C1DDA30A0909C63E71EEC8ACD106</GUID>
+      <GUID>5403C02C488334CF5456A61EBB8C38B5</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -410,7 +410,7 @@
         <Path>..\G-Audio\Audio Files\Get Audio File Info.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>31ED478189865086E502A08C0219C1EB</GUID>
+      <GUID>BE68BFD64CB9379DD4D8B34BF514C6E0</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -571,7 +571,7 @@
         <Path>..\G-Audio\Audio Devices\Playback Wait.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>5B045C6D9468624AEA1B1F624A9BCFB9</GUID>
+      <GUID>0C5413672B07D07D52774B9B4F4CB060</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -676,7 +676,7 @@
         <Path>..\G-Audio\Examples\IEEE Float Compare Example.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>CE88B269FA0651927B35B130613ABF49</GUID>
+      <GUID>41DC2BC943AE4C7BCA943A84E19C3776</GUID>
     </Functions_Palette_Data>
   </Library_Palette_Definition>
 </VI_Package_Builder_Settings>
