@@ -1,22 +1,47 @@
 # G-Audio
 <p align="center">
-  <img width="300" height="115" src="g-audio-logo.png">
+  <img width="300" height="115" src="images/g-audio-logo.png">
 </p>
-A LabVIEW library for reading and writing audio files. Currently supports reading MP3, FLAC, Ogg Vorbis, and WAV encoded audio files, and writing WAV files. The library has 32-bit and 64-bit support, though only the decoders for FLAC and WAV utilize the full 64-bit address space.
+A cross-platform LabVIEW library for audio device playback and capture, and for reading and writing audio files.
+
+## What's New?
+* Audio playback and capture!
+    * Continuous audio input / output
+    * Multiple audio backends supported (WASAPI, DirectSound, Core Audio, PulseAudio, ALSA, etc)
+    * Simultaneous playback on multiple devices
+    * Enumerate audio devices on-the-fly ([a requested feature / bug of lvsound2](https://forums.ni.com/t5/LabVIEW-Idea-Exchange/Update-the-lvsound2-library-Sound-Input-Sound-Output-VIs-to/idi-p/2049098?profile.language=en))
 
 ## Features
+* Support for audio playback
+* Support for audio capture
+* Playback and capture using selectable backends (WASAPI, DirectSound, Core Audio, PulseAudio, ALSA, etc)
 * Support for reading MP3, FLAC, Ogg Vorbis, and WAV formats
 * Support for writing WAV (PCM, IEEE Float, with Sony Wave64 support for large files)
 * Internal UTF-8 path support
 * Cross-platform
+* 32-bit and 64-bit support
 * Thread-safe
 * Simple to use API
 
-![The G-Audio library API](g-audio-library.png?raw=true "The G-Audio library API")
+![The G-Audio library API](images/g-audio-palettes.png?raw=true "The G-Audio library API")
 
-The library is designed to be cross platform, with compiled libraries available for Windows and Linux. MacOS should also work (it builds with zig c++), but is untested.
+The library is designed to be cross platform, with compiled libraries available for Windows, macOS, and Linux.
 
 ## Comparison
+### Audio Playback & Capture
+Feature                       | G-Audio             | [LabVIEW Sound](https://zone.ni.com/reference/en-XX/help/371361R-01/lvconcepts/soundvis/) | [WaveIO](https://www.zeitnitz.eu/scms/waveio)
+------------------------------|---------------------|-------------------------|--------------
+Selectable backend            | :heavy_check_mark:  | :x:                     | :heavy_check_mark: (WASAPI, WinMM, ASIO)
+Cross-platform                | :heavy_check_mark:  | :heavy_check_mark:¹     | :x: (Windows only)
+Runtime device enumeration    | :heavy_check_mark:  | :x:²                    | :heavy_check_mark:
+Audio device playback         | :heavy_check_mark:  | :heavy_check_mark:      | :heavy_check_mark:
+Audio device capture          | :heavy_check_mark:  | :heavy_check_mark:      | :heavy_check_mark:
+
+¹ *The backend for Linux is OSS, which was deprecated in Linux kernel version 2.5 in favor of ALSA. OSS support is not included out-of-the-box by any of the Linux distributions supported by LabVIEW 2020.*
+
+² *LabVIEW Sound only enumerates devices when lvsound2.dll is loaded, and can't detect newly added or removed devices unless the entire library is unloaded and loaded again. See [this idea exchange entry](https://forums.ni.com/t5/LabVIEW-Idea-Exchange/Update-the-lvsound2-library-Sound-Input-Sound-Output-VIs-to/idi-p/2049098?profile.language=en) for details.*
+
+### Audio Files
 Feature                      | G-Audio | [LabVIEW Sound](https://zone.ni.com/reference/en-XX/help/371361R-01/lvconcepts/soundvis/) | [LabVIEW Audio DataPlugin](https://www.ni.com/example/25044/en/)
 -----------------------------|---------------------|---------------------|-------------------------
 Read WAV (PCM)               | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark:
@@ -32,7 +57,7 @@ Write WAV (64-bit Float)     | :heavy_check_mark:  | :x:                 | :x:
 Write Non-WAV formats        | :x:                 | :x:                 | :x:
 Large file support (>2GB)    | :heavy_check_mark:² | :x:                 | :x:
 UTF-8 path support           | :heavy_check_mark:³ | :x:                 | :x:
-Cross-platform               | :heavy_check_mark: (Win + Linux tested)   | :heavy_check_mark:⁴   | :x: (Windows only)
+Cross-platform               | :heavy_check_mark:  | :heavy_check_mark:⁴ | :x: (Windows only)
 
 ¹ *While LabVIEW Sound and LabVIEW Audio DataPlugin both support writing IEEE Float WAV files, writing the file and then reading it back shows they are **not** lossless. Both the read and write functions appear to be lossy (a file written by LV Sound and read with G-Audio will not be equal to the original data, as will a file written by G-Audio and read by LV Sound). dr_wav's (and by extension, G-Audio's) IEEE Float WAV write and read functions are lossless.*
 
@@ -40,7 +65,7 @@ Cross-platform               | :heavy_check_mark: (Win + Linux tested)   | :heav
 
 ³ *The underlying library supports UTF-8 paths, and is best used with LabVIEW NXG. Wrappers and workarounds for LabVIEW's unicode support may be added in future.*
 
-⁴ *While LabVIEW Sound is cross-platform, testing under Linux showed writing 32-bit IEEE Float didn't work.*
+⁴ *While LabVIEW Sound is cross-platform, testing under macOS and Linux shows writing 32-bit IEEE Float is unsupported.*
 
 ## License
 This library is built using public domain audio decoders and libraries. As such, this library is also made available in the public domain. See [LICENSE](LICENSE) for details.
@@ -51,19 +76,42 @@ See the example VIs in [Examples](src/LabVIEW/G-Audio/Examples) to write, read, 
 Unit tests are included and can be run individually, or with the [AST Unit Tester](https://www.autosofttech.net/documents/ast-unit-tester).
 
 ### Supported Data Types
-The `Audio File Read` and `Audio File Write` VIs are malleable, and accept waveform arrays, waveforms, 2D arrays, and 1D arrays with types U8, I16, I32, SGL, and DBL (20 combinations in total). All audio data is read in its native format, and then converted to the requested format if necessary. For WAV and FLAC files, any conversions are considered lossy, so check the file format before loading to ensure everything is lossless.
+The `Playback Audio`, `Capture Audio`, `Audio File Read`, and `Audio File Write` VIs are malleable, and accept waveform arrays, waveforms, 2D arrays, and 1D arrays with types U8, I16, I32, SGL, and DBL (20 combinations in total). All audio data is processed in its native format, and then converted to the requested format if necessary. For WAV and FLAC files, any conversions are considered lossy, so check the file format before loading to ensure everything is lossless.
 
-![Supported data types](g-audio-data-types.png?raw=true "Supported data types")
+![Supported data types](images/g-audio-data-types.png?raw=true "Supported data types")
+
+#### Malleable VIs and broken wires
+If a malleable VI has broken wire inputs and errors about unsupported types, even though the type is supported, try hold Ctrl and click the run arrow. This will force LabVIEW to recompile the VI, and should hopefully fix those broken wires.
+
+## Playback and Capture Buffering
+The underlying mechanism for playback and capture is a callback made from the backend, where it requests the next block of audio data to be sent to the audio device, or the next available block read from the audio device.
+
+The diagram below shows the audio data flow during playback. The functions `Playback Audio.vim` and the backend callback run asynchronously. The ring buffer sits between the two, and keeps track of the next block of audio to be read (by the callback) and written (from LabVIEW). It's critical sufficient audio data is written to the ring buffer during playback, and read from the buffer during capture to ensure there are no audio glitches.
+
+Definitions used when referring to the diagram:
+
+Term   | Definition
+-------|--------
+Sample | Single unit of audio data, typically an I16 or SGL
+Frame  | Group of samples equal to number of channels
+Period | 10ms of audio data (sample rate / 100). Typically 441 or 480 frames.
+
+![The G-Audio library API](images/playback.png?raw=true "The G-Audio library API")
+
+The *period* size should be regarded as the minimum buffer size when configuring the audio device. Note that the number of frames requested in the callback routine isn't necessarily fixed, and can be larger than a single *period*.
 
 ## Compiling
 Under Windows, Microsoft Visual Studio Community 2019 is used to compile and test the DLL called by LabVIEW.
 
-For Linux and MacOS, cross-compilation is performed from Windows using [zig c++](https://andrewkelley.me/post/zig-cc-powerful-drop-in-replacement-gcc-clang.html). Grab the [latest zig](https://ziglang.org/download/) and place a copy in `src\C++\zig`, then run the batch file [zig-make.bat](src/C%2B%2B/zig-make.bat). This will build the libraries and place them in `src\LabVIEW\G-Audio\lib`.
+Under macOS, XCode 11.5 is used to compile the shared framework.
+
+Under Linux, run the `make.sh` script to compile the shared object library, or manually compile with the command `g++ -shared -fPIC -o g_audio_x64.so *.cpp -lm -lpthread -ldl`.
 
 ## Libraries
-This library uses the following public domain libraries:
-* [minimp3](https://github.com/lieff/minimp3) by lieff
-* [stb_vorbis.c](https://github.com/nothings/stb) by nothings
+This library uses the following public domain libraries. Massive thanks to these authors.
+* [miniaudio.h](https://github.com/mackron/miniaudio) by mackron
 * [dr_flac.h](https://github.com/mackron/dr_libs) by mackron
 * [dr_wav.h](https://github.com/mackron/dr_libs) by mackron
+* [minimp3](https://github.com/lieff/minimp3) by lieff
+* [stb_vorbis.c](https://github.com/nothings/stb) by nothings
 * [thread.h](https://github.com/mattiasgustavsson/libs) by mattiasgustavsson
