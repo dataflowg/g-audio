@@ -29,6 +29,7 @@ https://github.com/dataflowg/g-audio</Property>
 		</Item>
 		<Item Name="Close Audio File.vi" Type="VI" URL="../Audio Files/Close Audio File.vi"/>
 		<Item Name="Get Audio File Info.vi" Type="VI" URL="../Audio Files/Get Audio File Info.vi"/>
+		<Item Name="Get Audio File Position.vi" Type="VI" URL="../Audio Files/Get Audio File Position.vi"/>
 		<Item Name="Open Audio File Read.vi" Type="VI" URL="../Audio Files/Open Audio File Read.vi"/>
 		<Item Name="Open Audio File Write.vi" Type="VI" URL="../Audio Files/Open Audio File Write.vi"/>
 		<Item Name="Quick Load Audio File.vi" Type="VI" URL="../Audio Files/Quick Load Audio File.vi"/>
