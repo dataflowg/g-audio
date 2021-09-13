@@ -16,57 +16,49 @@ ma_context* global_context = NULL;
 // LabVIEW Audio File API //
 ////////////////////////////
 
-extern "C" LV_DLL_EXPORT GA_RESULT get_audio_file_info(const char* codec, const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, uint32_t* bits_per_sample)
+extern "C" LV_DLL_EXPORT GA_RESULT get_audio_file_info(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, uint32_t* bits_per_sample, ga_codec* codec)
 {
-	if (!strcmp(codec, "flac"))
+	GA_RESULT result;
+
+	result = get_audio_file_codec(file_name, codec);
+
+	if (result != GA_SUCCESS)
 	{
-		return get_flac_info(file_name, num_frames, channels, sample_rate, bits_per_sample);
+		return result;
 	}
-	else if (!strcmp(codec, "mp3"))
+
+	switch (*codec)
 	{
-		return get_mp3_info(file_name, num_frames, channels, sample_rate, bits_per_sample);
-	}
-	else if (!strcmp(codec, "vorbis"))
-	{
-		return get_vorbis_info(file_name, num_frames, channels, sample_rate, bits_per_sample);
-	}
-	else if (!strcmp(codec, "wav"))
-	{
-		return get_wav_info(file_name, num_frames, channels, sample_rate, bits_per_sample);
-	}
-	else
-	{
-		return GA_E_UNSUPPORTED;
+		case ga_codec_flac: return get_flac_info(file_name, num_frames, channels, sample_rate, bits_per_sample); break;
+		case ga_codec_mp3: return get_mp3_info(file_name, num_frames, channels, sample_rate, bits_per_sample); break;
+		case ga_codec_vorbis: return get_vorbis_info(file_name, num_frames, channels, sample_rate, bits_per_sample); break;
+		case ga_codec_wav: return get_wav_info(file_name, num_frames, channels, sample_rate, bits_per_sample); break;
+		case ga_codec_unsupported: return GA_E_UNSUPPORTED;
+		default: break;
 	}
 
 	return GA_E_GENERIC;
 }
 
-extern "C" LV_DLL_EXPORT int16_t* load_audio_file_s16(const char* codec, const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, GA_RESULT* result)
+extern "C" LV_DLL_EXPORT int16_t* load_audio_file_s16(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, ga_codec* codec, GA_RESULT* result)
 {
 	int16_t* sample_data = NULL;
 
-	if (!strcmp(codec, "flac"))
+	*result = get_audio_file_codec(file_name, codec);
+
+	if (*result != GA_SUCCESS)
 	{
-		sample_data = load_flac(file_name, num_frames, channels, sample_rate, result);
-	}
-	else if (!strcmp(codec, "mp3"))
-	{
-		sample_data = load_mp3(file_name, num_frames, channels, sample_rate, result);
-	}
-	else if (!strcmp(codec, "vorbis"))
-	{
-		sample_data = load_vorbis(file_name, num_frames, channels, sample_rate, result);
-	}
-	else if (!strcmp(codec, "wav"))
-	{
-		sample_data = load_wav(file_name, num_frames, channels, sample_rate, result);
-	}
-	else
-	{
-		// Unsupported codec type
-		*result = GA_E_UNSUPPORTED;
 		return NULL;
+	}
+
+	switch (*codec)
+	{
+		case ga_codec_flac: sample_data = load_flac(file_name, num_frames, channels, sample_rate, result); break;
+		case ga_codec_mp3: sample_data = load_mp3(file_name, num_frames, channels, sample_rate, result); break;
+		case ga_codec_vorbis: sample_data = load_vorbis(file_name, num_frames, channels, sample_rate, result); break;
+		case ga_codec_wav: sample_data = load_wav(file_name, num_frames, channels, sample_rate, result); break;
+		case ga_codec_unsupported: *result = GA_E_UNSUPPORTED; break;
+		default: *result = GA_E_GENERIC; break;
 	}
 
 	if (*result != GA_SUCCESS)
@@ -83,8 +75,10 @@ extern "C" LV_DLL_EXPORT void free_sample_data(int16_t* buffer)
 	free(buffer);
 }
 
-extern "C" LV_DLL_EXPORT GA_RESULT open_audio_file(const char* codec, const char* file_name, int32_t* refnum)
+extern "C" LV_DLL_EXPORT GA_RESULT open_audio_file(const char* file_name, int32_t* refnum)
 {
+	GA_RESULT result;
+	ga_codec codec;
 	audio_file_codec* audio_file = (audio_file_codec*)malloc(sizeof(audio_file_codec));
 	if (audio_file == NULL)
 	{
@@ -92,65 +86,66 @@ extern "C" LV_DLL_EXPORT GA_RESULT open_audio_file(const char* codec, const char
 	}
 
 	audio_file->file_mode = ga_file_mode_read;
-#if defined(_WIN32)
-	strcpy_s(audio_file->codec_name, codec);
-#else
-	strncpy(audio_file->codec_name, codec, CODEC_NAME_LEN);
-	audio_file->codec_name[CODEC_NAME_LEN-1] = '\0';
-#endif
+
+	result = get_audio_file_codec(file_name, &codec);
+
+	if (result != GA_SUCCESS)
+	{
+		return result;
+	}
+
+	audio_file->codec = codec;
 	audio_file->decoder = NULL;
 	audio_file->encoder = NULL;
 	audio_file->read_offset = 0;
 
-	if (!strcmp(codec, "flac"))
+	switch (audio_file->codec)
 	{
-		audio_file->open = open_flac_file;
-		audio_file->get_basic_info = get_basic_flac_file_info;
-		audio_file->seek = seek_flac_file;
-		audio_file->read = read_flac_file;
-		audio_file->close = close_flac_file;
-		// These should never be called in read mode
-		audio_file->open_write = NULL;
-		audio_file->write = NULL;
-	}
-	else if (!strcmp(codec, "mp3"))
-	{
-		audio_file->open = open_mp3_file;
-		audio_file->get_basic_info = get_basic_mp3_file_info;
-		audio_file->seek = seek_mp3_file;
-		audio_file->read = read_mp3_file;
-		audio_file->close = close_mp3_file;
-		// These should never be called in read mode
-		audio_file->open_write = NULL;
-		audio_file->write = NULL;
-	}
-	else if (!strcmp(codec, "vorbis"))
-	{
-		audio_file->open = open_vorbis_file;
-		audio_file->get_basic_info = get_basic_vorbis_file_info;
-		audio_file->seek = seek_vorbis_file;
-		audio_file->read = read_vorbis_file;
-		audio_file->close = close_vorbis_file;
-		// These should never be called in read mode
-		audio_file->open_write = NULL;
-		audio_file->write = NULL;
-	}
-	else if (!strcmp(codec, "wav"))
-	{
-		audio_file->open = open_wav_file;
-		audio_file->get_basic_info = get_basic_wav_file_info;
-		audio_file->seek = seek_wav_file;
-		audio_file->read = read_wav_file;
-		audio_file->close = close_wav_file;
-		// These should never be called in read mode
-		audio_file->open_write = NULL;
-		audio_file->write = NULL;
-	}
-	else
-	{
-		free(audio_file);
-		audio_file = NULL;
-		return GA_E_UNSUPPORTED;
+		case ga_codec_flac:
+			audio_file->open = open_flac_file;
+			audio_file->get_basic_info = get_basic_flac_file_info;
+			audio_file->seek = seek_flac_file;
+			audio_file->read = read_flac_file;
+			audio_file->close = close_flac_file;
+			// These should never be called in read mode
+			audio_file->open_write = NULL;
+			audio_file->write = NULL;
+			break;
+		case ga_codec_mp3:
+			audio_file->open = open_mp3_file;
+			audio_file->get_basic_info = get_basic_mp3_file_info;
+			audio_file->seek = seek_mp3_file;
+			audio_file->read = read_mp3_file;
+			audio_file->close = close_mp3_file;
+			// These should never be called in read mode
+			audio_file->open_write = NULL;
+			audio_file->write = NULL;
+			break;
+		case ga_codec_vorbis:
+			audio_file->open = open_vorbis_file;
+			audio_file->get_basic_info = get_basic_vorbis_file_info;
+			audio_file->seek = seek_vorbis_file;
+			audio_file->read = read_vorbis_file;
+			audio_file->close = close_vorbis_file;
+			// These should never be called in read mode
+			audio_file->open_write = NULL;
+			audio_file->write = NULL;
+			break;
+		case ga_codec_wav:
+			audio_file->open = open_wav_file;
+			audio_file->get_basic_info = get_basic_wav_file_info;
+			audio_file->seek = seek_wav_file;
+			audio_file->read = read_wav_file;
+			audio_file->close = close_wav_file;
+			// These should never be called in read mode
+			audio_file->open_write = NULL;
+			audio_file->write = NULL;
+			break;
+		default:
+			free(audio_file);
+			audio_file = NULL;
+			return GA_E_UNSUPPORTED;
+			break;
 	}
 
 	if (audio_file->open == NULL)
@@ -184,7 +179,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT open_audio_file(const char* codec, const char
 	return GA_SUCCESS;
 }
 
-extern "C" LV_DLL_EXPORT GA_RESULT open_audio_file_write(const char* codec, const char* file_name, uint32_t channels, uint32_t sample_rate, uint32_t bits_per_sample, int32_t has_specific_info, void* codec_specific, int32_t* refnum)
+extern "C" LV_DLL_EXPORT GA_RESULT open_audio_file_write(const char* file_name, uint32_t channels, uint32_t sample_rate, uint32_t bits_per_sample, ga_codec codec, int32_t has_specific_info, void* codec_specific, int32_t* refnum)
 {
 	audio_file_codec* audio_file = (audio_file_codec*)malloc(sizeof(audio_file_codec));
 	if (audio_file == NULL)
@@ -193,32 +188,28 @@ extern "C" LV_DLL_EXPORT GA_RESULT open_audio_file_write(const char* codec, cons
 	}
 
 	audio_file->file_mode = ga_file_mode_write;
-#if defined(_WIN32)
-	strcpy_s(audio_file->codec_name, codec);
-#else
-	strncpy(audio_file->codec_name, codec, CODEC_NAME_LEN-1);
-	audio_file->codec_name[CODEC_NAME_LEN - 1] = '\0';
-#endif
+	audio_file->codec = codec;
 	audio_file->decoder = NULL;
 	audio_file->encoder = NULL;
 	audio_file->read_offset = 0;
 
-	if (!strcmp(codec, "wav"))
+	switch (audio_file->codec)
 	{
-		audio_file->open_write = open_wav_file_write;
-		audio_file->write = write_wav_file;
-		audio_file->close = close_wav_file;
-		// These should never be called in write mode
-		audio_file->open = NULL;
-		audio_file->get_basic_info = NULL;
-		audio_file->seek = NULL;
-		audio_file->read = NULL;
-	}
-	else
-	{
-		free(audio_file);
-		audio_file = NULL;
-		return GA_E_UNSUPPORTED;
+		case ga_codec_wav:
+			audio_file->open_write = open_wav_file_write;
+			audio_file->write = write_wav_file;
+			audio_file->close = close_wav_file;
+			// These should never be called in write mode
+			audio_file->open = NULL;
+			audio_file->get_basic_info = NULL;
+			audio_file->seek = NULL;
+			audio_file->read = NULL;
+			break;
+		default:
+			free(audio_file);
+			audio_file = NULL;
+			return GA_E_UNSUPPORTED;
+			break;
 	}
 
 	if (audio_file->open_write == NULL)
@@ -384,6 +375,69 @@ extern "C" LV_DLL_EXPORT GA_RESULT close_audio_file(int32_t refnum)
 	free(audio_file);
 	audio_file = NULL;
 
+	return GA_SUCCESS;
+}
+
+GA_RESULT get_audio_file_codec(const char* file_name, ga_codec* codec)
+{
+	FILE* pFile;
+
+	*codec = ga_codec_unsupported;
+
+#if defined(_WIN32) && defined(__STDC_WANT_SECURE_LIB__)
+	if (0 != _wfopen_s(&pFile, widen(file_name), L"rb"))
+		pFile = NULL;
+#elif defined(_WIN32)
+	pFile = _wfopen(widen(file_name), L"rb");
+#else
+	pFile = fopen(file_name, "rb");
+#endif
+	if (pFile == NULL)
+	{
+		return GA_E_FILE;
+	}
+
+	char signature[4];
+
+	fseek(pFile, 0, SEEK_SET);
+	fread(&signature, 1, sizeof(signature), pFile);
+	fclose(pFile);
+
+	// FLAC
+	if (!strncmp(signature, "fLaC", 4))
+	{
+		*codec = ga_codec_flac;
+	}
+	// MP3 (ID3v2)
+	else if (!strncmp(signature, "ID3", 3))
+	{
+		*codec = ga_codec_mp3;
+	}
+	// MP3 (no tag or ID3V1)
+	else if ((byte)signature[0] == 0xFF && ((byte)signature[1] == 0xFB || (byte)signature[1] == 0xF3 || (byte)signature[1] == 0xF2))
+	{
+		*codec = ga_codec_mp3;
+	}
+	// Ogg Vorbis
+	else if (!strncmp(signature, "OggS", 4))
+	{
+		*codec = ga_codec_vorbis;
+	}
+	// WAV (RIFF format)
+	else if (!strncmp(signature, "RIFF", 4))
+	{
+		*codec = ga_codec_wav;
+	}
+	// WAV (Wave64 format)
+	else if (!strncmp(signature, "riff", 4))
+	{
+		*codec = ga_codec_wav;
+	}
+	else
+	{
+		*codec = ga_codec_unsupported;
+		return GA_E_UNSUPPORTED;
+	}
 	return GA_SUCCESS;
 }
 

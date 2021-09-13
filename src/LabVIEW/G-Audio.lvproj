@@ -82,6 +82,10 @@
 		<Item Name="Unit Tests" Type="Folder">
 			<Item Name="Test Default Audio Device Capture.vi" Type="VI" URL="../Unit Tests/Test Default Audio Device Capture.vi"/>
 			<Item Name="Test Default Audio Device Playback.vi" Type="VI" URL="../Unit Tests/Test Default Audio Device Playback.vi"/>
+			<Item Name="Test File Info FLAC.vi" Type="VI" URL="../Unit Tests/Test File Info FLAC.vi"/>
+			<Item Name="Test File Info MP3.vi" Type="VI" URL="../Unit Tests/Test File Info MP3.vi"/>
+			<Item Name="Test File Info Vorbis.vi" Type="VI" URL="../Unit Tests/Test File Info Vorbis.vi"/>
+			<Item Name="Test File Info WAV.vi" Type="VI" URL="../Unit Tests/Test File Info WAV.vi"/>
 			<Item Name="Test Load FLAC.vi" Type="VI" URL="../Unit Tests/Test Load FLAC.vi"/>
 			<Item Name="Test Load MP3.vi" Type="VI" URL="../Unit Tests/Test Load MP3.vi"/>
 			<Item Name="Test Load Vorbis.vi" Type="VI" URL="../Unit Tests/Test Load Vorbis.vi"/>

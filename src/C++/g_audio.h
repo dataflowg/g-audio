@@ -133,6 +133,15 @@ typedef int32_t GA_RESULT;
 
 typedef enum
 {
+	ga_codec_flac = 0,
+	ga_codec_mp3,
+	ga_codec_vorbis,
+	ga_codec_wav,
+	ga_codec_unsupported
+} ga_codec;
+
+typedef enum
+{
 	ga_file_mode_closed = 0,
 	ga_file_mode_read,
 	ga_file_mode_write
@@ -155,7 +164,7 @@ typedef struct
 {
 	int32_t refnum;
 	thread_mutex_t mutex;
-	char codec_name[CODEC_NAME_LEN];
+	ga_codec codec;
 	ga_file_mode file_mode;
 	void* decoder;
 	void* encoder;
@@ -183,15 +192,15 @@ typedef struct
 ////////////////////////////
 
 // Get detailed audio file information. Requires decoding some audio files (mp3).
-extern "C" LV_DLL_EXPORT GA_RESULT get_audio_file_info(const char* codec, const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, uint32_t* bits_per_sample);
+extern "C" LV_DLL_EXPORT GA_RESULT get_audio_file_info(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, uint32_t* bits_per_sample, ga_codec* codec);
 // Load an entire audio file and return data in interleaved 16-bit integer format. Data returned by this function must be freed with free_sample_data().
-extern "C" LV_DLL_EXPORT int16_t* load_audio_file_s16(const char* codec, const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, GA_RESULT* result);
+extern "C" LV_DLL_EXPORT int16_t* load_audio_file_s16(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, ga_codec* codec, GA_RESULT* result);
 // Frees the memory allocated during a file load operation.
 extern "C" LV_DLL_EXPORT void free_sample_data(int16_t* buffer);
 // Opens an audio file in read mode. Call close_audio_file() to free memory related to the refnum.
-extern "C" LV_DLL_EXPORT GA_RESULT open_audio_file(const char* codec, const char* file_name, int32_t* refnum);
+extern "C" LV_DLL_EXPORT GA_RESULT open_audio_file(const char* file_name, int32_t* refnum);
 // Opens an audio file in write mode. Call close_audio_file() to free memory related to the refnum.
-extern "C" LV_DLL_EXPORT GA_RESULT open_audio_file_write(const char* codec, const char* file_name, uint32_t channels, uint32_t sample_rate, uint32_t bits_per_sample, int32_t has_specific_info, void* codec_specific, int32_t * refnum);
+extern "C" LV_DLL_EXPORT GA_RESULT open_audio_file_write(const char* file_name, uint32_t channels, uint32_t sample_rate, uint32_t bits_per_sample, ga_codec codec, int32_t has_specific_info, void* codec_specific, int32_t* refnum);
 // Get basic audio file information. More detailed info can be accessed using get_audio_file_info().
 extern "C" LV_DLL_EXPORT GA_RESULT get_basic_audio_file_info(int32_t refnum, uint32_t* channels, uint32_t* sample_rate, uint64_t* read_offset);
 // Updates the file offset to the specified offset. Subsequent reads will be at the new offset.
@@ -203,6 +212,9 @@ extern "C" LV_DLL_EXPORT GA_RESULT read_audio_file(int32_t refnum, uint64_t fram
 extern "C" LV_DLL_EXPORT GA_RESULT write_audio_file(int32_t refnum, uint64_t frames_to_write, void* input_buffer, uint64_t* frames_written);
 // Close the audio file and release any resources allocated in the refnum.
 extern "C" LV_DLL_EXPORT GA_RESULT close_audio_file(int32_t refnum);
+
+// Determine the codec of the audio file
+GA_RESULT get_audio_file_codec(const char* file_name, ga_codec* codec);
 
 //////////////////////////////
 // LabVIEW Audio Device API //
