@@ -25,14 +25,16 @@ https://github.com/dataflowg/g-audio</Property>
 	</Item>
 	<Item Name="Audio Files" Type="Folder">
 		<Item Name="Polymorphic VIs" Type="Folder">
+			<Property Name="NI.SortType" Type="Int">3</Property>
 			<Item Name="Open Audio File Write (WAV).vi" Type="VI" URL="../Audio Files/Polymorphic VIs/Open Audio File Write (WAV).vi"/>
+			<Item Name="Open Audio File Write (WAV) (UTF-8).vi" Type="VI" URL="../Audio Files/Polymorphic VIs/Open Audio File Write (WAV) (UTF-8).vi"/>
 		</Item>
 		<Item Name="Close Audio File.vi" Type="VI" URL="../Audio Files/Close Audio File.vi"/>
-		<Item Name="Get Audio File Info.vi" Type="VI" URL="../Audio Files/Get Audio File Info.vi"/>
+		<Item Name="Get Audio File Info.vim" Type="VI" URL="../Audio Files/Get Audio File Info.vim"/>
 		<Item Name="Get Audio File Position.vi" Type="VI" URL="../Audio Files/Get Audio File Position.vi"/>
-		<Item Name="Open Audio File Read.vi" Type="VI" URL="../Audio Files/Open Audio File Read.vi"/>
+		<Item Name="Open Audio File Read.vim" Type="VI" URL="../Audio Files/Open Audio File Read.vim"/>
 		<Item Name="Open Audio File Write.vi" Type="VI" URL="../Audio Files/Open Audio File Write.vi"/>
-		<Item Name="Quick Load Audio File.vi" Type="VI" URL="../Audio Files/Quick Load Audio File.vi"/>
+		<Item Name="Quick Load Audio File.vim" Type="VI" URL="../Audio Files/Quick Load Audio File.vim"/>
 		<Item Name="Read Audio File.vim" Type="VI" URL="../Audio Files/Read Audio File.vim"/>
 		<Item Name="Seek Audio File.vi" Type="VI" URL="../Audio Files/Seek Audio File.vi"/>
 		<Item Name="Write Audio File.vim" Type="VI" URL="../Audio Files/Write Audio File.vim"/>
@@ -50,6 +52,18 @@ https://github.com/dataflowg/g-audio</Property>
 		<Item Name="WAV Data Format.ctl" Type="VI" URL="../Controls/WAV Data Format.ctl"/>
 	</Item>
 	<Item Name="lib" Type="Folder">
+		<Item Name="g_audio_x64.framework" Type="Folder">
+			<Item Name="Headers" Type="Folder">
+				<Item Name="xcode.h" Type="Document" URL="../lib/g_audio_x64.framework/Headers/xcode.h"/>
+			</Item>
+			<Item Name="Resources" Type="Folder">
+				<Item Name="g_audio" Type="Folder">
+					<Item Name="Info.plist" Type="Document" URL="../lib/g_audio_x64.framework/Resources/g_audio/Info.plist"/>
+				</Item>
+				<Item Name="Info.plist" Type="Document" URL="../lib/g_audio_x64.framework/Resources/Info.plist"/>
+			</Item>
+			<Item Name="g_audio_x64" Type="Document" URL="../lib/g_audio_x64.framework/g_audio_x64"/>
+		</Item>
 		<Item Name="g_audio_x64.dll" Type="Document" URL="../lib/g_audio_x64.dll"/>
 		<Item Name="g_audio_x64.so" Type="Document" URL="../lib/g_audio_x64.so"/>
 		<Item Name="g_audio_x86.dll" Type="Document" URL="../lib/g_audio_x86.dll"/>
@@ -65,10 +79,9 @@ https://github.com/dataflowg/g-audio</Property>
 		<Item Name="Get Audio Data Type.vim" Type="VI" URL="../Private/Get Audio Data Type.vim"/>
 		<Item Name="Get Audio Device Info.vi" Type="VI" URL="../Private/Get Audio Device Info.vi"/>
 		<Item Name="Get Basic Audio File Info.vi" Type="VI" URL="../Private/Get Basic Audio File Info.vi"/>
-		<Item Name="Get Codec.vi" Type="VI" URL="../Private/Get Codec.vi"/>
 		<Item Name="Get Configured Audio Device Info.vi" Type="VI" URL="../Private/Get Configured Audio Device Info.vi"/>
-		<Item Name="Get File Extension (Reentrant).vi" Type="VI" URL="../Private/Get File Extension (Reentrant).vi"/>
 		<Item Name="Interleaved Sample Data To Audio Data.vim" Type="VI" URL="../Private/Interleaved Sample Data To Audio Data.vim"/>
+		<Item Name="Path To UTF-8 String.vim" Type="VI" URL="../Private/Path To UTF-8 String.vim"/>
 		<Item Name="Result To Error.vi" Type="VI" URL="../Private/Result To Error.vi"/>
 	</Item>
 </Library>

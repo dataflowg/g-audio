@@ -100,6 +100,7 @@
 			<Item Name="Test Seek Position MP3.vi" Type="VI" URL="../Unit Tests/Test Seek Position MP3.vi"/>
 			<Item Name="Test Seek Position Vorbis.vi" Type="VI" URL="../Unit Tests/Test Seek Position Vorbis.vi"/>
 			<Item Name="Test Seek Position WAV.vi" Type="VI" URL="../Unit Tests/Test Seek Position WAV.vi"/>
+			<Item Name="Test Unicode Path UTF8.vi" Type="VI" URL="../Unit Tests/Test Unicode Path UTF8.vi"/>
 			<Item Name="Waveform Array In Range Comparison.vim" Type="VI" URL="../Unit Tests/Waveform Array In Range Comparison.vim"/>
 		</Item>
 		<Item Name="G-Audio.lvlib" Type="Library" URL="../G-Audio/G-Audio.lvlib"/>

@@ -17,7 +17,7 @@ A cross-platform LabVIEW library for audio device playback and capture, and for 
 * Playback and capture using selectable backends (WASAPI, DirectSound, Core Audio, PulseAudio, ALSA, etc)
 * Support for reading MP3, FLAC, Ogg Vorbis, and WAV formats
 * Support for writing WAV (PCM, IEEE Float, with Sony Wave64 support for large files)
-* Internal UTF-8 path support
+* UTF-8 path support
 * Cross-platform
 * 32-bit and 64-bit support
 * Thread-safe
@@ -61,9 +61,9 @@ Cross-platform               | :heavy_check_mark:  | :heavy_check_mark:⁴ | :x:
 
 ¹ *While LabVIEW Sound and LabVIEW Audio DataPlugin both support writing IEEE Float WAV files, writing the file and then reading it back shows they are **not** lossless. Both the read and write functions appear to be lossy (a file written by LV Sound and read with G-Audio will not be equal to the original data, as will a file written by G-Audio and read by LV Sound). dr_wav's (and by extension, G-Audio's) IEEE Float WAV write and read functions are lossless.*
 
-² *64-bit version of LabVIEW required*
+² *64-bit version of LabVIEW required.*
 
-³ *The underlying library supports UTF-8 paths, and is best used with LabVIEW NXG. Wrappers and workarounds for LabVIEW's unicode support may be added in future.*
+³ *The path must be a UTF-8 encoded string type (not path type) when passed to the Path input of the audio file functions. LabVIEW's file dialog and path controls don't support unicode, so getting the UTF-8 path into LabVIEW will require additional effort. String controls do support unicode with the `UseUnicode=TRUE` flag in **labview.ini** but are encoded as UTF-16 LE, so will require conversion to UTF-8 before use with G-Audio.*
 
 ⁴ *While LabVIEW Sound is cross-platform, testing under macOS and Linux shows writing 32-bit IEEE Float is unsupported.*
 
@@ -71,7 +71,7 @@ Cross-platform               | :heavy_check_mark:  | :heavy_check_mark:⁴ | :x:
 This library is built using public domain audio decoders and libraries. As such, this library is also made available in the public domain. See [LICENSE](LICENSE) for details.
 
 ## Usage
-See the example VIs in [Examples](src/LabVIEW/G-Audio/Examples) to write, read, and playback audio files.
+See the example VIs in [Examples](src/LabVIEW/G-Audio/Examples) to write, read, playback, and capture audio files.
 
 Unit tests are included and can be run individually, or with the [AST Unit Tester](https://www.autosofttech.net/documents/ast-unit-tester).
 

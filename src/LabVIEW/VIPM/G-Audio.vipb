@@ -1,7 +1,7 @@
-<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2021-09-07 16:03:21" Creator="Dataflow_G" Comments="" ID="e72b249d7fce5dcd2b9b0e45bbceecac">
+<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2021-09-14 05:32:46" Creator="Dataflow_G" Comments="" ID="2672272243bc96df20d0ba64a74eaf26">
   <Library_General_Settings>
     <Package_File_Name>Dataflow_G_lib_G_Audio</Package_File_Name>
-    <Library_Version>0.2.0.2</Library_Version>
+    <Library_Version>0.2.1.1</Library_Version>
     <Auto_Increment_Version>false</Auto_Increment_Version>
     <Library_Source_Folder>..</Library_Source_Folder>
     <Library_Output_Folder>.</Library_Output_Folder>
@@ -36,18 +36,20 @@
 * Playback and capture using selectable backends (WASAPI, DirectSound, Core Audio, PulseAudio, ALSA, etc)
 * Support for reading MP3, FLAC, Ogg Vorbis, and WAV formats
 * Support for writing WAV (PCM, IEEE Float, with Sony Wave64 support for large files)
-* Internal UTF-8 path support
+* UTF-8 path support
 * Cross-platform
 * Thread-safe
 * Simple to use API</Description>
       <Copyright>Public domain</Copyright>
       <Packager/>
       <URL>https://github.com/dataflowg/g-audio</URL>
-      <Release_Notes>- Audio playback and capture!
-    - Continuous audio input and output
-    - Multiple audio backends supported (WASAPI, DirectSound, Core Audio, PulseAudio, ALSA, etc)
-    - Simultaneous playback and capture on multiple devices
-    - Enumerate audio devices on-the-fly</Release_Notes>
+      <Release_Notes>* Added `Get Audio File Position.vi` (issue #2)
+* Codec detection based on file signature (issue #3)
+* UTF-8 strings can be used as the path when opening files
+* Added `Open Audio File Write (WAV) (UTF-8).vi` to polymorphic VI `Open Audio File Write.vi`
+* API Changes
+    * Removed Codec input from `Open Audio File Read`, `Quick Load Audio File`, `Get Audio File Info`
+    * `Open Audio File Read`, `Quick Load Audio File`, `Get Audio File Info` are now malleable, accepting path type or string type as the Path input to support UTF-8 string paths</Release_Notes>
     </Description>
     <Destinations>
       <Toolkit_VIs>
@@ -277,7 +279,7 @@
         <Path>..\G-Audio\Examples</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>D956F9B5D397EAE23B8866074FD18CD8</GUID>
+      <GUID>63D08E3EF5BFB1095D83679F8748C17C</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -329,34 +331,6 @@
       <Items_Data>
         <Type>Item</Type>
         <Sub_Palette_Index>-1</Sub_Palette_Index>
-        <NameSub_Menu_Name>Open Audio File Read.vi</NameSub_Menu_Name>
-        <Short_Name/>
-        <is_Merge_VI>false</is_Merge_VI>
-        <Position>
-          <Row>1</Row>
-          <Column>1</Column>
-        </Position>
-        <Icon>00000000</Icon>
-        <Path>..\G-Audio\Audio Files\Open Audio File Read.vi</Path>
-        <VI_Title/>
-      </Items_Data>
-      <Items_Data>
-        <Type>Item</Type>
-        <Sub_Palette_Index>-1</Sub_Palette_Index>
-        <NameSub_Menu_Name>Read Audio File.vim</NameSub_Menu_Name>
-        <Short_Name/>
-        <is_Merge_VI>false</is_Merge_VI>
-        <Position>
-          <Row>1</Row>
-          <Column>2</Column>
-        </Position>
-        <Icon>00000000</Icon>
-        <Path>..\G-Audio\Audio Files\Read Audio File.vim</Path>
-        <VI_Title/>
-      </Items_Data>
-      <Items_Data>
-        <Type>Item</Type>
-        <Sub_Palette_Index>-1</Sub_Palette_Index>
         <NameSub_Menu_Name>Seek Audio File.vi</NameSub_Menu_Name>
         <Short_Name/>
         <is_Merge_VI>false</is_Merge_VI>
@@ -385,34 +359,6 @@
       <Items_Data>
         <Type>Item</Type>
         <Sub_Palette_Index>-1</Sub_Palette_Index>
-        <NameSub_Menu_Name>Quick Load Audio File.vi</NameSub_Menu_Name>
-        <Short_Name/>
-        <is_Merge_VI>false</is_Merge_VI>
-        <Position>
-          <Row>3</Row>
-          <Column>1</Column>
-        </Position>
-        <Icon>00000000</Icon>
-        <Path>..\G-Audio\Audio Files\Quick Load Audio File.vi</Path>
-        <VI_Title/>
-      </Items_Data>
-      <Items_Data>
-        <Type>Item</Type>
-        <Sub_Palette_Index>-1</Sub_Palette_Index>
-        <NameSub_Menu_Name>Get Audio File Info.vi</NameSub_Menu_Name>
-        <Short_Name/>
-        <is_Merge_VI>false</is_Merge_VI>
-        <Position>
-          <Row>3</Row>
-          <Column>2</Column>
-        </Position>
-        <Icon>00000000</Icon>
-        <Path>..\G-Audio\Audio Files\Get Audio File Info.vi</Path>
-        <VI_Title/>
-      </Items_Data>
-      <Items_Data>
-        <Type>Item</Type>
-        <Sub_Palette_Index>-1</Sub_Palette_Index>
         <NameSub_Menu_Name>Get Audio File Position.vi</NameSub_Menu_Name>
         <Short_Name/>
         <is_Merge_VI>false</is_Merge_VI>
@@ -424,7 +370,63 @@
         <Path>..\G-Audio\Audio Files\Get Audio File Position.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>C727F3219FBCC7BC197D41302F2C8D54</GUID>
+      <Items_Data>
+        <Type>Item</Type>
+        <Sub_Palette_Index>-1</Sub_Palette_Index>
+        <NameSub_Menu_Name>Open Audio File Read.vim</NameSub_Menu_Name>
+        <Short_Name/>
+        <is_Merge_VI>false</is_Merge_VI>
+        <Position>
+          <Row>1</Row>
+          <Column>1</Column>
+        </Position>
+        <Icon>00000000</Icon>
+        <Path>..\G-Audio\Audio Files\Open Audio File Read.vim</Path>
+        <VI_Title/>
+      </Items_Data>
+      <Items_Data>
+        <Type>Item</Type>
+        <Sub_Palette_Index>-1</Sub_Palette_Index>
+        <NameSub_Menu_Name>Read Audio File.vim</NameSub_Menu_Name>
+        <Short_Name/>
+        <is_Merge_VI>false</is_Merge_VI>
+        <Position>
+          <Row>1</Row>
+          <Column>2</Column>
+        </Position>
+        <Icon>00000000</Icon>
+        <Path>..\G-Audio\Audio Files\Read Audio File.vim</Path>
+        <VI_Title/>
+      </Items_Data>
+      <Items_Data>
+        <Type>Item</Type>
+        <Sub_Palette_Index>-1</Sub_Palette_Index>
+        <NameSub_Menu_Name>Quick Load Audio File.vim</NameSub_Menu_Name>
+        <Short_Name/>
+        <is_Merge_VI>false</is_Merge_VI>
+        <Position>
+          <Row>3</Row>
+          <Column>1</Column>
+        </Position>
+        <Icon>00000000</Icon>
+        <Path>..\G-Audio\Audio Files\Quick Load Audio File.vim</Path>
+        <VI_Title/>
+      </Items_Data>
+      <Items_Data>
+        <Type>Item</Type>
+        <Sub_Palette_Index>-1</Sub_Palette_Index>
+        <NameSub_Menu_Name>Get Audio File Info.vim</NameSub_Menu_Name>
+        <Short_Name/>
+        <is_Merge_VI>false</is_Merge_VI>
+        <Position>
+          <Row>3</Row>
+          <Column>2</Column>
+        </Position>
+        <Icon>00000000</Icon>
+        <Path>..\G-Audio\Audio Files\Get Audio File Info.vim</Path>
+        <VI_Title/>
+      </Items_Data>
+      <GUID>25AE2B3C39E21589097D9298D7FCB9BE</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -585,7 +587,7 @@
         <Path>..\G-Audio\Audio Devices\Playback Wait.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>C5FDC870FB934F42D69B01A554861AAC</GUID>
+      <GUID>1783F00330EC0B84BC09EEB8456E5964</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -690,7 +692,7 @@
         <Path>..\G-Audio\Examples\IEEE Float Compare Example.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>E241BBA0B018B54DD51EC5280E023C5C</GUID>
+      <GUID>E86A3B1B5E85A831A48ABD00C47793CE</GUID>
     </Functions_Palette_Data>
   </Library_Palette_Definition>
 </VI_Package_Builder_Settings>
