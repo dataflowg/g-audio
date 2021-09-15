@@ -51,23 +51,6 @@ https://github.com/dataflowg/g-audio</Property>
 		<Item Name="WAV Container Format.ctl" Type="VI" URL="../Controls/WAV Container Format.ctl"/>
 		<Item Name="WAV Data Format.ctl" Type="VI" URL="../Controls/WAV Data Format.ctl"/>
 	</Item>
-	<Item Name="lib" Type="Folder">
-		<Item Name="g_audio_x64.framework" Type="Folder">
-			<Item Name="Headers" Type="Folder">
-				<Item Name="xcode.h" Type="Document" URL="../lib/g_audio_x64.framework/Headers/xcode.h"/>
-			</Item>
-			<Item Name="Resources" Type="Folder">
-				<Item Name="g_audio" Type="Folder">
-					<Item Name="Info.plist" Type="Document" URL="../lib/g_audio_x64.framework/Resources/g_audio/Info.plist"/>
-				</Item>
-				<Item Name="Info.plist" Type="Document" URL="../lib/g_audio_x64.framework/Resources/Info.plist"/>
-			</Item>
-			<Item Name="g_audio_x64" Type="Document" URL="../lib/g_audio_x64.framework/g_audio_x64"/>
-		</Item>
-		<Item Name="g_audio_x64.dll" Type="Document" URL="../lib/g_audio_x64.dll"/>
-		<Item Name="g_audio_x64.so" Type="Document" URL="../lib/g_audio_x64.so"/>
-		<Item Name="g_audio_x86.dll" Type="Document" URL="../lib/g_audio_x86.dll"/>
-	</Item>
 	<Item Name="Private" Type="Folder">
 		<Property Name="NI.LibItem.Scope" Type="Int">2</Property>
 		<Item Name="Assert Supported Audio Type.vim" Type="VI" URL="../Private/Assert Supported Audio Type.vim"/>
