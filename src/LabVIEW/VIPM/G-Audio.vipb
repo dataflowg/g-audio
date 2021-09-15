@@ -1,7 +1,7 @@
-<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2021-09-15 03:09:03" Creator="Dataflow_G" Comments="" ID="58af0213ac55e28ded8d608e788eaf5f">
+<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2021-09-15 03:23:13" Creator="Dataflow_G" Comments="" ID="5cdf87f8e71c7f1603753b7f1b88f949">
   <Library_General_Settings>
     <Package_File_Name>Dataflow_G_lib_G_Audio</Package_File_Name>
-    <Library_Version>0.2.1.1</Library_Version>
+    <Library_Version>0.2.1.2</Library_Version>
     <Auto_Increment_Version>false</Auto_Increment_Version>
     <Library_Source_Folder>..</Library_Source_Folder>
     <Library_Output_Folder>.</Library_Output_Folder>
@@ -279,7 +279,7 @@
         <Path>..\G-Audio\Examples</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>48F19DE1338E88DAD197901C89229EB3</GUID>
+      <GUID>572BA56F19D2773437AC544EBDEE45FA</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -426,7 +426,7 @@
         <Path>..\G-Audio\Audio Files\Get Audio File Info.vim</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>0D5C1E8289EDD8370574F72CDC7F5D7A</GUID>
+      <GUID>AE741D848D4B971FF8134FA16D1BFDE0</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -587,7 +587,7 @@
         <Path>..\G-Audio\Audio Devices\Playback Wait.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>58817D22A56AB63BA0DA1C55D1DBF419</GUID>
+      <GUID>1B0DAEFDAA99628A97611906B4D788C5</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -692,7 +692,7 @@
         <Path>..\G-Audio\Examples\IEEE Float Compare Example.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>517ABA9E24B829E1F460DD290414D99B</GUID>
+      <GUID>B8F0A57F85D3D2E6039994254979C9C6</GUID>
     </Functions_Palette_Data>
   </Library_Palette_Definition>
 </VI_Package_Builder_Settings>

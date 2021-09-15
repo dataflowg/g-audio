@@ -414,7 +414,7 @@ GA_RESULT get_audio_file_codec(const char* file_name, ga_codec* codec)
 		*codec = ga_codec_mp3;
 	}
 	// MP3 (no tag or ID3V1)
-	else if ((byte)signature[0] == 0xFF && ((byte)signature[1] == 0xFB || (byte)signature[1] == 0xF3 || (byte)signature[1] == 0xF2))
+	else if ((uint8_t)signature[0] == 0xFF && ((uint8_t)signature[1] == 0xFB || (uint8_t)signature[1] == 0xF3 || (uint8_t)signature[1] == 0xF2))
 	{
 		*codec = ga_codec_mp3;
 	}
