@@ -1,4 +1,4 @@
-<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2021-09-15 03:23:13" Creator="Dataflow_G" Comments="" ID="5cdf87f8e71c7f1603753b7f1b88f949">
+<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2021-09-21 14:07:39" Creator="Dataflow_G" Comments="" ID="e73cba08c4546f44f7d8d831c7ac0cd4">
   <Library_General_Settings>
     <Package_File_Name>Dataflow_G_lib_G_Audio</Package_File_Name>
     <Library_Version>0.2.1.2</Library_Version>
@@ -43,13 +43,13 @@
       <Copyright>Public domain</Copyright>
       <Packager/>
       <URL>https://github.com/dataflowg/g-audio</URL>
-      <Release_Notes>* Added `Get Audio File Position.vi` (issue #2)
-* Codec detection based on file signature (issue #3)
+      <Release_Notes>* Added `Get Audio File Position.vi`
+* Codec detection based on file signature
 * UTF-8 strings can be used as the path when opening files
-* Added `Open Audio File Write (WAV) (UTF-8).vi` to polymorphic VI `Open Audio File Write.vi`
+* Fix misc. malleable VI issues
 * API Changes
-    * Removed Codec input from `Open Audio File Read`, `Quick Load Audio File`, `Get Audio File Info`
-    * `Open Audio File Read`, `Quick Load Audio File`, `Get Audio File Info` are now malleable, accepting path type or string type as the Path input to support UTF-8 string paths</Release_Notes>
+    * Removed Codec input from `Open Audio File Read.vi`, `Quick Load Audio File.vi`, `Get Audio File Info.vi`
+    * `Open Audio File Read.vi`, `Quick Load Audio File.vi`, `Get Audio File Info.vi` are now polymorphic</Release_Notes>
     </Description>
     <Destinations>
       <Toolkit_VIs>
@@ -279,7 +279,7 @@
         <Path>..\G-Audio\Examples</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>572BA56F19D2773437AC544EBDEE45FA</GUID>
+      <GUID>A246276474B44BF8414456E611325DD7</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -373,7 +373,7 @@
       <Items_Data>
         <Type>Item</Type>
         <Sub_Palette_Index>-1</Sub_Palette_Index>
-        <NameSub_Menu_Name>Open Audio File Read.vim</NameSub_Menu_Name>
+        <NameSub_Menu_Name>Open Audio File Read.vi</NameSub_Menu_Name>
         <Short_Name/>
         <is_Merge_VI>false</is_Merge_VI>
         <Position>
@@ -381,7 +381,7 @@
           <Column>1</Column>
         </Position>
         <Icon>00000000</Icon>
-        <Path>..\G-Audio\Audio Files\Open Audio File Read.vim</Path>
+        <Path>..\G-Audio\Audio Files\Open Audio File Read.vi</Path>
         <VI_Title/>
       </Items_Data>
       <Items_Data>
@@ -401,7 +401,7 @@
       <Items_Data>
         <Type>Item</Type>
         <Sub_Palette_Index>-1</Sub_Palette_Index>
-        <NameSub_Menu_Name>Quick Load Audio File.vim</NameSub_Menu_Name>
+        <NameSub_Menu_Name>Quick Load Audio File.vi</NameSub_Menu_Name>
         <Short_Name/>
         <is_Merge_VI>false</is_Merge_VI>
         <Position>
@@ -409,13 +409,13 @@
           <Column>1</Column>
         </Position>
         <Icon>00000000</Icon>
-        <Path>..\G-Audio\Audio Files\Quick Load Audio File.vim</Path>
+        <Path>..\G-Audio\Audio Files\Quick Load Audio File.vi</Path>
         <VI_Title/>
       </Items_Data>
       <Items_Data>
         <Type>Item</Type>
         <Sub_Palette_Index>-1</Sub_Palette_Index>
-        <NameSub_Menu_Name>Get Audio File Info.vim</NameSub_Menu_Name>
+        <NameSub_Menu_Name>Get Audio File Info.vi</NameSub_Menu_Name>
         <Short_Name/>
         <is_Merge_VI>false</is_Merge_VI>
         <Position>
@@ -423,10 +423,10 @@
           <Column>2</Column>
         </Position>
         <Icon>00000000</Icon>
-        <Path>..\G-Audio\Audio Files\Get Audio File Info.vim</Path>
+        <Path>..\G-Audio\Audio Files\Get Audio File Info.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>AE741D848D4B971FF8134FA16D1BFDE0</GUID>
+      <GUID>12D018D6B5A94A712D088C5BB511820A</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -587,7 +587,7 @@
         <Path>..\G-Audio\Audio Devices\Playback Wait.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>1B0DAEFDAA99628A97611906B4D788C5</GUID>
+      <GUID>AD24AA1E013320F8237204A58347C14C</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -692,7 +692,7 @@
         <Path>..\G-Audio\Examples\IEEE Float Compare Example.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>B8F0A57F85D3D2E6039994254979C9C6</GUID>
+      <GUID>8C9B3BE26B62D82570EECF49E6A359C8</GUID>
     </Functions_Palette_Data>
   </Library_Palette_Definition>
 </VI_Package_Builder_Settings>
