@@ -1,4 +1,4 @@
-<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2021-09-21 14:07:39" Creator="Dataflow_G" Comments="" ID="e73cba08c4546f44f7d8d831c7ac0cd4">
+<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2021-09-22 02:37:06" Creator="Dataflow_G" Comments="" ID="839dca75478feea8b148e9cfbe1eda46">
   <Library_General_Settings>
     <Package_File_Name>Dataflow_G_lib_G_Audio</Package_File_Name>
     <Library_Version>0.2.1.2</Library_Version>
@@ -27,7 +27,7 @@
     </Custom_Action_VIs>
     <VI_Package_Configuration_File>G-Audio.vipc</VI_Package_Configuration_File>
     <Description>
-      <One_Line_Description_Summary>An audio library for LabVIEW.</One_Line_Description_Summary>
+      <One_Line_Description_Summary>A LabVIEW audio library.</One_Line_Description_Summary>
       <Description>A cross-platform LabVIEW library for audio device playback and capture, and for reading and writing audio files.
 
 &lt;b&gt;Features:&lt;/b&gt;
@@ -36,9 +36,8 @@
 * Playback and capture using selectable backends (WASAPI, DirectSound, Core Audio, PulseAudio, ALSA, etc)
 * Support for reading MP3, FLAC, Ogg Vorbis, and WAV formats
 * Support for writing WAV (PCM, IEEE Float, with Sony Wave64 support for large files)
-* UTF-8 path support
-* Cross-platform
-* Thread-safe
+* Unicode path support (UTF-8)
+* Cross-platform, 32-bit and 64-bit
 * Simple to use API</Description>
       <Copyright>Public domain</Copyright>
       <Packager/>
@@ -279,7 +278,7 @@
         <Path>..\G-Audio\Examples</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>A246276474B44BF8414456E611325DD7</GUID>
+      <GUID>E5B8BB7BD422E233A9E3C5C3ECD5E27B</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -426,7 +425,7 @@
         <Path>..\G-Audio\Audio Files\Get Audio File Info.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>12D018D6B5A94A712D088C5BB511820A</GUID>
+      <GUID>D9CFB0B21D621348512F25059EF51BEA</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -587,7 +586,7 @@
         <Path>..\G-Audio\Audio Devices\Playback Wait.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>AD24AA1E013320F8237204A58347C14C</GUID>
+      <GUID>24F3C297371FC8FE59A4DA2E01BA80E0</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -692,7 +691,7 @@
         <Path>..\G-Audio\Examples\IEEE Float Compare Example.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>8C9B3BE26B62D82570EECF49E6A359C8</GUID>
+      <GUID>7483665FC62B6E4261AF124DF59CC699</GUID>
     </Functions_Palette_Data>
   </Library_Palette_Definition>
 </VI_Package_Builder_Settings>
