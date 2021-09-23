@@ -1,5 +1,5 @@
 # G-Audio Release History
-### v0.2.1 - 2021-09
+### v0.2.1 - 2021-09-23
 * Added `Get Audio File Position.vi` (issue #2)
 * Codec detection based on file signature (issue #3)
 * UTF-8 strings can be used as the path when opening files
