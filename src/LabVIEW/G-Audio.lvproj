@@ -90,6 +90,8 @@
 			<Item Name="Test Load MP3.vi" Type="VI" URL="../Unit Tests/Test Load MP3.vi"/>
 			<Item Name="Test Load Vorbis.vi" Type="VI" URL="../Unit Tests/Test Load Vorbis.vi"/>
 			<Item Name="Test Load WAV.vi" Type="VI" URL="../Unit Tests/Test Load WAV.vi"/>
+			<Item Name="Test Minimal Audio Device Capture.vi" Type="VI" URL="../Unit Tests/Test Minimal Audio Device Capture.vi"/>
+			<Item Name="Test Minimal Audio Device Playback.vi" Type="VI" URL="../Unit Tests/Test Minimal Audio Device Playback.vi"/>
 			<Item Name="Test Open Read Close FLAC.vi" Type="VI" URL="../Unit Tests/Test Open Read Close FLAC.vi"/>
 			<Item Name="Test Open Read Close MP3.vi" Type="VI" URL="../Unit Tests/Test Open Read Close MP3.vi"/>
 			<Item Name="Test Open Read Close Vorbis.vi" Type="VI" URL="../Unit Tests/Test Open Read Close Vorbis.vi"/>

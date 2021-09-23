@@ -1638,8 +1638,6 @@ extern "C" LV_DLL_EXPORT GA_RESULT get_configured_audio_device_info(int32_t refn
 
 extern "C" LV_DLL_EXPORT GA_RESULT start_audio_device(int32_t refnum)
 {
-	ma_result result;
-
 	audio_device* pDevice = (audio_device*)get_reference_data(ga_refnum_audio_device, refnum);
 
 	if (pDevice == NULL)
@@ -1647,23 +1645,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT start_audio_device(int32_t refnum)
 		return GA_E_REFNUM;
 	}
 
-	switch (ma_device_get_state(&pDevice->device))
-	{
-		case MA_STATE_STARTING:
-		case MA_STATE_STARTED:
-			return GA_SUCCESS;
-			break;
-		default:
-			break;
-	}
-
-	result = ma_device_start(&pDevice->device);
-	if (result != MA_SUCCESS)
-	{
-		return result + MA_ERROR_OFFSET;
-	}
-
-	return GA_SUCCESS;
+	return check_and_start_audio_device(&pDevice->device);
 }
 
 extern "C" LV_DLL_EXPORT GA_RESULT playback_audio(int32_t refnum, void* buffer, int32_t num_frames, ga_data_type audio_type)
@@ -1747,6 +1729,12 @@ extern "C" LV_DLL_EXPORT GA_RESULT playback_audio(int32_t refnum, void* buffer, 
 		return GA_E_MEMORY;
 	}
 
+	result = check_and_start_audio_device(&pDevice->device);
+	if (result != GA_SUCCESS)
+	{
+		return result;
+	}
+
 	while ((ma_pcm_rb_available_write(&pDevice->buffer) < num_frames) && ma_device_is_started(&pDevice->device))
 	{
 		Sleep(1);
@@ -1821,6 +1809,12 @@ extern "C" LV_DLL_EXPORT GA_RESULT capture_audio(int32_t refnum, void* buffer, i
 	if (conversion_buffer == NULL)
 	{
 		return GA_E_MEMORY;
+	}
+
+	result = check_and_start_audio_device(&pDevice->device);
+	if (result != GA_SUCCESS)
+	{
+		return result;
 	}
 
 	while ((ma_pcm_rb_available_read(&pDevice->buffer) < numFrames) && ma_device_is_started(&pDevice->device))
@@ -2039,7 +2033,6 @@ void playback_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma
 		}
 	} while (pcmFramesProcessed < frameCount);
 
-	/* Unused in this example. */
 	(void)pInput;
 }
 
@@ -2082,11 +2075,38 @@ void capture_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_
 		}
 	} while (pcmFramesProcessed < frameCount);
 
-	/* Unused in this example. */
 	(void)pOutput;
 }
 
 void stop_callback(ma_device* pDevice)
 {
 	// ma_pcm_rb_reset((ma_pcm_rb*)pDevice->pUserData);
+}
+
+inline ma_bool32 device_is_started(ma_device* pDevice)
+{
+	ma_uint32 state;
+	state = ma_device_get_state(pDevice);
+	return (state == MA_STATE_STARTED) || (state == MA_STATE_STARTING);
+}
+
+inline GA_RESULT check_and_start_audio_device(ma_device* pDevice)
+{
+	ma_result result;
+
+	if (pDevice == NULL)
+	{
+		return GA_E_REFNUM;
+	}
+
+	if (!device_is_started(pDevice))
+	{
+		result = ma_device_start(pDevice);
+		if (result != MA_SUCCESS)
+		{
+			return result + MA_ERROR_OFFSET;
+		}
+	}
+
+	return GA_SUCCESS;
 }

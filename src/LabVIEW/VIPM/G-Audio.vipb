@@ -1,4 +1,4 @@
-<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2021-09-22 02:37:06" Creator="Dataflow_G" Comments="" ID="839dca75478feea8b148e9cfbe1eda46">
+<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2021-09-23 07:31:24" Creator="Dataflow_G" Comments="" ID="ae3bcd3d1b314dac2fcb6c3a28d1be7e">
   <Library_General_Settings>
     <Package_File_Name>Dataflow_G_lib_G_Audio</Package_File_Name>
     <Library_Version>0.2.1.2</Library_Version>
@@ -45,6 +45,7 @@
       <Release_Notes>* Added `Get Audio File Position.vi`
 * Codec detection based on file signature
 * UTF-8 strings can be used as the path when opening files
+* Automatically start audio device during playback and capture
 * Fix misc. malleable VI issues
 * API Changes
     * Removed Codec input from `Open Audio File Read.vi`, `Quick Load Audio File.vi`, `Get Audio File Info.vi`
@@ -278,7 +279,7 @@
         <Path>..\G-Audio\Examples</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>E5B8BB7BD422E233A9E3C5C3ECD5E27B</GUID>
+      <GUID>D01F1D06AF1CA8A24CBF9951328C78F4</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -425,7 +426,7 @@
         <Path>..\G-Audio\Audio Files\Get Audio File Info.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>D9CFB0B21D621348512F25059EF51BEA</GUID>
+      <GUID>BE4159C44E8E0B4E2D40E0F5037C6044</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -586,7 +587,7 @@
         <Path>..\G-Audio\Audio Devices\Playback Wait.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>24F3C297371FC8FE59A4DA2E01BA80E0</GUID>
+      <GUID>795595631BB25B55A624C3B7F1F94769</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -691,7 +692,7 @@
         <Path>..\G-Audio\Examples\IEEE Float Compare Example.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>7483665FC62B6E4261AF124DF59CC699</GUID>
+      <GUID>650DC63154568E841EC611F850B5BE17</GUID>
     </Functions_Palette_Data>
   </Library_Palette_Definition>
 </VI_Package_Builder_Settings>

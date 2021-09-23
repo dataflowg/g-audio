@@ -247,6 +247,8 @@ extern "C" LV_DLL_EXPORT GA_RESULT clear_audio_backend();
 void playback_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount);
 void capture_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount);
 void stop_callback(ma_device* pDevice);
+inline ma_bool32 device_is_started(ma_device* pDevice);
+inline GA_RESULT check_and_start_audio_device(ma_device* pDevice);
 
 /////////////////////////
 // FLAC codec wrappers //

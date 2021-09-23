@@ -4,6 +4,7 @@
 * Codec detection based on file signature (issue #3)
 * UTF-8 strings can be used as the path when opening files
     * LabVIEW's unicode support treats strings as UTF-16 LE, so will require a conversion
+* Automatically start audio device during playback and capture (issue #7)
 * Fix misc. malleable VI issues (issue #4, #6)
 
 ##### API Changes
