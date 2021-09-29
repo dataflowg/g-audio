@@ -939,10 +939,6 @@ int mp3dec_load_cb_no_decode(mp3dec_t *dec, mp3dec_io_t *io, uint8_t *buf, size_
 		break;
 	} while (1);
 	size_t allocated = MINIMP3_MAX_SAMPLES_PER_FRAME * sizeof(mp3d_sample_t);
-	if (detected_samples)
-		allocated += detected_samples * sizeof(mp3d_sample_t);
-	else
-		allocated += (buf_size / frame_info.frame_bytes)*samples * sizeof(mp3d_sample_t);
 	info->buffer = (mp3d_sample_t*)malloc(allocated);
 	if (!info->buffer)
 		return MP3D_E_MEMORY;
@@ -954,14 +950,6 @@ int mp3dec_load_cb_no_decode(mp3dec_t *dec, mp3dec_io_t *io, uint8_t *buf, size_
 	size_t avg_bitrate_kbps = 0, frames = 0;
 	do
 	{
-		if ((allocated - info->samples * sizeof(mp3d_sample_t)) < MINIMP3_MAX_SAMPLES_PER_FRAME * sizeof(mp3d_sample_t))
-		{
-			allocated *= 2;
-			mp3d_sample_t *alloc_buf = (mp3d_sample_t*)realloc(info->buffer, allocated);
-			if (!alloc_buf)
-				return MP3D_E_MEMORY;
-			info->buffer = alloc_buf;
-		}
 		if (io)
 		{
 			if (!eof && filled - consumed < MINIMP3_BUF_SIZE)
@@ -976,12 +964,12 @@ int mp3dec_load_cb_no_decode(mp3dec_t *dec, mp3dec_io_t *io, uint8_t *buf, size_
 				if (eof)
 					mp3dec_skip_id3v1(buf, &filled);
 			}
-			samples = mp3dec_decode_frame_no_decode(dec, buf + consumed, filled - consumed, info->buffer + info->samples, &frame_info);
+			samples = mp3dec_decode_frame_no_decode(dec, buf + consumed, filled - consumed, info->buffer, &frame_info);
 			consumed += frame_info.frame_bytes;
 		}
 		else
 		{
-			samples = mp3dec_decode_frame_no_decode(dec, buf, MINIMP3_MIN(buf_size, (size_t)INT_MAX), info->buffer + info->samples, &frame_info);
+			samples = mp3dec_decode_frame_no_decode(dec, buf, MINIMP3_MIN(buf_size, (size_t)INT_MAX), info->buffer, &frame_info);
 			buf += frame_info.frame_bytes;
 			buf_size -= frame_info.frame_bytes;
 		}
@@ -1007,7 +995,6 @@ int mp3dec_load_cb_no_decode(mp3dec_t *dec, mp3dec_io_t *io, uint8_t *buf, size_
 				size_t skip = MINIMP3_MIN(samples, to_skip);
 				to_skip -= skip;
 				samples -= skip;
-				memmove(info->buffer, info->buffer + skip, samples * sizeof(mp3d_sample_t));
 			}
 			info->samples += samples;
 			avg_bitrate_kbps += frame_info.bitrate_kbps;
@@ -1023,13 +1010,6 @@ int mp3dec_load_cb_no_decode(mp3dec_t *dec, mp3dec_io_t *io, uint8_t *buf, size_
 	if (detected_samples && info->samples > detected_samples)
 		info->samples = detected_samples; /* cut padding */
 										  /* reallocate to normal buffer size */
-	if (allocated != info->samples * sizeof(mp3d_sample_t))
-	{
-		mp3d_sample_t *alloc_buf = (mp3d_sample_t*)realloc(info->buffer, info->samples * sizeof(mp3d_sample_t));
-		if (!alloc_buf && info->samples)
-			return MP3D_E_MEMORY;
-		info->buffer = alloc_buf;
-	}
 	if (frames)
 		info->avg_bitrate_kbps = avg_bitrate_kbps / frames;
 	return ret;
