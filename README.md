@@ -68,6 +68,11 @@ Cross-platform               | :heavy_check_mark:  | :heavy_check_mark:⁴ | :x:
 ## License
 This library is built using public domain audio decoders and libraries. As such, this library is also made available in the public domain. See [LICENSE](LICENSE) for details.
 
+## Installation
+G-Audio is published on [vipm.io](https://www.vipm.io/package/dataflow_g_lib_g_audio/), and can be installed using VI Package Manager (VIPM). The packages are also available as [github releases](https://github.com/dataflowg/g-audio/releases) and can be installed manually using VIPM.
+
+If you want to include the library directly in your project, download or clone the repo and place the [G-Audio folder](https://github.com/dataflowg/g-audio/tree/main/src/LabVIEW/G-Audio) in your source directory, then add `G-Audio.lvlib` to your LabVIEW project.
+
 ## Usage
 See the example VIs in [Examples](src/LabVIEW/G-Audio/Examples) to write, read, playback, and capture audio files.
 
