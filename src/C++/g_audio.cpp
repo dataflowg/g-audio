@@ -1524,6 +1524,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT configure_audio_device(uint16_t backend_in, c
 	switch (device_config.deviceType)
 	{
 	case ma_device_type_capture:
+	case ma_device_type_loopback:
 		device_config.capture.format = (ma_format)format;   // Set to ma_format_unknown to use the device's native format.
 		device_config.capture.channels = channels;               // Set to 0 to use the device's native channel count.
 		device_config.capture.pDeviceID = memcmp(&deviceId, &blank_device_id, sizeof(ma_device_id)) != 0 ? &deviceId : NULL;
@@ -1566,6 +1567,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT configure_audio_device(uint16_t backend_in, c
 	switch (device_config.deviceType)
 	{
 	case ma_device_type_capture:
+	case ma_device_type_loopback:
 		device_format_init = pDevice->device.capture.format;
 		device_channels_init = pDevice->device.capture.channels;
 		device_internal_buffer_size = pDevice->device.capture.internalPeriodSizeInFrames;
@@ -1620,6 +1622,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT get_configured_audio_device_info(int32_t refn
 	switch (pDevice->device.type)
 	{
 	case ma_device_type_capture:
+	case ma_device_type_loopback:
 		*format = pDevice->device.capture.format;
 		*channels = pDevice->device.capture.channels;
 		*sample_rate = pDevice->device.sampleRate;
@@ -1793,7 +1796,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT capture_audio(int32_t refnum, void* buffer, i
 		return GA_E_REFNUM;
 	}
 
-	if (pDevice->device.type != ma_device_type_capture)
+	if (!(pDevice->device.type == ma_device_type_capture || pDevice->device.type == ma_device_type_loopback))
 	{
 		return GA_E_CAPTURE_MODE;
 	}
