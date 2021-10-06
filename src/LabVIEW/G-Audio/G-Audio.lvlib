@@ -66,6 +66,14 @@ https://github.com/dataflowg/g-audio</Property>
 		<Item Name="WAV Container Format.ctl" Type="VI" URL="../Controls/WAV Container Format.ctl"/>
 		<Item Name="WAV Data Format.ctl" Type="VI" URL="../Controls/WAV Data Format.ctl"/>
 	</Item>
+	<Item Name="Mixer" Type="Folder">
+		<Item Name="Channel" Type="Folder">
+			<Item Name="Channel.lvclass" Type="LVClass" URL="../Mixer/Channel/Channel.lvclass"/>
+		</Item>
+		<Item Name="Mixer" Type="Folder">
+			<Item Name="Mixer.lvclass" Type="LVClass" URL="../Mixer/Mixer/Mixer.lvclass"/>
+		</Item>
+	</Item>
 	<Item Name="Private" Type="Folder">
 		<Property Name="NI.LibItem.Scope" Type="Int">2</Property>
 		<Item Name="Assert Supported Audio Type.vim" Type="VI" URL="../Private/Assert Supported Audio Type.vim"/>
@@ -74,6 +82,8 @@ https://github.com/dataflowg/g-audio</Property>
 		<Item Name="Audio Data Type Enum.ctl" Type="VI" URL="../Private/Audio Data Type Enum.ctl"/>
 		<Item Name="Copy Data.vi" Type="VI" URL="../Private/Copy Data.vi"/>
 		<Item Name="Debug Path.vi" Type="VI" URL="../Private/Debug Path.vi"/>
+		<Item Name="DVR Read.vim" Type="VI" URL="../Private/DVR Read.vim"/>
+		<Item Name="DVR Write.vim" Type="VI" URL="../Private/DVR Write.vim"/>
 		<Item Name="Get Audio Data Type.vim" Type="VI" URL="../Private/Get Audio Data Type.vim"/>
 		<Item Name="Get Audio Device Info.vi" Type="VI" URL="../Private/Get Audio Device Info.vi"/>
 		<Item Name="Get Basic Audio File Info.vi" Type="VI" URL="../Private/Get Basic Audio File Info.vi"/>
