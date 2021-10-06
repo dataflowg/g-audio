@@ -1,7 +1,7 @@
-<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2021-10-06 04:55:26" Creator="Dataflow_G" Comments="" ID="7b32ed62a89e2951a1331c1f5278e8e4">
+<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2021-10-06 16:59:31" Creator="Dataflow_G" Comments="" ID="5fd8f3c63ff17a6c9899e92ce47d3ee2">
   <Library_General_Settings>
     <Package_File_Name>Dataflow_G_lib_G_Audio</Package_File_Name>
-    <Library_Version>0.3.0.2</Library_Version>
+    <Library_Version>0.3.0.4</Library_Version>
     <Auto_Increment_Version>false</Auto_Increment_Version>
     <Library_Source_Folder>..</Library_Source_Folder>
     <Library_Output_Folder>.</Library_Output_Folder>
@@ -273,7 +273,7 @@
         <Path>..\G-Audio\Examples</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>B9A10A9337FB466CA14541B26434CB97</GUID>
+      <GUID>993B2E5267DD1C3C1DA9B5463183FFED</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -420,7 +420,7 @@
         <Path>..\G-Audio\Audio Files\Get Audio File Info.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>DA554DD48C5AFDC121F80D5023887DB8</GUID>
+      <GUID>07EA4FE50E8642203047671E08EC634D</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -581,7 +581,7 @@
         <Path>..\G-Audio\Audio Devices\Playback Wait.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>375B4EB761EE764046379F68347CDF69</GUID>
+      <GUID>9670DB2DD78A210EBC85E0C6F634FD60</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -728,7 +728,7 @@
         <Path>..\G-Audio\Examples\Write Audio File Example.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>D4E91E98385C234F45A9494278A2CE36</GUID>
+      <GUID>86748906E1709ADD345468561B811596</GUID>
     </Functions_Palette_Data>
   </Library_Palette_Definition>
 </VI_Package_Builder_Settings>

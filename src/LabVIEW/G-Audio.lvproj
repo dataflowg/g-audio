@@ -173,8 +173,7 @@
 				<Item Name="Synchronize Data Flow.vim" Type="VI" URL="/&lt;vilib&gt;/Utility/Synchronize Data Flow.vim"/>
 				<Item Name="System Directory Type.ctl" Type="VI" URL="/&lt;vilib&gt;/Utility/sysdir.llb/System Directory Type.ctl"/>
 			</Item>
-			<Item Name="g_audio_x64.dll" Type="Document" URL="../G-Audio/lib/g_audio_x64.dll"/>
-			<Item Name="g_audio_x86.dll" Type="Document" URL="../G-Audio/lib/g_audio_x86.dll"/>
+			<Item Name="g_audio_32.dll" Type="Document" URL="../G-Audio/lib/g_audio_32.dll"/>
 			<Item Name="lvanlys.dll" Type="Document" URL="/&lt;resource&gt;/lvanlys.dll"/>
 			<Item Name="lvsound2.dll" Type="Document" URL="/&lt;resource&gt;/lvsound2.dll"/>
 		</Item>
