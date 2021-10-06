@@ -13,6 +13,16 @@ See g_audio.h for license details.
 ma_context* global_context = NULL;
 
 ////////////////////////////
+// LabVIEW CLFN Callbacks //
+////////////////////////////
+
+extern "C" LV_DLL_EXPORT int32_t clfn_abort(void* data)
+{
+	clear_audio_backend();
+	return 0;
+}
+
+////////////////////////////
 // LabVIEW Audio File API //
 ////////////////////////////
 

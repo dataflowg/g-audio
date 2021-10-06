@@ -1,7 +1,7 @@
 /*
 G-Audio - An audio library for LabVIEW.
 
-v0.2.0
+v0.3.0
 
 This code implements a wrapper library around the following libraries:
 dr_flac and dr_wav - https://github.com/mackron/dr_libs
@@ -19,6 +19,10 @@ Twitter - https://twitter.com/Dataflow_G
 /////////////
 // HISTORY //
 /////////////
+v0.3.0
+- Loopback support
+- CLFN abort callback
+
 v0.2.0
 - Audio device playback and capture via miniaudio
 - Update dr_flac, dr_wav, minimp3, stb_vorbis libraries
@@ -186,6 +190,10 @@ typedef struct
 	ma_int32 buffer_size;
 } audio_device;
 
+////////////////////////////
+// LabVIEW CLFN Callbacks //
+////////////////////////////
+extern "C" LV_DLL_EXPORT int32_t clfn_abort(void* data);
 
 ////////////////////////////
 // LabVIEW Audio File API //
