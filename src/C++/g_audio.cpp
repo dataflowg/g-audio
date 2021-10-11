@@ -1661,7 +1661,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT start_audio_device(int32_t refnum)
 	return check_and_start_audio_device(&pDevice->device);
 }
 
-extern "C" LV_DLL_EXPORT GA_RESULT playback_audio(int32_t refnum, void* buffer, int32_t num_frames, ga_data_type audio_type)
+extern "C" LV_DLL_EXPORT GA_RESULT playback_audio(int32_t refnum, void* buffer, int32_t num_frames, uint32_t channels, ga_data_type audio_type)
 {
 	ma_result result;
 	ma_uint32 framesToWrite = num_frames;
@@ -1671,6 +1671,8 @@ extern "C" LV_DLL_EXPORT GA_RESULT playback_audio(int32_t refnum, void* buffer, 
 	void* pWriteBuffer;
 	int i = 0;
 	audio_device* pDevice = (audio_device*)get_reference_data(ga_refnum_audio_device, refnum);
+	void* output_buffer = buffer;
+	ma_bool32 passthrough = true;
 
 	if (pDevice == NULL)
 	{
@@ -1687,59 +1689,122 @@ extern "C" LV_DLL_EXPORT GA_RESULT playback_audio(int32_t refnum, void* buffer, 
 		return GA_E_BUFFER_SIZE;
 	}
 
-	void* conversion_buffer = NULL;
-	uint64_t num_channel_samples = num_frames * pDevice->device.playback.channels;
-
-	switch (audio_type)
+	if (!((audio_type == ga_data_type_u8 && pDevice->device.playback.format == ma_format_u8) ||
+		(audio_type == ga_data_type_i16 && pDevice->device.playback.format == ma_format_s16) ||
+		(audio_type == ga_data_type_i32 && pDevice->device.playback.format == ma_format_s32) ||
+		(audio_type == ga_data_type_float && pDevice->device.playback.format == ma_format_f32)))
 	{
-	case ga_data_type_u8:
-		conversion_buffer = malloc(num_channel_samples * ma_get_bytes_per_sample(pDevice->device.playback.format));
-		ma_pcm_convert(conversion_buffer, pDevice->device.playback.format, buffer, ma_format_u8, num_channel_samples, ma_dither_mode_none);
-		break;
-	case ga_data_type_i16:
-		conversion_buffer = malloc(num_channel_samples * ma_get_bytes_per_sample(pDevice->device.playback.format));
-		ma_pcm_convert(conversion_buffer, pDevice->device.playback.format, buffer, ma_format_s16, num_channel_samples, ma_dither_mode_none);
-		break;
-	case ga_data_type_i32:
-		conversion_buffer = malloc(num_channel_samples * ma_get_bytes_per_sample(pDevice->device.playback.format));
-		ma_pcm_convert(conversion_buffer, pDevice->device.playback.format, buffer, ma_format_s32, num_channel_samples, ma_dither_mode_none);
-		break;
-	case ga_data_type_float:
-		conversion_buffer = malloc(num_channel_samples * ma_get_bytes_per_sample(pDevice->device.playback.format));
-		ma_pcm_convert(conversion_buffer, pDevice->device.playback.format, buffer, ma_format_f32, num_channel_samples, ma_dither_mode_none);
-		break;
-	case ga_data_type_double:
-		switch (pDevice->device.playback.format)
+		void* conversion_buffer = NULL;
+		uint64_t num_channel_samples = num_frames * channels;
+
+		switch (audio_type)
 		{
-		case ma_format_u8:
-			conversion_buffer = malloc(num_channel_samples * sizeof(uint8_t));
-			f64_to_u8((uint8_t*)conversion_buffer, (double*)buffer, num_channel_samples);
-			break;
-		case ma_format_s16:
-			conversion_buffer = malloc(num_channel_samples * sizeof(int16_t));
-			f64_to_s16((int16_t*)conversion_buffer, (double*)buffer, num_channel_samples);
-			break;
-		case ma_format_s32:
-			conversion_buffer = malloc(num_channel_samples * sizeof(int32_t));
-			f64_to_s32((int32_t*)conversion_buffer, (double*)buffer, num_channel_samples);
-			break;
-		case ma_format_f32:
-			conversion_buffer = malloc(num_channel_samples * sizeof(float));
-			f64_to_f32((float*)conversion_buffer, (double*)buffer, num_channel_samples);
-			break;
-		default:
-			return GA_E_INVALID_TYPE;
-			break;
+			case ga_data_type_u8:
+				conversion_buffer = malloc(num_channel_samples * ma_get_bytes_per_sample(pDevice->device.playback.format));
+				ma_pcm_convert(conversion_buffer, pDevice->device.playback.format, output_buffer, ma_format_u8, num_channel_samples, ma_dither_mode_none);
+				break;
+			case ga_data_type_i16:
+				conversion_buffer = malloc(num_channel_samples * ma_get_bytes_per_sample(pDevice->device.playback.format));
+				ma_pcm_convert(conversion_buffer, pDevice->device.playback.format, output_buffer, ma_format_s16, num_channel_samples, ma_dither_mode_none);
+				break;
+			case ga_data_type_i32:
+				conversion_buffer = malloc(num_channel_samples * ma_get_bytes_per_sample(pDevice->device.playback.format));
+				ma_pcm_convert(conversion_buffer, pDevice->device.playback.format, output_buffer, ma_format_s32, num_channel_samples, ma_dither_mode_none);
+				break;
+			case ga_data_type_float:
+				conversion_buffer = malloc(num_channel_samples * ma_get_bytes_per_sample(pDevice->device.playback.format));
+				ma_pcm_convert(conversion_buffer, pDevice->device.playback.format, output_buffer, ma_format_f32, num_channel_samples, ma_dither_mode_none);
+				break;
+			case ga_data_type_double:
+				switch (pDevice->device.playback.format)
+				{
+				case ma_format_u8:
+					conversion_buffer = malloc(num_channel_samples * sizeof(uint8_t));
+					f64_to_u8((uint8_t*)conversion_buffer, (double*)output_buffer, num_channel_samples);
+					break;
+				case ma_format_s16:
+					conversion_buffer = malloc(num_channel_samples * sizeof(int16_t));
+					f64_to_s16((int16_t*)conversion_buffer, (double*)output_buffer, num_channel_samples);
+					break;
+				case ma_format_s32:
+					conversion_buffer = malloc(num_channel_samples * sizeof(int32_t));
+					f64_to_s32((int32_t*)conversion_buffer, (double*)output_buffer, num_channel_samples);
+					break;
+				case ma_format_f32:
+					conversion_buffer = malloc(num_channel_samples * sizeof(float));
+					f64_to_f32((float*)conversion_buffer, (double*)output_buffer, num_channel_samples);
+					break;
+				default:
+					return GA_E_INVALID_TYPE;
+					break;
+				}
+				break;
+			default:
+				return GA_E_INVALID_TYPE;
+				break;
 		}
-		break;
-	default:
-		return GA_E_INVALID_TYPE;
-		break;
+
+		if (conversion_buffer == NULL)
+		{
+			return GA_E_MEMORY;
+		}
+
+		output_buffer = conversion_buffer;
+		conversion_buffer = NULL;
+		passthrough = MA_FALSE;
 	}
 
-	if (conversion_buffer == NULL)
+	if (pDevice->device.playback.channels != channels)
 	{
-		return GA_E_MEMORY;
+		void* channel_conversion_buffer = NULL;
+		ma_channel_converter converter;
+		ma_channel_converter_config converter_config = ma_channel_converter_config_init(pDevice->device.playback.format, channels, NULL, pDevice->device.playback.channels, NULL, ma_channel_mix_mode_default);
+
+		result = ma_channel_converter_init(&converter_config, &converter);
+		if (result != MA_SUCCESS)
+		{
+			if (!passthrough)
+			{
+			    free(output_buffer);
+				output_buffer = NULL;
+			}
+			return result + MA_ERROR_OFFSET;
+		}
+
+		channel_conversion_buffer = malloc(num_frames * ma_get_bytes_per_frame(pDevice->device.playback.format, pDevice->device.playback.channels));
+		if (channel_conversion_buffer == NULL)
+		{
+			ma_channel_converter_uninit(&converter);
+			if (!passthrough)
+			{
+				free(output_buffer);
+				output_buffer = NULL;
+			}
+			return GA_E_MEMORY;
+		}
+
+		ma_result result = ma_channel_converter_process_pcm_frames(&converter, channel_conversion_buffer, output_buffer, num_frames);
+		if (result != MA_SUCCESS)
+		{
+			ma_channel_converter_uninit(&converter);
+			free(channel_conversion_buffer);
+			channel_conversion_buffer = NULL;
+			if (!passthrough)
+			{
+				free(output_buffer);
+				output_buffer = NULL;
+			}
+			return result + MA_ERROR_OFFSET;
+		}
+
+		ma_channel_converter_uninit(&converter);
+		if (!passthrough)
+		{
+			free(output_buffer);
+		}
+		output_buffer = channel_conversion_buffer;
+		channel_conversion_buffer = NULL;
+		passthrough = MA_FALSE;
 	}
 
 	result = check_and_start_audio_device(&pDevice->device);
@@ -1769,7 +1834,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT playback_audio(int32_t refnum, void* buffer, 
 		}
 		{
 			bytesToWrite = framesToWrite * ma_get_bytes_per_frame(pDevice->device.playback.format, pDevice->device.playback.channels);
-			memcpy(pWriteBuffer, (ma_uint8*)conversion_buffer + bufferOffset, bytesToWrite);
+			memcpy(pWriteBuffer, (ma_uint8*)output_buffer + bufferOffset, bytesToWrite);
 		}
 		result = ma_pcm_rb_commit_write(&pDevice->buffer, framesToWrite, pWriteBuffer);
 		if (!((result == MA_SUCCESS) || (result == MA_AT_END)))
@@ -1780,10 +1845,10 @@ extern "C" LV_DLL_EXPORT GA_RESULT playback_audio(int32_t refnum, void* buffer, 
 		bufferOffset += bytesToWrite;
 	} while (pcmFramesProcessed < num_frames);
 
-	if (conversion_buffer != NULL)
+	if (!passthrough)
 	{
-		free(conversion_buffer);
-		conversion_buffer = NULL;
+		free(output_buffer);
+		output_buffer = NULL;
 	}
 
 	return GA_SUCCESS;
