@@ -70,14 +70,16 @@
 			<Item Name="SubVIs" Type="Folder">
 				<Item Name="Generate Signal Components.vim" Type="VI" URL="../G-Audio/Examples/SubVIs/Generate Signal Components.vim"/>
 			</Item>
-			<Item Name="Audio Device Capture Example (G-Audio).vi" Type="VI" URL="../G-Audio/Examples/Audio Device Capture Example (G-Audio).vi"/>
-			<Item Name="Audio Device Loopback Example (G-Audio).vi" Type="VI" URL="../G-Audio/Examples/Audio Device Loopback Example (G-Audio).vi"/>
-			<Item Name="Audio Device Playback Example (G-Audio).vi" Type="VI" URL="../G-Audio/Examples/Audio Device Playback Example (G-Audio).vi"/>
+			<Item Name="Audio Device Capture Example.vi" Type="VI" URL="../G-Audio/Examples/Audio Device Capture Example.vi"/>
+			<Item Name="Audio Device Loopback Example.vi" Type="VI" URL="../G-Audio/Examples/Audio Device Loopback Example.vi"/>
 			<Item Name="Audio Device Playback Example (lvsound2).vi" Type="VI" URL="../G-Audio/Examples/Audio Device Playback Example (lvsound2).vi"/>
+			<Item Name="Audio Device Playback Example.vi" Type="VI" URL="../G-Audio/Examples/Audio Device Playback Example.vi"/>
+			<Item Name="Drum Pad Mixer Example.vi" Type="VI" URL="../G-Audio/Examples/Drum Pad Mixer Example.vi"/>
 			<Item Name="IEEE Float Compare Example.vi" Type="VI" URL="../G-Audio/Examples/IEEE Float Compare Example.vi"/>
 			<Item Name="Media Player Example.vi" Type="VI" URL="../G-Audio/Examples/Media Player Example.vi"/>
 			<Item Name="Minimize Memory Example.vi" Type="VI" URL="../G-Audio/Examples/Minimize Memory Example.vi"/>
 			<Item Name="Mixer Example.vi" Type="VI" URL="../G-Audio/Examples/Mixer Example.vi"/>
+			<Item Name="Music Visualizer Example.vi" Type="VI" URL="../G-Audio/Examples/Music Visualizer Example.vi"/>
 			<Item Name="Playback Latency Compare Example.vi" Type="VI" URL="../G-Audio/Examples/Playback Latency Compare Example.vi"/>
 			<Item Name="Query Audio Devices Example.vi" Type="VI" URL="../G-Audio/Examples/Query Audio Devices Example.vi"/>
 			<Item Name="Write Audio File Example.vi" Type="VI" URL="../G-Audio/Examples/Write Audio File Example.vi"/>
@@ -120,18 +122,22 @@
 				<Item Name="Assert Floating-Point Numeric Type.vim" Type="VI" URL="/&lt;vilib&gt;/Utility/TypeAssert/Assert Floating-Point Numeric Type.vim"/>
 				<Item Name="Assert Signed Integer Type.vim" Type="VI" URL="/&lt;vilib&gt;/Utility/TypeAssert/Assert Signed Integer Type.vim"/>
 				<Item Name="Assert Unsigned Integer Type.vim" Type="VI" URL="/&lt;vilib&gt;/Utility/TypeAssert/Assert Unsigned Integer Type.vim"/>
+				<Item Name="Color to RGB.vi" Type="VI" URL="/&lt;vilib&gt;/Utility/colorconv.llb/Color to RGB.vi"/>
 				<Item Name="Error Cluster From Error Code.vi" Type="VI" URL="/&lt;vilib&gt;/Utility/error.llb/Error Cluster From Error Code.vi"/>
 				<Item Name="ex_CorrectErrorChain.vi" Type="VI" URL="/&lt;vilib&gt;/express/express shared/ex_CorrectErrorChain.vi"/>
 				<Item Name="Get Memory Status.vi" Type="VI" URL="/&lt;vilib&gt;/MemoryControl/Get Memory Status.vi"/>
 				<Item Name="Get System Directory.vi" Type="VI" URL="/&lt;vilib&gt;/Utility/sysdir.llb/Get System Directory.vi"/>
 				<Item Name="LVNumericRepresentation.ctl" Type="VI" URL="/&lt;vilib&gt;/numeric/LVNumericRepresentation.ctl"/>
 				<Item Name="NI_AALBase.lvlib" Type="Library" URL="/&lt;vilib&gt;/Analysis/NI_AALBase.lvlib"/>
+				<Item Name="NI_AALPro.lvlib" Type="Library" URL="/&lt;vilib&gt;/Analysis/NI_AALPro.lvlib"/>
 				<Item Name="NI_Data Type.lvlib" Type="Library" URL="/&lt;vilib&gt;/Utility/Data Type/NI_Data Type.lvlib"/>
 				<Item Name="NI_FileType.lvlib" Type="Library" URL="/&lt;vilib&gt;/Utility/lvfile.llb/NI_FileType.lvlib"/>
 				<Item Name="NI_MABase.lvlib" Type="Library" URL="/&lt;vilib&gt;/measure/NI_MABase.lvlib"/>
+				<Item Name="NI_PtbyPt.lvlib" Type="Library" URL="/&lt;vilib&gt;/ptbypt/NI_PtbyPt.lvlib"/>
 				<Item Name="Path To Command Line String.vi" Type="VI" URL="/&lt;vilib&gt;/AdvancedString/Path To Command Line String.vi"/>
 				<Item Name="PathToUNIXPathString.vi" Type="VI" URL="/&lt;vilib&gt;/Platform/CFURL.llb/PathToUNIXPathString.vi"/>
 				<Item Name="Range Limits for Type.vim" Type="VI" URL="/&lt;vilib&gt;/numeric/Range Limits for Type.vim"/>
+				<Item Name="RGB to Color.vi" Type="VI" URL="/&lt;vilib&gt;/Utility/colorconv.llb/RGB to Color.vi"/>
 				<Item Name="Sampling Mode.ctl" Type="VI" URL="/&lt;vilib&gt;/sound2/lvsound2.llb/Sampling Mode.ctl"/>
 				<Item Name="Sound Data Format.ctl" Type="VI" URL="/&lt;vilib&gt;/sound2/lvsound2.llb/Sound Data Format.ctl"/>
 				<Item Name="Sound File Close.vi" Type="VI" URL="/&lt;vilib&gt;/sound2/lvsound2.llb/Sound File Close.vi"/>

@@ -5,6 +5,14 @@
 A cross-platform LabVIEW library for audio device playback and capture, and for reading and writing audio files.
 
 ## What's New?
+* Multi-channel audio mixer!
+    * Quickly playback one or more audio files
+    * Play, pause, stop, and volume controls for each channel
+    * Load audio files while existing channels play, without interruption
+    * Includes basic mixer and drum pad examples
+* Loopback capture!
+    * Capture, process, and record sound from other applications
+    * WASAPI only
 * Audio playback and capture!
     * Continuous audio input / output
     * Multiple audio backends supported (WASAPI, DirectSound, Core Audio, PulseAudio, ALSA, etc)
