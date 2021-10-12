@@ -1783,7 +1783,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT playback_audio(int32_t refnum, void* buffer, 
 			return GA_E_MEMORY;
 		}
 
-		ma_result result = ma_channel_converter_process_pcm_frames(&converter, channel_conversion_buffer, output_buffer, num_frames);
+		result = ma_channel_converter_process_pcm_frames(&converter, channel_conversion_buffer, output_buffer, num_frames);
 		if (result != MA_SUCCESS)
 		{
 			ma_channel_converter_uninit(&converter);
@@ -2187,4 +2187,47 @@ inline GA_RESULT check_and_start_audio_device(ma_device* pDevice)
 	}
 
 	return GA_SUCCESS;
+}
+
+
+////////////////////////////
+// LabVIEW Audio Data API //
+////////////////////////////
+extern "C" LV_DLL_EXPORT GA_RESULT channel_converter(ga_data_type audio_type, uint64_t num_frames, void* audio_buffer_in, uint32_t channels_in, void* audio_buffer_out, uint32_t channels_out)
+{
+	ma_result result;
+	ma_channel_converter converter;
+	ma_channel_converter_config converter_config = ma_channel_converter_config_init(ga_data_type_to_ma_format(audio_type), channels_in, NULL, channels_out, NULL, ma_channel_mix_mode_default);
+
+	result = ma_channel_converter_init(&converter_config, &converter);
+	if (result != MA_SUCCESS)
+	{
+		return result + MA_ERROR_OFFSET;
+	}
+
+	result = ma_channel_converter_process_pcm_frames(&converter, audio_buffer_out, audio_buffer_in, num_frames);
+	if (result != MA_SUCCESS)
+	{
+		ma_channel_converter_uninit(&converter);
+		return result + MA_ERROR_OFFSET;
+	}
+
+	ma_channel_converter_uninit(&converter);
+
+	return GA_SUCCESS;
+}
+
+inline ma_format ga_data_type_to_ma_format(ga_data_type audio_type)
+{
+	switch (audio_type)
+	{
+		case ga_data_type_u8: return ma_format_u8; break;
+		case ga_data_type_i16: return ma_format_s16; break;
+		case ga_data_type_i32: return ma_format_s32; break;
+		case ga_data_type_float: return ma_format_f32; break;
+		case ga_data_type_double: return ma_format_f32; break;
+		default: return ma_format_s16; break;
+	}
+
+	return ma_format_s16;
 }

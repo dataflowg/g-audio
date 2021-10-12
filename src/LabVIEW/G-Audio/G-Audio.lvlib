@@ -52,7 +52,9 @@ https://github.com/dataflowg/g-audio</Property>
 		<Item Name="Seek Audio File.vi" Type="VI" URL="../Audio Files/Seek Audio File.vi"/>
 		<Item Name="Write Audio File.vim" Type="VI" URL="../Audio Files/Write Audio File.vim"/>
 	</Item>
-	<Item Name="Audio Processing" Type="Folder"/>
+	<Item Name="Audio Processing" Type="Folder">
+		<Item Name="Channel Conversion.vim" Type="VI" URL="../Audio Processing/Channel Conversion.vim"/>
+	</Item>
 	<Item Name="Controls" Type="Folder">
 		<Item Name="Audio Device Config.ctl" Type="VI" URL="../Controls/Audio Device Config.ctl"/>
 		<Item Name="Audio Device Format.ctl" Type="VI" URL="../Controls/Audio Device Format.ctl"/>

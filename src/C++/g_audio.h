@@ -258,6 +258,13 @@ void stop_callback(ma_device* pDevice);
 inline ma_bool32 device_is_started(ma_device* pDevice);
 inline GA_RESULT check_and_start_audio_device(ma_device* pDevice);
 
+////////////////////////////
+// LabVIEW Audio Data API //
+////////////////////////////
+extern "C" LV_DLL_EXPORT GA_RESULT channel_converter(ga_data_type audio_type, uint64_t num_frames, void* audio_buffer_in, uint32_t channels_in, void* audio_buffer_out, uint32_t channels_out);
+
+inline ma_format ga_data_type_to_ma_format(ga_data_type audio_type);
+
 /////////////////////////
 // FLAC codec wrappers //
 /////////////////////////
