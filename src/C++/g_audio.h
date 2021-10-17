@@ -230,7 +230,8 @@ GA_RESULT get_audio_file_codec(const char* file_name, ga_codec* codec);
 // Query the available backends (WASAPI, DirectSound, WinMM, etc).
 extern "C" LV_DLL_EXPORT GA_RESULT query_audio_backends(uint16_t* backends, uint16_t* num_backends);
 // Query available devices for a given backend. Set backend greater than ma_backend_null to query the default backend.
-extern "C" LV_DLL_EXPORT GA_RESULT query_audio_devices(uint16_t backend, uint8_t* playback_device_ids, int32_t* num_playback_devices, uint8_t* capture_device_ids, int32_t* num_capture_devices);
+// backend will be set to the actual backend used when querying devices, used for discovering what default backend is in use.
+extern "C" LV_DLL_EXPORT GA_RESULT query_audio_devices(uint16_t* backend, uint8_t* playback_device_ids, int32_t* num_playback_devices, uint8_t* capture_device_ids, int32_t* num_capture_devices);
 // Get audio device info for a given backend. Set backend greater than ma_backend_null to query the default backend.
 extern "C" LV_DLL_EXPORT GA_RESULT get_audio_device_info(uint16_t backend, const uint8_t* device_id, uint16_t device_type, char* device_name);
 // Configure an audio device ready for playback. Will setup the context, device, audio buffers, and callbacks.
