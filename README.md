@@ -20,11 +20,11 @@ A cross-platform LabVIEW library for audio device playback and capture, and for 
     * Enumerate audio devices on-the-fly ([a requested feature / bug of lvsound2](https://forums.ni.com/t5/LabVIEW-Idea-Exchange/Update-the-lvsound2-library-Sound-Input-Sound-Output-VIs-to/idi-p/2049098?profile.language=en))
 
 ## Features
-* Support for audio playback
-* Support for audio capture
+* Support for audio playback and capture, including loopback capture
 * Playback and capture using selectable backends (WASAPI, DirectSound, Core Audio, PulseAudio, ALSA, etc)
-* Support for reading MP3, FLAC, Ogg Vorbis, and WAV formats
-* Support for writing WAV (PCM, IEEE Float, with Sony Wave64 support for large files)
+* Multi-channel audio mixer
+* Read MP3, FLAC, Ogg Vorbis, and WAV formats
+* Write WAV format (PCM and IEEE Float, with Sony Wave64 support for large files)
 * Unicode path support (UTF-8)
 * Cross-platform, 32-bit and 64-bit
 * Simple to use API
