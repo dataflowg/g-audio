@@ -1,4 +1,4 @@
-<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2021-10-19 16:29:21" Creator="Dataflow_G" Comments="" ID="017e2647b9ab52e5de9a2814cab5ec6e">
+<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2021-10-20 05:00:58" Creator="Dataflow_G" Comments="" ID="8c05e6e30a19ca3940ac35257dfd01de">
   <Library_General_Settings>
     <Package_File_Name>Dataflow_G_lib_G_Audio</Package_File_Name>
     <Library_Version>0.3.0.2</Library_Version>
@@ -292,7 +292,7 @@
         <Path>..\unnamed</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>8A962457E66D0AA3AC312075036C9ABC</GUID>
+      <GUID>A88D015559F4ACF02BFEF63FDD93E7F2</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -439,7 +439,7 @@
         <Path>..\G-Audio\Audio Files\Get Audio File Info.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>8774ED5982BAA3FD43DC171E2B05F92E</GUID>
+      <GUID>E3C1D763717280C38F71CBE829262955</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -600,7 +600,7 @@
         <Path>..\G-Audio\Audio Devices\Playback Wait.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>641148EAD58F906E84B1F70F5733B498</GUID>
+      <GUID>0F7FB393C41B0BFF727C4D269A841006</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -736,7 +736,7 @@
       <Items_Data>
         <Type>Item</Type>
         <Sub_Palette_Index>-1</Sub_Palette_Index>
-        <NameSub_Menu_Name>Drum Pad Mixer Example.vi</NameSub_Menu_Name>
+        <NameSub_Menu_Name>Sample Pad Mixer Example.vi</NameSub_Menu_Name>
         <Short_Name/>
         <is_Merge_VI>false</is_Merge_VI>
         <Position>
@@ -744,7 +744,7 @@
           <Column>2</Column>
         </Position>
         <Icon>00000000</Icon>
-        <Path>..\G-Audio\Examples\Drum Pad Mixer Example.vi</Path>
+        <Path>..\G-Audio\Examples\Sample Pad Mixer Example.vi</Path>
         <VI_Title/>
       </Items_Data>
       <Items_Data>
@@ -761,7 +761,7 @@
         <Path>..\G-Audio\Examples\Music Visualizer Example.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>CD0C5610EA978FDAC9E90220E3353626</GUID>
+      <GUID>11FBFDD8C1E5B6A91BCBD4AD4D4E81D3</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -908,7 +908,7 @@
         <Path>..\G-Audio\Mixer\Mixer\Clear.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>D3B483A28B0F817B8772BDE333158196</GUID>
+      <GUID>FD8CFBE432764ECDE316C7F5BB7A8F17</GUID>
     </Functions_Palette_Data>
   </Library_Palette_Definition>
 </VI_Package_Builder_Settings>

@@ -69,11 +69,11 @@
 		<Item Name="Examples" Type="Folder">
 			<Item Name="SubVIs" Type="Folder">
 				<Item Name="Generate Signal Components.vim" Type="VI" URL="../G-Audio/Examples/SubVIs/Generate Signal Components.vim"/>
+				<Item Name="Music Visualizer (Queue Only).vi" Type="VI" URL="../G-Audio/Examples/SubVIs/Music Visualizer (Queue Only).vi"/>
 			</Item>
 			<Item Name="Audio Capture Example.vi" Type="VI" URL="../G-Audio/Examples/Audio Capture Example.vi"/>
 			<Item Name="Audio Loopback Example.vi" Type="VI" URL="../G-Audio/Examples/Audio Loopback Example.vi"/>
 			<Item Name="Audio Playback Example.vi" Type="VI" URL="../G-Audio/Examples/Audio Playback Example.vi"/>
-			<Item Name="Drum Pad Mixer Example.vi" Type="VI" URL="../G-Audio/Examples/Drum Pad Mixer Example.vi"/>
 			<Item Name="IEEE Float Compare Example.vi" Type="VI" URL="../G-Audio/Examples/IEEE Float Compare Example.vi"/>
 			<Item Name="Media Player Example.vi" Type="VI" URL="../G-Audio/Examples/Media Player Example.vi"/>
 			<Item Name="Minimize Memory Example.vi" Type="VI" URL="../G-Audio/Examples/Minimize Memory Example.vi"/>
@@ -81,6 +81,8 @@
 			<Item Name="Music Visualizer Example.vi" Type="VI" URL="../G-Audio/Examples/Music Visualizer Example.vi"/>
 			<Item Name="Playback Latency Compare Example.vi" Type="VI" URL="../G-Audio/Examples/Playback Latency Compare Example.vi"/>
 			<Item Name="Query Audio Devices Example.vi" Type="VI" URL="../G-Audio/Examples/Query Audio Devices Example.vi"/>
+			<Item Name="Sample Pad Example (LINX).vi" Type="VI" URL="../G-Audio/Examples/Sample Pad Example (LINX).vi"/>
+			<Item Name="Sample Pad Example.vi" Type="VI" URL="../G-Audio/Examples/Sample Pad Example.vi"/>
 			<Item Name="Write Audio File Example.vi" Type="VI" URL="../G-Audio/Examples/Write Audio File Example.vi"/>
 		</Item>
 		<Item Name="Unit Tests" Type="Folder">
@@ -127,6 +129,9 @@
 				<Item Name="ex_CorrectErrorChain.vi" Type="VI" URL="/&lt;vilib&gt;/express/express shared/ex_CorrectErrorChain.vi"/>
 				<Item Name="Get Memory Status.vi" Type="VI" URL="/&lt;vilib&gt;/MemoryControl/Get Memory Status.vi"/>
 				<Item Name="Get System Directory.vi" Type="VI" URL="/&lt;vilib&gt;/Utility/sysdir.llb/Get System Directory.vi"/>
+				<Item Name="Is Path and Not Empty.vi" Type="VI" URL="/&lt;vilib&gt;/Utility/file.llb/Is Path and Not Empty.vi"/>
+				<Item Name="liblinxdevice.dll" Type="Document" URL="/&lt;vilib&gt;/MakerHub/LINX/Resources/liblinxdevice.dll"/>
+				<Item Name="LMH-LINX.lvlib" Type="Library" URL="/&lt;vilib&gt;/MakerHub/LINX/LMH-LINX.lvlib"/>
 				<Item Name="LVNumericRepresentation.ctl" Type="VI" URL="/&lt;vilib&gt;/numeric/LVNumericRepresentation.ctl"/>
 				<Item Name="NI_AALBase.lvlib" Type="Library" URL="/&lt;vilib&gt;/Analysis/NI_AALBase.lvlib"/>
 				<Item Name="NI_AALPro.lvlib" Type="Library" URL="/&lt;vilib&gt;/Analysis/NI_AALPro.lvlib"/>
@@ -178,52 +183,16 @@
 				<Item Name="subFile Dialog.vi" Type="VI" URL="/&lt;vilib&gt;/express/express input/FileDialogBlock.llb/subFile Dialog.vi"/>
 				<Item Name="Synchronize Data Flow.vim" Type="VI" URL="/&lt;vilib&gt;/Utility/Synchronize Data Flow.vim"/>
 				<Item Name="System Directory Type.ctl" Type="VI" URL="/&lt;vilib&gt;/Utility/sysdir.llb/System Directory Type.ctl"/>
+				<Item Name="Trim Whitespace.vi" Type="VI" URL="/&lt;vilib&gt;/Utility/error.llb/Trim Whitespace.vi"/>
+				<Item Name="VISA Configure Serial Port" Type="VI" URL="/&lt;vilib&gt;/Instr/_visa.llb/VISA Configure Serial Port"/>
+				<Item Name="VISA Configure Serial Port (Instr).vi" Type="VI" URL="/&lt;vilib&gt;/Instr/_visa.llb/VISA Configure Serial Port (Instr).vi"/>
+				<Item Name="VISA Configure Serial Port (Serial Instr).vi" Type="VI" URL="/&lt;vilib&gt;/Instr/_visa.llb/VISA Configure Serial Port (Serial Instr).vi"/>
+				<Item Name="whitespace.ctl" Type="VI" URL="/&lt;vilib&gt;/Utility/error.llb/whitespace.ctl"/>
 			</Item>
 			<Item Name="g_audio_32.dll" Type="Document" URL="../G-Audio/lib/g_audio_32.dll"/>
 			<Item Name="lvanlys.dll" Type="Document" URL="/&lt;resource&gt;/lvanlys.dll"/>
 			<Item Name="lvsound2.dll" Type="Document" URL="/&lt;resource&gt;/lvsound2.dll"/>
 		</Item>
-		<Item Name="Build Specifications" Type="Build">
-			<Item Name="Drum Pad" Type="EXE">
-				<Property Name="App_copyErrors" Type="Bool">true</Property>
-				<Property Name="App_INI_aliasGUID" Type="Str">{75137E09-3115-4DFF-895F-332623C4E244}</Property>
-				<Property Name="App_INI_GUID" Type="Str">{93FB14B5-4F03-45CA-9A12-B0FA870E59C2}</Property>
-				<Property Name="App_serverConfig.httpPort" Type="Int">8002</Property>
-				<Property Name="App_serverType" Type="Int">0</Property>
-				<Property Name="Bld_autoIncrement" Type="Bool">true</Property>
-				<Property Name="Bld_buildCacheID" Type="Str">{041D3773-FE42-4405-882B-985D35721AEA}</Property>
-				<Property Name="Bld_buildSpecName" Type="Str">Drum Pad</Property>
-				<Property Name="Bld_excludeInlineSubVIs" Type="Bool">true</Property>
-				<Property Name="Bld_excludeLibraryItems" Type="Bool">true</Property>
-				<Property Name="Bld_excludePolymorphicVIs" Type="Bool">true</Property>
-				<Property Name="Bld_localDestDir" Type="Path">../builds/NI_AB_PROJECTNAME/Drum Pad</Property>
-				<Property Name="Bld_localDestDirType" Type="Str">relativeToCommon</Property>
-				<Property Name="Bld_modifyLibraryFile" Type="Bool">true</Property>
-				<Property Name="Bld_previewCacheID" Type="Str">{3AB51544-4440-4D2A-B1E8-6F50F9FA56C7}</Property>
-				<Property Name="Bld_version.build" Type="Int">3</Property>
-				<Property Name="Bld_version.major" Type="Int">1</Property>
-				<Property Name="Destination[0].destName" Type="Str">Drum Pad.exe</Property>
-				<Property Name="Destination[0].path" Type="Path">../builds/NI_AB_PROJECTNAME/Drum Pad/Drum Pad.exe</Property>
-				<Property Name="Destination[0].preserveHierarchy" Type="Bool">true</Property>
-				<Property Name="Destination[0].type" Type="Str">App</Property>
-				<Property Name="Destination[1].destName" Type="Str">Support Directory</Property>
-				<Property Name="Destination[1].path" Type="Path">../builds/NI_AB_PROJECTNAME/Drum Pad/data</Property>
-				<Property Name="DestinationCount" Type="Int">2</Property>
-				<Property Name="Source[0].itemID" Type="Str">{AA6E2B14-8019-44ED-BDC9-28B125E7DD0B}</Property>
-				<Property Name="Source[0].type" Type="Str">Container</Property>
-				<Property Name="Source[1].destinationIndex" Type="Int">0</Property>
-				<Property Name="Source[1].itemID" Type="Ref">/My Computer/Examples/Drum Pad Mixer Example.vi</Property>
-				<Property Name="Source[1].sourceInclusion" Type="Str">TopLevel</Property>
-				<Property Name="Source[1].type" Type="Str">VI</Property>
-				<Property Name="SourceCount" Type="Int">2</Property>
-				<Property Name="TgtF_fileDescription" Type="Str">Drum Pad</Property>
-				<Property Name="TgtF_internalName" Type="Str">Drum Pad</Property>
-				<Property Name="TgtF_legalCopyright" Type="Str">Copyright © 2021 </Property>
-				<Property Name="TgtF_productName" Type="Str">Drum Pad</Property>
-				<Property Name="TgtF_targetfileGUID" Type="Str">{BE574312-9CFA-4536-A7AA-20308ED2FE0F}</Property>
-				<Property Name="TgtF_targetfileName" Type="Str">Drum Pad.exe</Property>
-				<Property Name="TgtF_versionIndependent" Type="Bool">true</Property>
-			</Item>
-		</Item>
+		<Item Name="Build Specifications" Type="Build"/>
 	</Item>
 </Project>
