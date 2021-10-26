@@ -9,7 +9,7 @@ A cross-platform LabVIEW library for audio device playback and capture, and for 
     * Quickly playback one or more audio files
     * Play, pause, stop, and volume controls for each channel
     * Load audio files while existing channels play, without interruption
-    * Includes basic mixer and drum pad examples
+    * Includes simple mixer and sample pad examples
 * Loopback capture!
     * Capture, process, and record sound from other applications
     * WASAPI only
