@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "3CD6706226E0D1FE0040E196"
-               BuildableName = "g_audio_x64.framework"
-               BlueprintName = "g_audio_x64"
-               ReferencedContainer = "container:g_audio_x64.xcodeproj">
+               BuildableName = "g_audio_64.framework"
+               BlueprintName = "g_audio_64"
+               ReferencedContainer = "container:g_audio_64.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -51,9 +51,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "3CD6706226E0D1FE0040E196"
-            BuildableName = "g_audio_x64.framework"
-            BlueprintName = "g_audio_x64"
-            ReferencedContainer = "container:g_audio_x64.xcodeproj">
+            BuildableName = "g_audio_64.framework"
+            BlueprintName = "g_audio_64"
+            ReferencedContainer = "container:g_audio_64.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>

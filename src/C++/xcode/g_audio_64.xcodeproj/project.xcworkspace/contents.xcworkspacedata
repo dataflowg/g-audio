@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:/Users/dataflowg/Documents/g-audio/src/C++/g_audio/g_audio_x64.xcodeproj">
+      location = "self:/Users/dataflowg/github/g-audio/src/C++/xcode/g_audio_64.xcodeproj">
    </FileRef>
 </Workspace>
