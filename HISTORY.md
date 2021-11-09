@@ -1,8 +1,8 @@
 # G-Audio Release History
-### v0.3.0 - 2021-10-
+### v0.3.0 - 2021-11-09
 * Multi-channel audio mixer
 * Loopback audio capture (WASAPI only)
-* Drum pad & music visualizer examples
+* Sample pad & music visualizer examples
 * Fix malleable VI broken wires (issue #4)
 * Fix mp3 info memory error (issue #8)
 * Upmix / downmix audio data to match audio device (issue #9)
