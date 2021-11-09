@@ -13,6 +13,16 @@ See g_audio.h for license details.
 ma_context* global_context = NULL;
 
 ////////////////////////////
+// LabVIEW CLFN Callbacks //
+////////////////////////////
+
+extern "C" LV_DLL_EXPORT int32_t clfn_abort(void* data)
+{
+	clear_audio_backend();
+	return 0;
+}
+
+////////////////////////////
 // LabVIEW Audio File API //
 ////////////////////////////
 
@@ -1366,7 +1376,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT query_audio_backends(uint16_t* backends, uint
 	return GA_SUCCESS;
 }
 
-extern "C" LV_DLL_EXPORT GA_RESULT query_audio_devices(uint16_t backend_in, uint8_t* playback_device_ids, int32_t* num_playback_devices, uint8_t* capture_device_ids, int32_t* num_capture_devices)
+extern "C" LV_DLL_EXPORT GA_RESULT query_audio_devices(uint16_t* backend, uint8_t* playback_device_ids, int32_t* num_playback_devices, uint8_t* capture_device_ids, int32_t* num_capture_devices)
 {
 	ma_context context;
 	ma_device_info* pPlaybackDeviceInfos;
@@ -1375,13 +1385,12 @@ extern "C" LV_DLL_EXPORT GA_RESULT query_audio_devices(uint16_t backend_in, uint
 	ma_uint32 captureDeviceCount;
 	ma_result result;
 	uint32_t iDevice;
-	ma_backend backend = (ma_backend)backend_in;
 
 	// Thread safety - ma_context_init, ma_context_get_devices, ma_context_uninit are unsafe
 	lock_ga_mutex(ga_mutex_context);
 	// Can safely pass 1 as backendCount, as it's ignored when backends is NULL.
 	// The backends enum in LabVIEW adds Default after Null
-	result = ma_context_init((backend_in > ma_backend_null ? NULL : &backend), 1, NULL, &context);
+	result = ma_context_init((*backend > ma_backend_null ? NULL : (ma_backend*)backend), 1, NULL, &context);
 	if (result != MA_SUCCESS)
 	{
 		unlock_ga_mutex(ga_mutex_context);
@@ -1417,6 +1426,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT query_audio_devices(uint16_t backend_in, uint
 		memcpy(&capture_device_ids[iDevice * sizeof(ma_device_id)], &pCaptureDeviceInfos[iDevice].id, sizeof(ma_device_id));
 	}
 
+	*backend = (uint16_t)context.backend;
 	*num_playback_devices = playbackDeviceCount;
 	*num_capture_devices = captureDeviceCount;
 
@@ -1524,6 +1534,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT configure_audio_device(uint16_t backend_in, c
 	switch (device_config.deviceType)
 	{
 	case ma_device_type_capture:
+	case ma_device_type_loopback:
 		device_config.capture.format = (ma_format)format;   // Set to ma_format_unknown to use the device's native format.
 		device_config.capture.channels = channels;               // Set to 0 to use the device's native channel count.
 		device_config.capture.pDeviceID = memcmp(&deviceId, &blank_device_id, sizeof(ma_device_id)) != 0 ? &deviceId : NULL;
@@ -1566,6 +1577,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT configure_audio_device(uint16_t backend_in, c
 	switch (device_config.deviceType)
 	{
 	case ma_device_type_capture:
+	case ma_device_type_loopback:
 		device_format_init = pDevice->device.capture.format;
 		device_channels_init = pDevice->device.capture.channels;
 		device_internal_buffer_size = pDevice->device.capture.internalPeriodSizeInFrames;
@@ -1620,6 +1632,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT get_configured_audio_device_info(int32_t refn
 	switch (pDevice->device.type)
 	{
 	case ma_device_type_capture:
+	case ma_device_type_loopback:
 		*format = pDevice->device.capture.format;
 		*channels = pDevice->device.capture.channels;
 		*sample_rate = pDevice->device.sampleRate;
@@ -1648,7 +1661,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT start_audio_device(int32_t refnum)
 	return check_and_start_audio_device(&pDevice->device);
 }
 
-extern "C" LV_DLL_EXPORT GA_RESULT playback_audio(int32_t refnum, void* buffer, int32_t num_frames, ga_data_type audio_type)
+extern "C" LV_DLL_EXPORT GA_RESULT playback_audio(int32_t refnum, void* buffer, int32_t num_frames, uint32_t channels, ga_data_type audio_type)
 {
 	ma_result result;
 	ma_uint32 framesToWrite = num_frames;
@@ -1658,6 +1671,8 @@ extern "C" LV_DLL_EXPORT GA_RESULT playback_audio(int32_t refnum, void* buffer, 
 	void* pWriteBuffer;
 	int i = 0;
 	audio_device* pDevice = (audio_device*)get_reference_data(ga_refnum_audio_device, refnum);
+	void* output_buffer = buffer;
+	ma_bool32 passthrough = true;
 
 	if (pDevice == NULL)
 	{
@@ -1674,59 +1689,122 @@ extern "C" LV_DLL_EXPORT GA_RESULT playback_audio(int32_t refnum, void* buffer, 
 		return GA_E_BUFFER_SIZE;
 	}
 
-	void* conversion_buffer = NULL;
-	uint64_t num_channel_samples = num_frames * pDevice->device.playback.channels;
-
-	switch (audio_type)
+	if (!((audio_type == ga_data_type_u8 && pDevice->device.playback.format == ma_format_u8) ||
+		(audio_type == ga_data_type_i16 && pDevice->device.playback.format == ma_format_s16) ||
+		(audio_type == ga_data_type_i32 && pDevice->device.playback.format == ma_format_s32) ||
+		(audio_type == ga_data_type_float && pDevice->device.playback.format == ma_format_f32)))
 	{
-	case ga_data_type_u8:
-		conversion_buffer = malloc(num_channel_samples * ma_get_bytes_per_sample(pDevice->device.playback.format));
-		ma_pcm_convert(conversion_buffer, pDevice->device.playback.format, buffer, ma_format_u8, num_channel_samples, ma_dither_mode_none);
-		break;
-	case ga_data_type_i16:
-		conversion_buffer = malloc(num_channel_samples * ma_get_bytes_per_sample(pDevice->device.playback.format));
-		ma_pcm_convert(conversion_buffer, pDevice->device.playback.format, buffer, ma_format_s16, num_channel_samples, ma_dither_mode_none);
-		break;
-	case ga_data_type_i32:
-		conversion_buffer = malloc(num_channel_samples * ma_get_bytes_per_sample(pDevice->device.playback.format));
-		ma_pcm_convert(conversion_buffer, pDevice->device.playback.format, buffer, ma_format_s32, num_channel_samples, ma_dither_mode_none);
-		break;
-	case ga_data_type_float:
-		conversion_buffer = malloc(num_channel_samples * ma_get_bytes_per_sample(pDevice->device.playback.format));
-		ma_pcm_convert(conversion_buffer, pDevice->device.playback.format, buffer, ma_format_f32, num_channel_samples, ma_dither_mode_none);
-		break;
-	case ga_data_type_double:
-		switch (pDevice->device.playback.format)
+		void* conversion_buffer = NULL;
+		uint64_t num_channel_samples = num_frames * channels;
+
+		switch (audio_type)
 		{
-		case ma_format_u8:
-			conversion_buffer = malloc(num_channel_samples * sizeof(uint8_t));
-			f64_to_u8((uint8_t*)conversion_buffer, (double*)buffer, num_channel_samples);
-			break;
-		case ma_format_s16:
-			conversion_buffer = malloc(num_channel_samples * sizeof(int16_t));
-			f64_to_s16((int16_t*)conversion_buffer, (double*)buffer, num_channel_samples);
-			break;
-		case ma_format_s32:
-			conversion_buffer = malloc(num_channel_samples * sizeof(int32_t));
-			f64_to_s32((int32_t*)conversion_buffer, (double*)buffer, num_channel_samples);
-			break;
-		case ma_format_f32:
-			conversion_buffer = malloc(num_channel_samples * sizeof(float));
-			f64_to_f32((float*)conversion_buffer, (double*)buffer, num_channel_samples);
-			break;
-		default:
-			return GA_E_INVALID_TYPE;
-			break;
+			case ga_data_type_u8:
+				conversion_buffer = malloc(num_channel_samples * ma_get_bytes_per_sample(pDevice->device.playback.format));
+				ma_pcm_convert(conversion_buffer, pDevice->device.playback.format, output_buffer, ma_format_u8, num_channel_samples, ma_dither_mode_none);
+				break;
+			case ga_data_type_i16:
+				conversion_buffer = malloc(num_channel_samples * ma_get_bytes_per_sample(pDevice->device.playback.format));
+				ma_pcm_convert(conversion_buffer, pDevice->device.playback.format, output_buffer, ma_format_s16, num_channel_samples, ma_dither_mode_none);
+				break;
+			case ga_data_type_i32:
+				conversion_buffer = malloc(num_channel_samples * ma_get_bytes_per_sample(pDevice->device.playback.format));
+				ma_pcm_convert(conversion_buffer, pDevice->device.playback.format, output_buffer, ma_format_s32, num_channel_samples, ma_dither_mode_none);
+				break;
+			case ga_data_type_float:
+				conversion_buffer = malloc(num_channel_samples * ma_get_bytes_per_sample(pDevice->device.playback.format));
+				ma_pcm_convert(conversion_buffer, pDevice->device.playback.format, output_buffer, ma_format_f32, num_channel_samples, ma_dither_mode_none);
+				break;
+			case ga_data_type_double:
+				switch (pDevice->device.playback.format)
+				{
+				case ma_format_u8:
+					conversion_buffer = malloc(num_channel_samples * sizeof(uint8_t));
+					f64_to_u8((uint8_t*)conversion_buffer, (double*)output_buffer, num_channel_samples);
+					break;
+				case ma_format_s16:
+					conversion_buffer = malloc(num_channel_samples * sizeof(int16_t));
+					f64_to_s16((int16_t*)conversion_buffer, (double*)output_buffer, num_channel_samples);
+					break;
+				case ma_format_s32:
+					conversion_buffer = malloc(num_channel_samples * sizeof(int32_t));
+					f64_to_s32((int32_t*)conversion_buffer, (double*)output_buffer, num_channel_samples);
+					break;
+				case ma_format_f32:
+					conversion_buffer = malloc(num_channel_samples * sizeof(float));
+					f64_to_f32((float*)conversion_buffer, (double*)output_buffer, num_channel_samples);
+					break;
+				default:
+					return GA_E_INVALID_TYPE;
+					break;
+				}
+				break;
+			default:
+				return GA_E_INVALID_TYPE;
+				break;
 		}
-		break;
-	default:
-		return GA_E_INVALID_TYPE;
-		break;
+
+		if (conversion_buffer == NULL)
+		{
+			return GA_E_MEMORY;
+		}
+
+		output_buffer = conversion_buffer;
+		conversion_buffer = NULL;
+		passthrough = MA_FALSE;
 	}
 
-	if (conversion_buffer == NULL)
+	if (pDevice->device.playback.channels != channels)
 	{
-		return GA_E_MEMORY;
+		void* channel_conversion_buffer = NULL;
+		ma_channel_converter converter;
+		ma_channel_converter_config converter_config = ma_channel_converter_config_init(pDevice->device.playback.format, channels, NULL, pDevice->device.playback.channels, NULL, ma_channel_mix_mode_default);
+
+		result = ma_channel_converter_init(&converter_config, &converter);
+		if (result != MA_SUCCESS)
+		{
+			if (!passthrough)
+			{
+			    free(output_buffer);
+				output_buffer = NULL;
+			}
+			return result + MA_ERROR_OFFSET;
+		}
+
+		channel_conversion_buffer = malloc(num_frames * ma_get_bytes_per_frame(pDevice->device.playback.format, pDevice->device.playback.channels));
+		if (channel_conversion_buffer == NULL)
+		{
+			ma_channel_converter_uninit(&converter);
+			if (!passthrough)
+			{
+				free(output_buffer);
+				output_buffer = NULL;
+			}
+			return GA_E_MEMORY;
+		}
+
+		result = ma_channel_converter_process_pcm_frames(&converter, channel_conversion_buffer, output_buffer, num_frames);
+		if (result != MA_SUCCESS)
+		{
+			ma_channel_converter_uninit(&converter);
+			free(channel_conversion_buffer);
+			channel_conversion_buffer = NULL;
+			if (!passthrough)
+			{
+				free(output_buffer);
+				output_buffer = NULL;
+			}
+			return result + MA_ERROR_OFFSET;
+		}
+
+		ma_channel_converter_uninit(&converter);
+		if (!passthrough)
+		{
+			free(output_buffer);
+		}
+		output_buffer = channel_conversion_buffer;
+		channel_conversion_buffer = NULL;
+		passthrough = MA_FALSE;
 	}
 
 	result = check_and_start_audio_device(&pDevice->device);
@@ -1756,7 +1834,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT playback_audio(int32_t refnum, void* buffer, 
 		}
 		{
 			bytesToWrite = framesToWrite * ma_get_bytes_per_frame(pDevice->device.playback.format, pDevice->device.playback.channels);
-			memcpy(pWriteBuffer, (ma_uint8*)conversion_buffer + bufferOffset, bytesToWrite);
+			memcpy(pWriteBuffer, (ma_uint8*)output_buffer + bufferOffset, bytesToWrite);
 		}
 		result = ma_pcm_rb_commit_write(&pDevice->buffer, framesToWrite, pWriteBuffer);
 		if (!((result == MA_SUCCESS) || (result == MA_AT_END)))
@@ -1767,10 +1845,10 @@ extern "C" LV_DLL_EXPORT GA_RESULT playback_audio(int32_t refnum, void* buffer, 
 		bufferOffset += bytesToWrite;
 	} while (pcmFramesProcessed < num_frames);
 
-	if (conversion_buffer != NULL)
+	if (!passthrough)
 	{
-		free(conversion_buffer);
-		conversion_buffer = NULL;
+		free(output_buffer);
+		output_buffer = NULL;
 	}
 
 	return GA_SUCCESS;
@@ -1793,7 +1871,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT capture_audio(int32_t refnum, void* buffer, i
 		return GA_E_REFNUM;
 	}
 
-	if (pDevice->device.type != ma_device_type_capture)
+	if (!(pDevice->device.type == ma_device_type_capture || pDevice->device.type == ma_device_type_loopback))
 	{
 		return GA_E_CAPTURE_MODE;
 	}
@@ -2109,4 +2187,47 @@ inline GA_RESULT check_and_start_audio_device(ma_device* pDevice)
 	}
 
 	return GA_SUCCESS;
+}
+
+
+////////////////////////////
+// LabVIEW Audio Data API //
+////////////////////////////
+extern "C" LV_DLL_EXPORT GA_RESULT channel_converter(ga_data_type audio_type, uint64_t num_frames, void* audio_buffer_in, uint32_t channels_in, void* audio_buffer_out, uint32_t channels_out)
+{
+	ma_result result;
+	ma_channel_converter converter;
+	ma_channel_converter_config converter_config = ma_channel_converter_config_init(ga_data_type_to_ma_format(audio_type), channels_in, NULL, channels_out, NULL, ma_channel_mix_mode_default);
+
+	result = ma_channel_converter_init(&converter_config, &converter);
+	if (result != MA_SUCCESS)
+	{
+		return result + MA_ERROR_OFFSET;
+	}
+
+	result = ma_channel_converter_process_pcm_frames(&converter, audio_buffer_out, audio_buffer_in, num_frames);
+	if (result != MA_SUCCESS)
+	{
+		ma_channel_converter_uninit(&converter);
+		return result + MA_ERROR_OFFSET;
+	}
+
+	ma_channel_converter_uninit(&converter);
+
+	return GA_SUCCESS;
+}
+
+inline ma_format ga_data_type_to_ma_format(ga_data_type audio_type)
+{
+	switch (audio_type)
+	{
+		case ga_data_type_u8: return ma_format_u8; break;
+		case ga_data_type_i16: return ma_format_s16; break;
+		case ga_data_type_i32: return ma_format_s32; break;
+		case ga_data_type_float: return ma_format_f32; break;
+		case ga_data_type_double: return ma_format_f32; break;
+		default: return ma_format_s16; break;
+	}
+
+	return ma_format_s16;
 }

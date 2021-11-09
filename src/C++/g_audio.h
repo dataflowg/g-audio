@@ -1,7 +1,7 @@
 /*
 G-Audio - An audio library for LabVIEW.
 
-v0.2.0
+v0.3.0
 
 This code implements a wrapper library around the following libraries:
 dr_flac and dr_wav - https://github.com/mackron/dr_libs
@@ -19,6 +19,10 @@ Twitter - https://twitter.com/Dataflow_G
 /////////////
 // HISTORY //
 /////////////
+v0.3.0
+- Loopback support
+- CLFN abort callback
+
 v0.2.0
 - Audio device playback and capture via miniaudio
 - Update dr_flac, dr_wav, minimp3, stb_vorbis libraries
@@ -186,6 +190,10 @@ typedef struct
 	ma_int32 buffer_size;
 } audio_device;
 
+////////////////////////////
+// LabVIEW CLFN Callbacks //
+////////////////////////////
+extern "C" LV_DLL_EXPORT int32_t clfn_abort(void* data);
 
 ////////////////////////////
 // LabVIEW Audio File API //
@@ -222,7 +230,8 @@ GA_RESULT get_audio_file_codec(const char* file_name, ga_codec* codec);
 // Query the available backends (WASAPI, DirectSound, WinMM, etc).
 extern "C" LV_DLL_EXPORT GA_RESULT query_audio_backends(uint16_t* backends, uint16_t* num_backends);
 // Query available devices for a given backend. Set backend greater than ma_backend_null to query the default backend.
-extern "C" LV_DLL_EXPORT GA_RESULT query_audio_devices(uint16_t backend, uint8_t* playback_device_ids, int32_t* num_playback_devices, uint8_t* capture_device_ids, int32_t* num_capture_devices);
+// backend will be set to the actual backend used when querying devices, used for discovering what default backend is in use.
+extern "C" LV_DLL_EXPORT GA_RESULT query_audio_devices(uint16_t* backend, uint8_t* playback_device_ids, int32_t* num_playback_devices, uint8_t* capture_device_ids, int32_t* num_capture_devices);
 // Get audio device info for a given backend. Set backend greater than ma_backend_null to query the default backend.
 extern "C" LV_DLL_EXPORT GA_RESULT get_audio_device_info(uint16_t backend, const uint8_t* device_id, uint16_t device_type, char* device_name);
 // Configure an audio device ready for playback. Will setup the context, device, audio buffers, and callbacks.
@@ -232,7 +241,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT get_configured_audio_device_info(int32_t refn
 // Start the audio device playback or capture.
 extern "C" LV_DLL_EXPORT GA_RESULT start_audio_device(int32_t refnum);
 // Write audio data to the device's buffer for playback. Will block if the audio buffer is full.
-extern "C" LV_DLL_EXPORT GA_RESULT playback_audio(int32_t refnum, void* buffer, int32_t num_frames, ga_data_type audio_type);
+extern "C" LV_DLL_EXPORT GA_RESULT playback_audio(int32_t refnum, void* buffer, int32_t num_frames, uint32_t channels, ga_data_type audio_type);
 // Read audio data from the device's buffer. Will block until the specified number of frames has been captured.
 extern "C" LV_DLL_EXPORT GA_RESULT capture_audio(int32_t refnum, void* buffer, int32_t* num_frames, ga_data_type audio_type);
 // Wait until the buffer has been emptied by the playback_callback routine.
@@ -249,6 +258,13 @@ void capture_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_
 void stop_callback(ma_device* pDevice);
 inline ma_bool32 device_is_started(ma_device* pDevice);
 inline GA_RESULT check_and_start_audio_device(ma_device* pDevice);
+
+////////////////////////////
+// LabVIEW Audio Data API //
+////////////////////////////
+extern "C" LV_DLL_EXPORT GA_RESULT channel_converter(ga_data_type audio_type, uint64_t num_frames, void* audio_buffer_in, uint32_t channels_in, void* audio_buffer_out, uint32_t channels_out);
+
+inline ma_format ga_data_type_to_ma_format(ga_data_type audio_type);
 
 /////////////////////////
 // FLAC codec wrappers //
