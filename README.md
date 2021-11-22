@@ -4,36 +4,109 @@
 </p>
 A cross-platform LabVIEW library for audio device playback and capture, and for reading and writing audio files.
 
-## What's New?
-* Multi-channel audio mixer!
-    * Quickly playback one or more audio files
-    * Play, pause, stop, and volume controls for each channel
-    * Load audio files while existing channels play, without interruption
-    * Includes simple mixer and sample pad examples
-* Loopback capture!
-    * Capture, process, and record sound from other applications
-    * WASAPI only
-* Audio playback and capture!
-    * Continuous audio input / output
-    * Multiple audio backends supported (WASAPI, DirectSound, Core Audio, PulseAudio, ALSA, etc)
-    * Simultaneous playback on multiple devices
-    * Enumerate audio devices on-the-fly ([a requested feature / bug of lvsound2](https://forums.ni.com/t5/LabVIEW-Idea-Exchange/Update-the-lvsound2-library-Sound-Input-Sound-Output-VIs-to/idi-p/2049098?profile.language=en))
+<p align="center">
+    <a href="#whats-new">What's New?</a> -
+    <a href="#features">Features</a> -
+    <a href="#installation">Installation</a> -
+    <a href="#usage">Usage</a> -
+	<a href="#compiling">Compiling</a> -
+	<a href="#comparison">Comparison</a> - 
+	<a href="#license">License</a> - 
+	<a href="#acknowledgments">Acknowledgments</a>
+</p>
 
-## Features
+## <a id="whats-new"></a>What's New?
+* Raspberry Pi / LINX support!
+    * See the [Installation](#installation) section to get started.
+
+## <a id="features"></a>Features
 * Support for audio playback and capture, including loopback capture
 * Playback and capture using selectable backends (WASAPI, DirectSound, Core Audio, PulseAudio, ALSA, etc)
 * Multi-channel audio mixer
 * Read MP3, FLAC, Ogg Vorbis, and WAV formats
 * Write WAV format (PCM and IEEE Float, with Sony Wave64 support for large files)
 * Unicode path support (UTF-8)
-* Cross-platform, 32-bit and 64-bit
+* Cross-platform (Windows, macOS, Linux, Raspberry Pi / LINX), 32-bit and 64-bit
 * Simple to use API
 
 ![The G-Audio library API](images/g-audio-palettes.png?raw=true "The G-Audio library API")
 
-The library is designed to be cross platform, with compiled libraries available for Windows, macOS, and Linux.
+## <a id="installation"></a>Installation
+G-Audio is published on [vipm.io](https://www.vipm.io/package/dataflow_g_lib_g_audio/), and can be installed using VI Package Manager (VIPM). The packages are also available as [github releases](https://github.com/dataflowg/g-audio/releases) and can be installed manually using VIPM.
 
-## Comparison
+If you want to include the library directly in your project, download or clone the repo and place the [G-Audio folder](https://github.com/dataflowg/g-audio/tree/main/src/LabVIEW/G-Audio) in your source directory, then add `G-Audio.lvlib` to your LabVIEW project.
+
+### Raspberry Pi / LINX Installation
+Before beginning, ensure your board has the LINX toolkit installed and SSH is enabled.
+
+#### 1. Install G-Audio
+Download and install the VIPM package from the github project dev branch:
+
+https://github.com/dataflowg/g-audio/raw/dev/src/LabVIEW/VIPM/dataflow_g_lib_g_audio-0.3.0.2-dev.vip
+
+#### 2. Install ALSA to chroot
+SSH into the LINX target (using PuTTy or similar) and run the commands:
+```
+sudo schroot -r -c lv
+opkg update
+opkg install alsa-lib
+exit
+```
+#### 3. Copy `g_audio_32.so` to the target
+*Note: This library has been compiled for armv7a processors. Other architectures may need to build the library before it can be used. See the [Compiling](#compiling) section.*
+
+SCP / SFTP to the LINX target (using WinSCP or similar) and copy the library file located in `<vi.lib>\Dataflow_G\G-Audio\lib\LINX\g_audio_32.so` to the `/srv/chroot/labview/usr/lib` folder.
+
+Alternatively, SSH to the LINX target and download the library direct from github:
+```
+cd /srv/chroot/labview/usr/lib
+wget https://github.com/dataflowg/g-audio/raw/dev/src/LabVIEW/G-Audio/lib/LINX/g_audio_32.so
+```
+
+#### 4. Make some noise!
+Copy some audio files to your device using SCP or SFTP and place them in `/home/pi` or your preferred location. Create a LabVIEW project, add your LINX target, then the examples in the Add-ons >> G-Audio >> Examples >> LINX palette.
+
+If you need to adjust the volume output, SSH into the LINX target and run `alsamixer`. Press F6, then select the physical audio device (not Default). Use the up and down arrow keys to adjust the volume, or use numbers 1-9 to set the volume in 10% increments. Press Esc to save and exit the mixer.
+
+## <a id="usage"></a>Usage
+See the example VIs in [Examples](src/LabVIEW/G-Audio/Examples) to write, read, playback, and capture audio files.
+
+Unit tests are included and can be run individually, or with the [AST Unit Tester](https://www.autosofttech.net/documents/ast-unit-tester).
+
+### Supported Data Types
+The `Playback Audio`, `Capture Audio`, `Audio File Read`, and `Audio File Write` VIs are malleable, and accept waveform arrays, waveforms, 2D arrays, and 1D arrays with types U8, I16, I32, SGL, and DBL (20 combinations in total). All audio data is processed in its native format, and then converted to the requested format if necessary. For WAV and FLAC files, any conversions are considered lossy, so check the file format before loading to ensure everything is lossless.
+
+![Supported data types](images/g-audio-data-types.png?raw=true "Supported data types")
+
+#### Malleable VIs and broken wires
+If a malleable VI has broken wire inputs and errors about unsupported types, even though the type is supported, try hold Ctrl and click the run arrow. This will force LabVIEW to recompile the VI, and should hopefully fix those broken wires.
+
+## <a id="compiling"></a>Compiling
+Under Windows, Microsoft Visual Studio Community 2019 is used to compile and test the DLL called by LabVIEW.
+
+Under macOS, XCode 11.5 is used to compile the shared framework.
+
+Under Linux, run the `make.sh` script to compile the shared object library, or manually compile with the command `g++ -shared -fPIC -o g_audio_64.so *.cpp -lm -lpthread -ldl`.
+
+Under Raspberry Pi / LINX, run the following commands from SSH:
+```
+sudo schroot -r -c lv
+opkg update
+opkg install packagegroup-core-buildessential
+opkg install --force-depends libc6-dev
+opkg install --force-depends libgcc-s-dev
+opkg install libstdc++-staticdev
+opkg install git
+opkg install alsa-lib-dev
+git clone https://github.com/dataflowg/g-audio
+cd g-audio/src/C++
+git checkout dev
+g++ -shared -fPIC -o g_audio_32.so *.cpp -lm -lpthread -ldl -std=c++11
+cp g_audio_32.so /usr/lib
+exit
+```
+
+## <a id="comparison"></a>Comparison
 ### Audio Playback & Capture
 Feature                       | G-Audio             | [LabVIEW Sound](https://zone.ni.com/reference/en-XX/help/371361R-01/lvconcepts/soundvis/) | [WaveIO](https://www.zeitnitz.eu/scms/waveio)
 ------------------------------|---------------------|-------------------------|--------------
@@ -73,31 +146,10 @@ Cross-platform               | :heavy_check_mark:  | :heavy_check_mark:⁴ | :x:
 
 ⁴ *While LabVIEW Sound is cross-platform, testing under macOS and Linux shows writing 32-bit IEEE Float is unsupported.*
 
-## License
-This library is built using public domain audio decoders and libraries. As such, this library is also made available in the public domain. See [LICENSE](LICENSE) for details.
-
-## Installation
-G-Audio is published on [vipm.io](https://www.vipm.io/package/dataflow_g_lib_g_audio/), and can be installed using VI Package Manager (VIPM). The packages are also available as [github releases](https://github.com/dataflowg/g-audio/releases) and can be installed manually using VIPM.
-
-If you want to include the library directly in your project, download or clone the repo and place the [G-Audio folder](https://github.com/dataflowg/g-audio/tree/main/src/LabVIEW/G-Audio) in your source directory, then add `G-Audio.lvlib` to your LabVIEW project.
-
-## Usage
-See the example VIs in [Examples](src/LabVIEW/G-Audio/Examples) to write, read, playback, and capture audio files.
-
-Unit tests are included and can be run individually, or with the [AST Unit Tester](https://www.autosofttech.net/documents/ast-unit-tester).
-
-### Supported Data Types
-The `Playback Audio`, `Capture Audio`, `Audio File Read`, and `Audio File Write` VIs are malleable, and accept waveform arrays, waveforms, 2D arrays, and 1D arrays with types U8, I16, I32, SGL, and DBL (20 combinations in total). All audio data is processed in its native format, and then converted to the requested format if necessary. For WAV and FLAC files, any conversions are considered lossy, so check the file format before loading to ensure everything is lossless.
-
-![Supported data types](images/g-audio-data-types.png?raw=true "Supported data types")
-
-#### Malleable VIs and broken wires
-If a malleable VI has broken wire inputs and errors about unsupported types, even though the type is supported, try hold Ctrl and click the run arrow. This will force LabVIEW to recompile the VI, and should hopefully fix those broken wires.
-
 ## Playback and Capture Buffering
 The underlying mechanism for playback and capture is a callback made from the backend, where it requests the next block of audio data to be sent to the audio device, or the next available block read from the audio device.
 
-The diagram below shows the audio data flow during playback. The functions `Playback Audio.vim` and the backend callback run asynchronously. The ring buffer sits between the two, and keeps track of the next block of audio to be read (by the callback) and written (from LabVIEW). It's critical sufficient audio data is written to the ring buffer during playback, and read from the buffer during capture to ensure there are no audio glitches.
+The diagram below shows the audio data flow during playback. The function `Playback Audio.vim` and the backend callback run asynchronously. The ring buffer sits between the two, and keeps track of the next block of audio to be read (by the callback) and written (from LabVIEW). It's critical sufficient audio data is written to the ring buffer during playback, and read from the buffer during capture, to ensure there are no audio glitches.
 
 Definitions used when referring to the diagram:
 
@@ -111,14 +163,10 @@ Period | 10ms of audio data (sample rate / 100). Typically 441 or 480 frames.
 
 The *period* size should be regarded as the minimum buffer size when configuring the audio device. Note that the number of frames requested in the callback routine isn't necessarily fixed, and can be larger than a single *period*.
 
-## Compiling
-Under Windows, Microsoft Visual Studio Community 2019 is used to compile and test the DLL called by LabVIEW.
+## <a id="license"></a>License
+This library is built using public domain audio decoders and libraries. As such, this library is also made available in the public domain. See [LICENSE](LICENSE) for details.
 
-Under macOS, XCode 11.5 is used to compile the shared framework.
-
-Under Linux, run the `make.sh` script to compile the shared object library, or manually compile with the command `g++ -shared -fPIC -o g_audio_x64.so *.cpp -lm -lpthread -ldl`.
-
-## Libraries
+## <a id="acknowledgements"></a>Acknowledgements
 This library uses the following public domain libraries. Massive thanks to these authors.
 * [miniaudio.h](https://github.com/mackron/miniaudio) by mackron
 * [dr_flac.h](https://github.com/mackron/dr_libs) by mackron

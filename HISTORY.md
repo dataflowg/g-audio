@@ -1,4 +1,9 @@
 # G-Audio Release History
+### v0.x.x - 2021-xx-xx
+* Raspberry Pi / LINX support
+
+
+
 ### v0.3.0 - 2021-11-09
 * Multi-channel audio mixer
 * Loopback audio capture (WASAPI only)
