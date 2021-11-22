@@ -2,7 +2,9 @@
 <p align="center">
   <img width="300" height="115" src="images/g-audio-logo.png">
 </p>
+<p align="center">
 A cross-platform LabVIEW library for audio device playback and capture, and for reading and writing audio files.
+</p>
 
 <p align="center">
     <a href="#whats-new">What's New?</a> -
