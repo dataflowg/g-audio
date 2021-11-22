@@ -2,7 +2,9 @@
 <p align="center">
   <img width="300" height="115" src="images/g-audio-logo.png">
 </p>
+<p align="center">
 A cross-platform LabVIEW library for audio device playback and capture, and for reading and writing audio files.
+</p>
 
 <p align="center">
     <a href="#whats-new">What's New?</a> -
@@ -166,7 +168,7 @@ The *period* size should be regarded as the minimum buffer size when configuring
 ## <a id="license"></a>License
 This library is built using public domain audio decoders and libraries. As such, this library is also made available in the public domain. See [LICENSE](LICENSE) for details.
 
-## <a id="acknowledgements"></a>Acknowledgements
+## <a id="acknowledgments"></a>Acknowledgments
 This library uses the following public domain libraries. Massive thanks to these authors.
 * [miniaudio.h](https://github.com/mackron/miniaudio) by mackron
 * [dr_flac.h](https://github.com/mackron/dr_libs) by mackron
