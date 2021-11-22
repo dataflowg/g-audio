@@ -1376,7 +1376,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT query_audio_backends(uint16_t* backends, uint
 	return GA_SUCCESS;
 }
 
-extern "C" LV_DLL_EXPORT GA_RESULT query_audio_devices(uint16_t* backend, uint8_t* playback_device_ids, int32_t* num_playback_devices, uint8_t* capture_device_ids, int32_t* num_capture_devices)
+extern "C" LV_DLL_EXPORT GA_RESULT query_audio_devices(uint16_t* backend_in, uint8_t* playback_device_ids, int32_t* num_playback_devices, uint8_t* capture_device_ids, int32_t* num_capture_devices)
 {
 	ma_context context;
 	ma_device_info* pPlaybackDeviceInfos;
@@ -1385,12 +1385,13 @@ extern "C" LV_DLL_EXPORT GA_RESULT query_audio_devices(uint16_t* backend, uint8_
 	ma_uint32 captureDeviceCount;
 	ma_result result;
 	uint32_t iDevice;
+	ma_backend backend = (ma_backend)*backend_in;
 
 	// Thread safety - ma_context_init, ma_context_get_devices, ma_context_uninit are unsafe
 	lock_ga_mutex(ga_mutex_context);
 	// Can safely pass 1 as backendCount, as it's ignored when backends is NULL.
 	// The backends enum in LabVIEW adds Default after Null
-	result = ma_context_init((*backend > ma_backend_null ? NULL : (ma_backend*)backend), 1, NULL, &context);
+	result = ma_context_init((*backend_in > ma_backend_null ? NULL : &backend), 1, NULL, &context);
 	if (result != MA_SUCCESS)
 	{
 		unlock_ga_mutex(ga_mutex_context);
@@ -1426,7 +1427,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT query_audio_devices(uint16_t* backend, uint8_
 		memcpy(&capture_device_ids[iDevice * sizeof(ma_device_id)], &pCaptureDeviceInfos[iDevice].id, sizeof(ma_device_id));
 	}
 
-	*backend = (uint16_t)context.backend;
+	*backend_in = (uint16_t)context.backend;
 	*num_playback_devices = playbackDeviceCount;
 	*num_capture_devices = captureDeviceCount;
 

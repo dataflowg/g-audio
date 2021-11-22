@@ -67,6 +67,10 @@
 		<Property Name="server.vi.propertiesEnabled" Type="Bool">true</Property>
 		<Property Name="specify.custom.address" Type="Bool">false</Property>
 		<Item Name="Examples" Type="Folder">
+			<Item Name="LINX" Type="Folder">
+				<Item Name="Audio Playback Example (LINX).vi" Type="VI" URL="../G-Audio/Examples/LINX/Audio Playback Example (LINX).vi"/>
+				<Item Name="Sample Pad Example (LINX).vi" Type="VI" URL="../G-Audio/Examples/LINX/Sample Pad Example (LINX).vi"/>
+			</Item>
 			<Item Name="SubVIs" Type="Folder">
 				<Item Name="Generate Signal Components.vim" Type="VI" URL="../G-Audio/Examples/SubVIs/Generate Signal Components.vim"/>
 				<Item Name="Music Visualizer (Queue Only).vi" Type="VI" URL="../G-Audio/Examples/SubVIs/Music Visualizer (Queue Only).vi"/>
@@ -81,7 +85,7 @@
 			<Item Name="Music Visualizer Example.vi" Type="VI" URL="../G-Audio/Examples/Music Visualizer Example.vi"/>
 			<Item Name="Playback Latency Compare Example.vi" Type="VI" URL="../G-Audio/Examples/Playback Latency Compare Example.vi"/>
 			<Item Name="Query Audio Devices Example.vi" Type="VI" URL="../G-Audio/Examples/Query Audio Devices Example.vi"/>
-			<Item Name="Sample Pad Example (LINX).vi" Type="VI" URL="../G-Audio/Examples/Sample Pad Example (LINX).vi"/>
+			<Item Name="Sample Pad Example (Arduino Controller).vi" Type="VI" URL="../G-Audio/Examples/Sample Pad Example (Arduino Controller).vi"/>
 			<Item Name="Sample Pad Example.vi" Type="VI" URL="../G-Audio/Examples/Sample Pad Example.vi"/>
 			<Item Name="Write Audio File Example.vi" Type="VI" URL="../G-Audio/Examples/Write Audio File Example.vi"/>
 		</Item>
