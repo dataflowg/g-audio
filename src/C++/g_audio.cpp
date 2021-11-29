@@ -1438,7 +1438,9 @@ extern "C" LV_DLL_EXPORT GA_RESULT query_audio_devices(uint16_t* backend_in, uin
 	return GA_SUCCESS;
 }
 
-extern "C" LV_DLL_EXPORT GA_RESULT get_audio_device_info(uint16_t backend_in, const uint8_t* device_id, uint16_t device_type, char* device_name)
+extern "C" LV_DLL_EXPORT GA_RESULT get_audio_device_info(uint16_t backend_in, const uint8_t* device_id, uint16_t device_type, char* device_name, uint32_t* device_default,
+                                                         uint32_t* device_min_sample_rate, uint32_t* device_max_sample_rate, uint32_t* device_min_channels, uint32_t* device_max_channels,
+                                                         uint16_t* device_formats, uint32_t* device_format_count)
 {
 	ma_context context;
 	ma_device_id deviceId;
@@ -1474,6 +1476,17 @@ extern "C" LV_DLL_EXPORT GA_RESULT get_audio_device_info(uint16_t backend_in, co
 	device_name[sizeof(deviceInfo.name)-1] = '\0';
 #endif
 
+	*device_default = deviceInfo.isDefault;
+	*device_min_sample_rate = deviceInfo.minSampleRate;
+	*device_max_sample_rate = deviceInfo.maxSampleRate;
+	*device_min_channels = deviceInfo.minChannels;
+	*device_max_channels = deviceInfo.maxChannels;
+	*device_format_count = deviceInfo.formatCount;
+	for (int i = 0; i < deviceInfo.formatCount; i++)
+	{
+		device_formats[i] = deviceInfo.formats[i];
+	}
+
 	ma_context_uninit(&context);
 
 	unlock_ga_mutex(ga_mutex_context);
@@ -1481,7 +1494,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT get_audio_device_info(uint16_t backend_in, co
 	return GA_SUCCESS;
 }
 
-extern "C" LV_DLL_EXPORT GA_RESULT configure_audio_device(uint16_t backend_in, const uint8_t* device_id, uint16_t device_type, uint32_t channels, uint32_t sample_rate, uint16_t format, uint8_t exclusive_mode, int32_t buffer_size, int32_t* refnum)
+extern "C" LV_DLL_EXPORT GA_RESULT configure_audio_device(uint16_t backend_in, const uint8_t* device_id, uint16_t device_type, uint32_t channels, uint32_t sample_rate, uint16_t format, uint8_t exclusive_mode, uint32_t period_size, uint32_t num_periods, int32_t buffer_size, int32_t* refnum)
 {
 	ma_result result;
 	ma_device_id deviceId;
@@ -1545,6 +1558,8 @@ extern "C" LV_DLL_EXPORT GA_RESULT configure_audio_device(uint16_t backend_in, c
 		device_config.capture.channelMixMode = ma_channel_mix_mode_simple;
 		//config.wasapi.noAutoConvertSRC = true; // Enable low latency shared mode
 		device_config.capture.shareMode = exclusive_mode ? ma_share_mode_exclusive : ma_share_mode_shared;
+		device_config.periodSizeInFrames = period_size;
+		device_config.periods = num_periods;
 		break;
 	default:
 		device_config.playback.format = (ma_format)format;   // Set to ma_format_unknown to use the device's native format.
@@ -1556,6 +1571,8 @@ extern "C" LV_DLL_EXPORT GA_RESULT configure_audio_device(uint16_t backend_in, c
 		device_config.playback.channelMixMode = ma_channel_mix_mode_simple;
 		//config.wasapi.noAutoConvertSRC = true; // Enable low latency shared mode
 		device_config.playback.shareMode = exclusive_mode ? ma_share_mode_exclusive : ma_share_mode_shared;
+		device_config.periodSizeInFrames = period_size;
+		device_config.periods = num_periods;
 		break;
 	}
 
@@ -1621,7 +1638,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT configure_audio_device(uint16_t backend_in, c
 	return GA_SUCCESS;
 }
 
-extern "C" LV_DLL_EXPORT GA_RESULT get_configured_audio_device_info(int32_t refnum, uint32_t* sample_rate, uint32_t* channels, uint16_t* format, uint8_t* exclusive_mode)
+extern "C" LV_DLL_EXPORT GA_RESULT get_audio_device_configuration(int32_t refnum, uint32_t* sample_rate, uint32_t* channels, uint16_t* format, uint8_t* exclusive_mode, uint32_t* period_size, uint32_t* num_periods)
 {
 	audio_device* pDevice = (audio_device*)get_reference_data(ga_refnum_audio_device, refnum);
 
@@ -1638,12 +1655,16 @@ extern "C" LV_DLL_EXPORT GA_RESULT get_configured_audio_device_info(int32_t refn
 		*channels = pDevice->device.capture.channels;
 		*sample_rate = pDevice->device.sampleRate;
 		*exclusive_mode = pDevice->device.capture.shareMode;
+		*period_size = pDevice->device.capture.internalPeriodSizeInFrames;
+		*num_periods = pDevice->device.capture.internalPeriods;
 		break;
 	default:
 		*format = pDevice->device.playback.format;
 		*channels = pDevice->device.playback.channels;
 		*sample_rate = pDevice->device.sampleRate;
-		*exclusive_mode = pDevice->device.capture.shareMode;
+		*exclusive_mode = pDevice->device.playback.shareMode;
+		*period_size = pDevice->device.playback.internalPeriodSizeInFrames;
+		*num_periods = pDevice->device.playback.internalPeriods;
 		break;
 	}
 

@@ -19,6 +19,10 @@ Twitter - https://twitter.com/Dataflow_G
 /////////////
 // HISTORY //
 /////////////
+v0.4.0
+- Query detailed device info
+- Advanced device configuration
+
 v0.3.0
 - Loopback support
 - CLFN abort callback
@@ -233,11 +237,11 @@ extern "C" LV_DLL_EXPORT GA_RESULT query_audio_backends(uint16_t* backends, uint
 // backend will be set to the actual backend used when querying devices, used for discovering what default backend is in use.
 extern "C" LV_DLL_EXPORT GA_RESULT query_audio_devices(uint16_t* backend, uint8_t* playback_device_ids, int32_t* num_playback_devices, uint8_t* capture_device_ids, int32_t* num_capture_devices);
 // Get audio device info for a given backend. Set backend greater than ma_backend_null to query the default backend.
-extern "C" LV_DLL_EXPORT GA_RESULT get_audio_device_info(uint16_t backend, const uint8_t* device_id, uint16_t device_type, char* device_name);
+extern "C" LV_DLL_EXPORT GA_RESULT get_audio_device_info(uint16_t backend, const uint8_t* device_id, uint16_t device_type, char* device_name, uint32_t* device_default,	uint32_t* device_min_sample_rate, uint32_t* device_max_sample_rate, uint32_t* device_min_channels, uint32_t* device_max_channels, uint16_t* device_formats, uint32_t* device_format_count);
 // Configure an audio device ready for playback. Will setup the context, device, audio buffers, and callbacks.
-extern "C" LV_DLL_EXPORT GA_RESULT configure_audio_device(uint16_t backend, const uint8_t* device_id, uint16_t device_type, uint32_t channels, uint32_t sample_rate, uint16_t format, uint8_t exclusive_mode, int32_t buffer_size, int32_t* refnum);
+extern "C" LV_DLL_EXPORT GA_RESULT configure_audio_device(uint16_t backend, const uint8_t* device_id, uint16_t device_type, uint32_t channels, uint32_t sample_rate, uint16_t format, uint8_t exclusive_mode, uint32_t period_size, uint32_t num_periods, int32_t buffer_size, int32_t* refnum);
 // Get info on the configured audio device, primarily for allocating memory in LabVIEW
-extern "C" LV_DLL_EXPORT GA_RESULT get_configured_audio_device_info(int32_t refnum, uint32_t * sample_rate, uint32_t * channels, uint16_t * format, uint8_t * exclusive_mode);
+extern "C" LV_DLL_EXPORT GA_RESULT get_audio_device_configuration(int32_t refnum, uint32_t* sample_rate, uint32_t* channels, uint16_t* format, uint8_t* exclusive_mode, uint32_t* period_size, uint32_t* num_periods);
 // Start the audio device playback or capture.
 extern "C" LV_DLL_EXPORT GA_RESULT start_audio_device(int32_t refnum);
 // Write audio data to the device's buffer for playback. Will block if the audio buffer is full.

@@ -16,6 +16,7 @@ https://github.com/dataflowg/g-audio</Property>
 		<Item Name="Clear Audio Backend.vi" Type="VI" URL="../Audio Devices/Clear Audio Backend.vi"/>
 		<Item Name="Clear Audio Device.vi" Type="VI" URL="../Audio Devices/Clear Audio Device.vi"/>
 		<Item Name="Configure Audio Device.vi" Type="VI" URL="../Audio Devices/Configure Audio Device.vi"/>
+		<Item Name="Get Audio Device Configuration.vi" Type="VI" URL="../Audio Devices/Get Audio Device Configuration.vi"/>
 		<Item Name="Playback Audio.vim" Type="VI" URL="../Audio Devices/Playback Audio.vim"/>
 		<Item Name="Playback Wait.vi" Type="VI" URL="../Audio Devices/Playback Wait.vi"/>
 		<Item Name="Query Audio Backends.vi" Type="VI" URL="../Audio Devices/Query Audio Backends.vi"/>
@@ -56,6 +57,7 @@ https://github.com/dataflowg/g-audio</Property>
 		<Item Name="Channel Conversion.vim" Type="VI" URL="../Audio Processing/Channel Conversion.vim"/>
 	</Item>
 	<Item Name="Controls" Type="Folder">
+		<Item Name="Audio Device Advanced Config.ctl" Type="VI" URL="../Controls/Audio Device Advanced Config.ctl"/>
 		<Item Name="Audio Device Config.ctl" Type="VI" URL="../Controls/Audio Device Config.ctl"/>
 		<Item Name="Audio Device Format.ctl" Type="VI" URL="../Controls/Audio Device Format.ctl"/>
 		<Item Name="Audio Device Info.ctl" Type="VI" URL="../Controls/Audio Device Info.ctl"/>
@@ -92,8 +94,8 @@ https://github.com/dataflowg/g-audio</Property>
 		<Item Name="Get Audio Data Type.vim" Type="VI" URL="../Private/Get Audio Data Type.vim"/>
 		<Item Name="Get Audio Device Info.vi" Type="VI" URL="../Private/Get Audio Device Info.vi"/>
 		<Item Name="Get Basic Audio File Info.vi" Type="VI" URL="../Private/Get Basic Audio File Info.vi"/>
-		<Item Name="Get Configured Audio Device Info.vi" Type="VI" URL="../Private/Get Configured Audio Device Info.vi"/>
 		<Item Name="Interleaved Sample Data To Audio Data.vim" Type="VI" URL="../Private/Interleaved Sample Data To Audio Data.vim"/>
+		<Item Name="ma_format To Audio Data Format.vi" Type="VI" URL="../Private/ma_format To Audio Data Format.vi"/>
 		<Item Name="Path To UTF-8 String.vi" Type="VI" URL="../Private/Path To UTF-8 String.vi"/>
 		<Item Name="Result To Error.vi" Type="VI" URL="../Private/Result To Error.vi"/>
 		<Item Name="Value To Audio Device Refnum.vi" Type="VI" URL="../Private/Value To Audio Device Refnum.vi"/>
