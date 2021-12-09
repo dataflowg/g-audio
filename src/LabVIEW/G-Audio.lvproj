@@ -90,12 +90,14 @@
 			<Item Name="Write Audio File Example.vi" Type="VI" URL="../G-Audio/Examples/Write Audio File Example.vi"/>
 		</Item>
 		<Item Name="Unit Tests" Type="Folder">
+			<Item Name="Test Configure Audio Device Duplicate.vi" Type="VI" URL="../Unit Tests/Test Configure Audio Device Duplicate.vi"/>
 			<Item Name="Test Default Audio Device Capture.vi" Type="VI" URL="../Unit Tests/Test Default Audio Device Capture.vi"/>
 			<Item Name="Test Default Audio Device Playback.vi" Type="VI" URL="../Unit Tests/Test Default Audio Device Playback.vi"/>
 			<Item Name="Test File Info FLAC.vi" Type="VI" URL="../Unit Tests/Test File Info FLAC.vi"/>
 			<Item Name="Test File Info MP3.vi" Type="VI" URL="../Unit Tests/Test File Info MP3.vi"/>
 			<Item Name="Test File Info Vorbis.vi" Type="VI" URL="../Unit Tests/Test File Info Vorbis.vi"/>
 			<Item Name="Test File Info WAV.vi" Type="VI" URL="../Unit Tests/Test File Info WAV.vi"/>
+			<Item Name="Test Get Audio Device Configuration.vi" Type="VI" URL="../Unit Tests/Test Get Audio Device Configuration.vi"/>
 			<Item Name="Test Load FLAC.vi" Type="VI" URL="../Unit Tests/Test Load FLAC.vi"/>
 			<Item Name="Test Load MP3.vi" Type="VI" URL="../Unit Tests/Test Load MP3.vi"/>
 			<Item Name="Test Load Vorbis.vi" Type="VI" URL="../Unit Tests/Test Load Vorbis.vi"/>

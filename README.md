@@ -20,6 +20,7 @@ A cross-platform LabVIEW library for audio device playback and capture, and for 
 ## <a id="whats-new"></a>What's New?
 * Raspberry Pi / LINX support!
     * See the [Installation](#installation) section to get started.
+* Advanced device configuration options
 
 ## <a id="features"></a>Features
 * Support for audio playback and capture, including loopback capture

@@ -43,7 +43,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT get_audio_file_info(const char* file_name, ui
 		case ga_codec_mp3: return get_mp3_info(file_name, num_frames, channels, sample_rate, bits_per_sample); break;
 		case ga_codec_vorbis: return get_vorbis_info(file_name, num_frames, channels, sample_rate, bits_per_sample); break;
 		case ga_codec_wav: return get_wav_info(file_name, num_frames, channels, sample_rate, bits_per_sample); break;
-		case ga_codec_unsupported: return GA_E_UNSUPPORTED;
+		case ga_codec_unsupported: return GA_E_UNSUPPORTED_CODEC;
 		default: break;
 	}
 
@@ -67,7 +67,7 @@ extern "C" LV_DLL_EXPORT int16_t* load_audio_file_s16(const char* file_name, uin
 		case ga_codec_mp3: sample_data = load_mp3(file_name, num_frames, channels, sample_rate, result); break;
 		case ga_codec_vorbis: sample_data = load_vorbis(file_name, num_frames, channels, sample_rate, result); break;
 		case ga_codec_wav: sample_data = load_wav(file_name, num_frames, channels, sample_rate, result); break;
-		case ga_codec_unsupported: *result = GA_E_UNSUPPORTED; break;
+		case ga_codec_unsupported: *result = GA_E_UNSUPPORTED_CODEC; break;
 		default: *result = GA_E_GENERIC; break;
 	}
 
@@ -154,7 +154,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT open_audio_file(const char* file_name, int32_
 		default:
 			free(audio_file);
 			audio_file = NULL;
-			return GA_E_UNSUPPORTED;
+			return GA_E_UNSUPPORTED_CODEC;
 			break;
 	}
 
@@ -218,7 +218,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT open_audio_file_write(const char* file_name, 
 		default:
 			free(audio_file);
 			audio_file = NULL;
-			return GA_E_UNSUPPORTED;
+			return GA_E_UNSUPPORTED_CODEC;
 			break;
 	}
 
@@ -446,7 +446,7 @@ GA_RESULT get_audio_file_codec(const char* file_name, ga_codec* codec)
 	else
 	{
 		*codec = ga_codec_unsupported;
-		return GA_E_UNSUPPORTED;
+		return GA_E_UNSUPPORTED_CODEC;
 	}
 	return GA_SUCCESS;
 }
@@ -1379,6 +1379,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT query_audio_backends(uint16_t* backends, uint
 extern "C" LV_DLL_EXPORT GA_RESULT query_audio_devices(uint16_t* backend_in, uint8_t* playback_device_ids, int32_t* num_playback_devices, uint8_t* capture_device_ids, int32_t* num_capture_devices)
 {
 	ma_context context;
+	ma_context_config context_config;
 	ma_device_info* pPlaybackDeviceInfos;
 	ma_uint32 playbackDeviceCount;
 	ma_device_info* pCaptureDeviceInfos;
@@ -1387,11 +1388,15 @@ extern "C" LV_DLL_EXPORT GA_RESULT query_audio_devices(uint16_t* backend_in, uin
 	uint32_t iDevice;
 	ma_backend backend = (ma_backend)*backend_in;
 
+	context_config = ma_context_config_init();
+	// TODO: Only set this flag on Raspberry Pi
+	context_config.alsa.useVerboseDeviceEnumeration = MA_TRUE;
+
 	// Thread safety - ma_context_init, ma_context_get_devices, ma_context_uninit are unsafe
 	lock_ga_mutex(ga_mutex_context);
 	// Can safely pass 1 as backendCount, as it's ignored when backends is NULL.
 	// The backends enum in LabVIEW adds Default after Null
-	result = ma_context_init((*backend_in > ma_backend_null ? NULL : &backend), 1, NULL, &context);
+	result = ma_context_init((*backend_in > ma_backend_null ? NULL : &backend), 1, &context_config, &context);
 	if (result != MA_SUCCESS)
 	{
 		unlock_ga_mutex(ga_mutex_context);
@@ -1443,18 +1448,28 @@ extern "C" LV_DLL_EXPORT GA_RESULT get_audio_device_info(uint16_t backend_in, co
                                                          uint16_t* device_formats, uint32_t* device_format_count)
 {
 	ma_context context;
+	ma_context_config context_config;
 	ma_device_id deviceId;
 	ma_device_info deviceInfo;
 	ma_result result;
 	ma_backend backend = (ma_backend)backend_in;
 
+	if ((ma_device_type)device_type == ma_device_type_duplex)
+	{
+		return GA_E_UNSUPPORTED_DEVICE;
+	}
+
 	memcpy(&deviceId, device_id, sizeof(ma_device_id));
+
+	context_config = ma_context_config_init();
+	// TODO: Only set this flag on Raspberry Pi
+	context_config.alsa.useVerboseDeviceEnumeration = MA_TRUE;
 
 	// Thread safety - ma_context_init, ma_context_uninit are unsafe
 	lock_ga_mutex(ga_mutex_context);
 	// Can safely pass 1 as backendCount, as it's ignored when backends is NULL.
 	// The backends enum in LabVIEW adds Default after Null
-	result = ma_context_init((backend_in > ma_backend_null ? NULL : &backend), 1, NULL, &context);
+	result = ma_context_init((backend_in > ma_backend_null ? NULL : &backend), 1, &context_config, &context);
 	if (result != MA_SUCCESS)
 	{
 		unlock_ga_mutex(ga_mutex_context);
@@ -1502,10 +1517,13 @@ extern "C" LV_DLL_EXPORT GA_RESULT configure_audio_device(uint16_t backend_in, c
 	ma_uint32 device_channels_init;
 	ma_uint32 device_internal_buffer_size = 0;
 	ma_backend backend = (ma_backend)backend_in;
-
 	uint8_t blank_device_id[sizeof(ma_device_id)] = { 0 };
-
 	audio_device* pDevice = NULL;
+
+	if ((ma_device_type)device_type == ma_device_type_duplex)
+	{
+		return GA_E_UNSUPPORTED_DEVICE;
+	}
 
 	memcpy(&deviceId, device_id, sizeof(ma_device_id));
 
@@ -1524,6 +1542,8 @@ extern "C" LV_DLL_EXPORT GA_RESULT configure_audio_device(uint16_t backend_in, c
 		ma_context_config context_config = ma_context_config_init();
 		// TODO: Make this configurable. Don't set it for now.
 		//context_config.threadPriority = ma_thread_priority_realtime;
+		// TODO: Only set this flag on Raspberry Pi
+		context_config.alsa.useVerboseDeviceEnumeration = MA_TRUE;
 
 		// Can safely pass 1 as backendCount, as it's ignored when backends is NULL.
 		// The backends enum in LabVIEW adds Default after Null
@@ -1591,6 +1611,8 @@ extern "C" LV_DLL_EXPORT GA_RESULT configure_audio_device(uint16_t backend_in, c
 	}
 
 	pDevice->buffer_size = buffer_size;
+	// Store the device ID used to configure this device. Will be zeroed, or device ID.
+	pDevice->device_id = deviceId;
 
 	switch (device_config.deviceType)
 	{
@@ -1633,6 +1655,86 @@ extern "C" LV_DLL_EXPORT GA_RESULT configure_audio_device(uint16_t backend_in, c
 	if (buffer_size < device_internal_buffer_size)
 	{
 		return GA_W_BUFFER_SIZE;
+	}
+
+	return GA_SUCCESS;
+}
+
+extern "C" LV_DLL_EXPORT GA_RESULT get_configured_backend(uint16_t* backend)
+{
+	if (global_context == NULL)
+	{
+		*backend = ma_backend_null;
+	}
+	else
+	{
+		*backend = global_context->backend;
+	}
+
+	return GA_SUCCESS;
+}
+
+extern "C" LV_DLL_EXPORT GA_RESULT get_configured_audio_devices(int32_t* playback_refnums, int32_t* num_playback_refnums, int32_t* capture_refnums, int32_t* num_capture_refnums, int32_t* loopback_refnums, int32_t* num_loopback_refnums)
+{
+	audio_device* pDevice;
+	std::vector<int32_t> refnums = get_all_references(ga_refnum_audio_device);
+
+	for (int i = 0; i < refnums.size(); i++)
+	{
+		pDevice = (audio_device*)get_reference_data(ga_refnum_audio_device, refnums[i]);
+
+		if (pDevice != NULL)
+		{
+			switch (pDevice->device.type)
+			{
+				case ma_device_type_playback:
+					playback_refnums[*num_playback_refnums] = refnums[i];
+					(*num_playback_refnums)++;
+					break;
+				case ma_device_type_capture:
+					capture_refnums[*num_capture_refnums] = refnums[i];
+					(*num_capture_refnums)++;
+					break;
+				case ma_device_type_loopback:
+					loopback_refnums[*num_loopback_refnums] = refnums[i];
+					(*num_loopback_refnums)++;
+					break;
+				default:
+					break;
+			}
+		}
+	}
+
+	return GA_SUCCESS;
+}
+
+extern "C" LV_DLL_EXPORT GA_RESULT get_configured_audio_device_info(int32_t refnum, uint8_t* config_device_id, uint8_t* actual_device_id)
+{
+	audio_device* pDevice = (audio_device*)get_reference_data(ga_refnum_audio_device, refnum);
+
+	if (pDevice == NULL)
+	{
+		return GA_E_REFNUM;
+	}
+
+	// There are two device IDs returned.
+	// config_device_id is the device ID specified at configuration time (all zeros if default).
+	// actual_device_id is the device ID after configuration. miniaudio states this should be the same as the configured id, but does differ if it was default and WASAPI is the backend.
+
+	memcpy(config_device_id, (void*)&pDevice->device_id, sizeof(ma_device_id));
+
+	switch (pDevice->device.type)
+	{
+	case ma_device_type_playback:
+		memcpy(actual_device_id, (void*)&pDevice->device.playback.id, sizeof(ma_device_id));
+		break;
+	case ma_device_type_capture:
+	case ma_device_type_loopback:
+		memcpy(actual_device_id, (void*)&pDevice->device.capture.id, sizeof(ma_device_id));
+		break;
+	default:
+		return GA_E_UNSUPPORTED_DEVICE;
+		break;
 	}
 
 	return GA_SUCCESS;
@@ -2068,7 +2170,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT clear_audio_device(int32_t refnum)
 
 extern "C" LV_DLL_EXPORT GA_RESULT clear_audio_backend()
 {
-	ma_result result;
+	ma_result result = MA_SUCCESS;
 
 	std::vector<int32_t> refnums = get_all_references(ga_refnum_audio_device);
 
@@ -2086,7 +2188,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT clear_audio_backend()
 	}
 	unlock_ga_mutex(ga_mutex_context);
 
-	if (result != GA_SUCCESS)
+	if (result != MA_SUCCESS)
 	{
 		return result + MA_ERROR_OFFSET;
 	}

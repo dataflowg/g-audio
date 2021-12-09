@@ -1,7 +1,7 @@
 /*
 G-Audio - An audio library for LabVIEW.
 
-v0.3.0
+v0.4.0
 
 This code implements a wrapper library around the following libraries:
 dr_flac and dr_wav - https://github.com/mackron/dr_libs
@@ -20,6 +20,7 @@ Twitter - https://twitter.com/Dataflow_G
 // HISTORY //
 /////////////
 v0.4.0
+- Raspberry Pi / LINX support (verbose ALSA devices)
 - Query detailed device info
 - Advanced device configuration
 
@@ -119,7 +120,7 @@ typedef int32_t GA_RESULT;
 // ERRORS
 #define GA_E_GENERIC			-1		// Generic error
 #define GA_E_MEMORY				-2		// Memory allocation / deallocation error
-#define GA_E_UNSUPPORTED		-3		// Unsupported codec
+#define GA_E_UNSUPPORTED_CODEC	-3		// Unsupported codec
 #define GA_E_FILE				-4		// Generic file IO error
 #define GA_E_DECODER			-5		// Internal decoder error
 #define GA_E_REFNUM				-6		// Invalid refnum
@@ -132,6 +133,7 @@ typedef int32_t GA_RESULT;
 #define GA_E_BUFFER_SIZE		-13		// Attempt to playback / capture more data than buffer can hold
 #define GA_E_PLAYBACK_MODE		-14		// Device type is playback, but tried capture operation
 #define GA_E_CAPTURE_MODE		-15		// Device type is capture, but tried playback operation
+#define GA_E_UNSUPPORTED_DEVICE	-16		// Unsupported device type (duplex)
 #define MA_ERROR_OFFSET			-1000	// Add this to miniaudio error codes for return to LabVIEW.
 // WARNINGS
 #define GA_W_BUFFER_SIZE		1		// The specified buffer size is smaller than the period, may cause glitches
@@ -190,6 +192,7 @@ typedef struct
 typedef struct
 {
 	ma_device device;
+	ma_device_id device_id;
 	ma_pcm_rb buffer;
 	ma_int32 buffer_size;
 } audio_device;
@@ -240,6 +243,12 @@ extern "C" LV_DLL_EXPORT GA_RESULT query_audio_devices(uint16_t* backend, uint8_
 extern "C" LV_DLL_EXPORT GA_RESULT get_audio_device_info(uint16_t backend, const uint8_t* device_id, uint16_t device_type, char* device_name, uint32_t* device_default,	uint32_t* device_min_sample_rate, uint32_t* device_max_sample_rate, uint32_t* device_min_channels, uint32_t* device_max_channels, uint16_t* device_formats, uint32_t* device_format_count);
 // Configure an audio device ready for playback. Will setup the context, device, audio buffers, and callbacks.
 extern "C" LV_DLL_EXPORT GA_RESULT configure_audio_device(uint16_t backend, const uint8_t* device_id, uint16_t device_type, uint32_t channels, uint32_t sample_rate, uint16_t format, uint8_t exclusive_mode, uint32_t period_size, uint32_t num_periods, int32_t buffer_size, int32_t* refnum);
+// Get the currently configured backend
+extern "C" LV_DLL_EXPORT GA_RESULT get_configured_backend(uint16_t* backend);
+// Get all of the configured audio device refnums
+extern "C" LV_DLL_EXPORT GA_RESULT get_configured_audio_devices(int32_t* playback_refnums, int32_t* num_playback_refnums, int32_t* capture_refnums, int32_t* num_capture_refnums, int32_t* loopback_refnums, int32_t* num_loopback_refnums);
+// Get the device ID associated with the refnum.
+extern "C" LV_DLL_EXPORT GA_RESULT get_configured_audio_device_info(int32_t refnum, uint8_t* config_device_id, uint8_t* actual_device_id);
 // Get info on the configured audio device, primarily for allocating memory in LabVIEW
 extern "C" LV_DLL_EXPORT GA_RESULT get_audio_device_configuration(int32_t refnum, uint32_t* sample_rate, uint32_t* channels, uint16_t* format, uint8_t* exclusive_mode, uint32_t* period_size, uint32_t* num_periods);
 // Start the audio device playback or capture.

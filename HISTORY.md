@@ -1,6 +1,16 @@
 # G-Audio Release History
-### v0.x.x - 2021-xx-xx
+### v0.4.0 - 2021-12-xx
 * Raspberry Pi / LINX support
+* Advanced device configuration (exclusive mode, period size, num periods)
+* New VI `Get Audio Device Configuration.vi` used to query info of an already configured device
+* `Query Audio Devices.vi` returns additional device info (default device, min/max sample rate, min/max channels, supported formats)
+* Prevent duplicate device configuration on PulseAudio backend (issue #10), warn of duplicate device config on other backends
+
+##### API Changes
+* `Configure Audio Device.vi`:
+    * Added `Audio Device Advanced Config.ctl` input
+    * Added `Audio Device Config.ctl` and `Audio Device Advanced Config.ctl` outputs which contain the device's actual configuration, and can differ from the requested configuration
+* Exclusive Mode flag moved from `Audio Device Config.ctl` to `Audio Device Advanced Config.ctl`
 
 
 
