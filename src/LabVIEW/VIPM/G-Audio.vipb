@@ -1,7 +1,7 @@
-<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2021-11-29 23:35:52" Creator="Dataflow_G" Comments="" ID="276afc7bc9a2bd1af4e6c08fb7bae602">
+<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2021-12-10 02:10:11" Creator="Dataflow_G" Comments="" ID="4e3ab72ec6c5fe0bc6b61d840e3dd4dc">
   <Library_General_Settings>
     <Package_File_Name>Dataflow_G_lib_G_Audio</Package_File_Name>
-    <Library_Version>0.3.0.3</Library_Version>
+    <Library_Version>0.3.0.4</Library_Version>
     <Auto_Increment_Version>false</Auto_Increment_Version>
     <Library_Source_Folder>..</Library_Source_Folder>
     <Library_Output_Folder>.</Library_Output_Folder>
@@ -43,10 +43,11 @@
       <Packager/>
       <URL>https://github.com/dataflowg/g-audio</URL>
       <Release_Notes>[THIS IS A DEV BUILD, NOT A FINAL RELEASE]
-* Raspberry Pi / LINX support!
-* Advanced device configuration (period size, num periods)
-* Query detailed audio device information (supported formats, channels, rates)
-* Query configured audio device configuration
+* Raspberry Pi / LINX support
+* Advanced device configuration (exclusive mode, period size, num periods)
+* New VI `Get Audio Device Configuration.vi` used to query info of an already configured device
+* `Query Audio Devices.vi` returns additional device info (default device, min/max sample rate, min/max channels, supported formats)
+* Prevent duplicate device configuration on PulseAudio backend (issue #10), warn of duplicate device config on other backends
 
 * Multi-channel audio mixer
 * Loopback audio capture (WASAPI only)
@@ -141,9 +142,6 @@
       </Exclusions>
       <Exclusions>
         <Path>G-Audio.lvproj</Path>
-      </Exclusions>
-      <Exclusions>
-        <Path>G-Audio/Polymorphic Templates</Path>
       </Exclusions>
       <Exclusions>
         <Path>G-Audio/Examples/Playback Latency Compare Example.vi</Path>
@@ -298,7 +296,7 @@
         <Path>..\unnamed</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>6E005CFFFCD62EB99793B4F2F4EFA281</GUID>
+      <GUID>BDB5CD1C324CC4BD0284BEF7A14E10A7</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -445,7 +443,7 @@
         <Path>..\G-Audio\Audio Files\Get Audio File Info.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>8604E2C7B3839032D3F43655D63295C5</GUID>
+      <GUID>1811DD9337EDFF8045B69A28179EA763</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -620,7 +618,7 @@
         <Path>..\G-Audio\Audio Devices\Get Audio Device Configuration.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>0F0C25B2882A4493C20C8FE570D566B4</GUID>
+      <GUID>86AB4802C2A2586AF2EA9C9554B6F45C</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -795,7 +793,7 @@
         <Path>..\unnamed</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>2851BF46A090F98057B7D30C08955569</GUID>
+      <GUID>6F4E7D4B3C7009592A30CD83A8CA7BCF</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -956,7 +954,7 @@
         <Path>..\G-Audio\Mixer\Mixer\Channel Volume.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>E198AE50F4FFF16E852BDF61568C54FC</GUID>
+      <GUID>79B77DCEF8FB4E95B07762CDE7FBFBEF</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>3</Parent_Palette_Index>
@@ -1005,7 +1003,7 @@
         <Path>..\G-Audio\Examples\LINX\Sample Pad Example (LINX).vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>3718A67B35B6A59FBFDFEC9D26ADA4C8</GUID>
+      <GUID>67DC267062DC682A0405F8A1870A4F0A</GUID>
     </Functions_Palette_Data>
   </Library_Palette_Definition>
 </VI_Package_Builder_Settings>
