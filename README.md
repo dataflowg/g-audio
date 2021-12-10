@@ -104,7 +104,7 @@ opkg install alsa-lib-dev
 git clone https://github.com/dataflowg/g-audio
 cd g-audio/src/C++
 git checkout dev
-g++ -shared -fPIC -o g_audio_32.so *.cpp -lm -lpthread -ldl -std=c++11
+g++ -shared -fPIC -o g_audio_32.so *.cpp -lm -lpthread -ldl -std=c++11 -mfpu=neon -mfloat-abi=softfp
 cp g_audio_32.so /usr/lib
 exit
 ```
