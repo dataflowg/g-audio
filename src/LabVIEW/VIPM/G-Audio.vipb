@@ -1,7 +1,7 @@
-<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2021-11-09 12:00:07" Creator="Dataflow_G" Comments="" ID="25a39162132286194b3a79182477e099">
+<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2021-12-17 01:34:12" Creator="Dataflow_G" Comments="" ID="958018b46dbc38e96900a786e68c040a">
   <Library_General_Settings>
     <Package_File_Name>Dataflow_G_lib_G_Audio</Package_File_Name>
-    <Library_Version>0.3.0.2</Library_Version>
+    <Library_Version>0.3.1.2</Library_Version>
     <Auto_Increment_Version>false</Auto_Increment_Version>
     <Library_Source_Folder>..</Library_Source_Folder>
     <Library_Output_Folder>.</Library_Output_Folder>
@@ -42,13 +42,7 @@
       <Copyright>Public domain</Copyright>
       <Packager/>
       <URL>https://github.com/dataflowg/g-audio</URL>
-      <Release_Notes>* Multi-channel audio mixer
-* Loopback audio capture (WASAPI only)
-* Sample pad &amp; music visualizer examples
-* Fix malleable VI broken wires (issue #4)
-* Fix mp3 info memory error (issue #8)
-* Upmix / downmix audio data to match audio device (issue #9)
-* Auto cleanup audio devices on VI abort</Release_Notes>
+      <Release_Notes>* Fix broken examples when VIPM package installed to LabVIEW 64-bit (issue #12)</Release_Notes>
     </Description>
     <Destinations>
       <Toolkit_VIs>
@@ -144,6 +138,9 @@
       </Exclusions>
       <Exclusions>
         <Path>G-Audio/Examples/Media Player Example.vi</Path>
+      </Exclusions>
+      <Exclusions>
+        <Path>G-Audio/Examples/Sample Pad Example (LINX).vi</Path>
       </Exclusions>
       <Place_Folder_Contents>
         <Path/>
@@ -292,7 +289,7 @@
         <Path>..\unnamed</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>331206CAAE3D20B33F603DC971834020</GUID>
+      <GUID>B2E02B13CD26C96BD4DBD30F5DCE4257</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -439,7 +436,7 @@
         <Path>..\G-Audio\Audio Files\Get Audio File Info.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>84759BE5A136E5B04027B7DD3C6AFB2C</GUID>
+      <GUID>79B7B16D4EA28A383657C7F7676EA001</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -600,7 +597,7 @@
         <Path>..\G-Audio\Audio Devices\Playback Wait.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>EB3282AE26BB8BCB84CC084F4442D7B1</GUID>
+      <GUID>5CA0AE836AFE74B6759A28BD4F6C2E83</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -761,7 +758,7 @@
         <Path>..\G-Audio\Examples\Music Visualizer Example.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>1596F587E8E530A29E8239D4E87C0991</GUID>
+      <GUID>EB8253238701EA943439475ED8357487</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -922,7 +919,7 @@
         <Path>..\G-Audio\Mixer\Mixer\Channel Volume.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>4A20C326E935659496A7392D4D6F387E</GUID>
+      <GUID>12C884BEA968CE9D91C5F6FF16E22B80</GUID>
     </Functions_Palette_Data>
   </Library_Palette_Definition>
 </VI_Package_Builder_Settings>

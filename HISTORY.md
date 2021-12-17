@@ -1,4 +1,9 @@
 # G-Audio Release History
+### v0.3.1 - 2021-12-17
+* Fix broken example VIs when VIPM package installed to LabVIEW 64-bit (issue #12)
+
+
+
 ### v0.3.0 - 2021-11-09
 * Multi-channel audio mixer
 * Loopback audio capture (WASAPI only)
