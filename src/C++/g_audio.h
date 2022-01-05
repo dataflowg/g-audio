@@ -91,6 +91,8 @@ For more information, please refer to <http://unlicense.org/>
 // Don't define miniaudio's encoders and decoders, as we're using those libraries separately.
 #define MA_NO_DECODING
 #define MA_NO_ENCODING
+// Should be disabled via MA_NO_DECODING, but linker still looks ma_decoder_* functions called by ma_resource_* functions
+#define MA_NO_RESOURCE_MANAGER
 // Not using miniaudio to generate audio signals
 #define MA_NO_GENERATION
 // No null backend
@@ -115,7 +117,11 @@ For more information, please refer to <http://unlicense.org/>
 #endif
 #endif
 
-typedef int32_t GA_RESULT;
+#define CODEC_NAME_LEN 8
+#define MAX_DEVICE_COUNT 32
+
+typedef int32_t ga_result;
+
 #define GA_SUCCESS				0
 // ERRORS
 #define GA_E_GENERIC			-1		// Generic error
@@ -138,8 +144,21 @@ typedef int32_t GA_RESULT;
 // WARNINGS
 #define GA_W_BUFFER_SIZE		1		// The specified buffer size is smaller than the period, may cause glitches
 
-#define CODEC_NAME_LEN 8
-#define MAX_DEVICE_COUNT 32
+typedef struct
+{
+	ga_result ga;
+	ma_result ma;
+} ga_combined_result;
+
+static inline ga_result ga_return_code(ga_combined_result result)
+{
+    if (result.ma != MA_SUCCESS)
+	{
+		return (ga_result)result.ma + MA_ERROR_OFFSET;
+	}
+
+	return result.ga;
+}
 
 typedef enum
 {
@@ -179,13 +198,13 @@ typedef struct
 	void* decoder;
 	void* encoder;
 	uint64_t read_offset;
-	GA_RESULT (*open)(const char* file_name, void** decoder);
-	GA_RESULT (*open_write)(const char* file_name, uint32_t channels, uint32_t sample_rate, uint32_t bits_per_sample, void* codec_specific, void** encoder);
-	GA_RESULT (*get_basic_info)(void* decoder, uint32_t* channels, uint32_t* sample_rate, uint64_t* read_offset);
-	GA_RESULT (*seek)(void* decoder, uint64_t offset, uint64_t* new_offset);
-	GA_RESULT (*read)(void* decoder, uint64_t frames_to_read, ga_data_type data_type, uint64_t* frames_read, void* output_buffer);
-	GA_RESULT (*write)(void* encoder, uint64_t frames_to_write, void* input_buffer, uint64_t* frames_written);
-	GA_RESULT (*close)(void* decoder);
+	ga_result (*open)(const char* file_name, void** decoder);
+	ga_result (*open_write)(const char* file_name, uint32_t channels, uint32_t sample_rate, uint32_t bits_per_sample, void* codec_specific, void** encoder);
+	ga_result (*get_basic_info)(void* decoder, uint32_t* channels, uint32_t* sample_rate, uint64_t* read_offset);
+	ga_result (*seek)(void* decoder, uint64_t offset, uint64_t* new_offset);
+	ga_result (*read)(void* decoder, uint64_t frames_to_read, ga_data_type data_type, uint64_t* frames_read, void* output_buffer);
+	ga_result (*write)(void* encoder, uint64_t frames_to_write, void* input_buffer, uint64_t* frames_written);
+	ga_result (*close)(void* decoder);
 } audio_file_codec;
 
 // Structure to hold information about the audio device
@@ -207,75 +226,75 @@ extern "C" LV_DLL_EXPORT int32_t clfn_abort(void* data);
 ////////////////////////////
 
 // Get detailed audio file information. Requires decoding some audio files (mp3).
-extern "C" LV_DLL_EXPORT GA_RESULT get_audio_file_info(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, uint32_t* bits_per_sample, ga_codec* codec);
+extern "C" LV_DLL_EXPORT ga_result get_audio_file_info(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, uint32_t* bits_per_sample, ga_codec* codec);
 // Load an entire audio file and return data in interleaved 16-bit integer format. Data returned by this function must be freed with free_sample_data().
-extern "C" LV_DLL_EXPORT int16_t* load_audio_file_s16(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, ga_codec* codec, GA_RESULT* result);
+extern "C" LV_DLL_EXPORT int16_t* load_audio_file_s16(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, ga_codec* codec, ga_result* result);
 // Frees the memory allocated during a file load operation.
 extern "C" LV_DLL_EXPORT void free_sample_data(int16_t* buffer);
 // Opens an audio file in read mode. Call close_audio_file() to free memory related to the refnum.
-extern "C" LV_DLL_EXPORT GA_RESULT open_audio_file(const char* file_name, int32_t* refnum);
+extern "C" LV_DLL_EXPORT ga_result open_audio_file(const char* file_name, int32_t* refnum);
 // Opens an audio file in write mode. Call close_audio_file() to free memory related to the refnum.
-extern "C" LV_DLL_EXPORT GA_RESULT open_audio_file_write(const char* file_name, uint32_t channels, uint32_t sample_rate, uint32_t bits_per_sample, ga_codec codec, int32_t has_specific_info, void* codec_specific, int32_t* refnum);
+extern "C" LV_DLL_EXPORT ga_result open_audio_file_write(const char* file_name, uint32_t channels, uint32_t sample_rate, uint32_t bits_per_sample, ga_codec codec, int32_t has_specific_info, void* codec_specific, int32_t* refnum);
 // Get basic audio file information. More detailed info can be accessed using get_audio_file_info().
-extern "C" LV_DLL_EXPORT GA_RESULT get_basic_audio_file_info(int32_t refnum, uint32_t* channels, uint32_t* sample_rate, uint64_t* read_offset);
+extern "C" LV_DLL_EXPORT ga_result get_basic_audio_file_info(int32_t refnum, uint32_t* channels, uint32_t* sample_rate, uint64_t* read_offset);
 // Updates the file offset to the specified offset. Subsequent reads will be at the new offset.
-extern "C" LV_DLL_EXPORT GA_RESULT seek_audio_file(int32_t refnum, uint64_t offset, uint64_t* new_offset);
+extern "C" LV_DLL_EXPORT ga_result seek_audio_file(int32_t refnum, uint64_t offset, uint64_t* new_offset);
 // Read a chunk of audio data from the file and update the file position ready for the next read.
 // The output_buffer variable needs to be allocated prior to calling this function, and should be channels x samples_to_read x sizeof(type)
-extern "C" LV_DLL_EXPORT GA_RESULT read_audio_file(int32_t refnum, uint64_t frames_to_read, ga_data_type audio_type, uint64_t* frames_read, void* output_buffer);
+extern "C" LV_DLL_EXPORT ga_result read_audio_file(int32_t refnum, uint64_t frames_to_read, ga_data_type audio_type, uint64_t* frames_read, void* output_buffer);
 // Write a chunk of audio data to the file and update the file position ready for the next write.
-extern "C" LV_DLL_EXPORT GA_RESULT write_audio_file(int32_t refnum, uint64_t frames_to_write, void* input_buffer, uint64_t* frames_written);
+extern "C" LV_DLL_EXPORT ga_result write_audio_file(int32_t refnum, uint64_t frames_to_write, void* input_buffer, uint64_t* frames_written);
 // Close the audio file and release any resources allocated in the refnum.
-extern "C" LV_DLL_EXPORT GA_RESULT close_audio_file(int32_t refnum);
+extern "C" LV_DLL_EXPORT ga_result close_audio_file(int32_t refnum);
 
 // Determine the codec of the audio file
-GA_RESULT get_audio_file_codec(const char* file_name, ga_codec* codec);
+ga_result get_audio_file_codec(const char* file_name, ga_codec* codec);
 
 //////////////////////////////
 // LabVIEW Audio Device API //
 //////////////////////////////
 // Query the available backends (WASAPI, DirectSound, WinMM, etc).
-extern "C" LV_DLL_EXPORT GA_RESULT query_audio_backends(uint16_t* backends, uint16_t* num_backends);
+extern "C" LV_DLL_EXPORT ga_result query_audio_backends(uint16_t* backends, uint16_t* num_backends);
 // Query available devices for a given backend. Set backend greater than ma_backend_null to query the default backend.
 // backend will be set to the actual backend used when querying devices, used for discovering what default backend is in use.
-extern "C" LV_DLL_EXPORT GA_RESULT query_audio_devices(uint16_t* backend, uint8_t* playback_device_ids, int32_t* num_playback_devices, uint8_t* capture_device_ids, int32_t* num_capture_devices);
+extern "C" LV_DLL_EXPORT ga_result query_audio_devices(uint16_t* backend, uint8_t* playback_device_ids, int32_t* num_playback_devices, uint8_t* capture_device_ids, int32_t* num_capture_devices);
 // Get audio device info for a given backend. Set backend greater than ma_backend_null to query the default backend.
-extern "C" LV_DLL_EXPORT GA_RESULT get_audio_device_info(uint16_t backend, const uint8_t* device_id, uint16_t device_type, char* device_name, uint32_t* device_default,	uint32_t* device_min_sample_rate, uint32_t* device_max_sample_rate, uint32_t* device_min_channels, uint32_t* device_max_channels, uint16_t* device_formats, uint32_t* device_format_count);
+extern "C" LV_DLL_EXPORT ga_result get_audio_device_info(uint16_t backend_in, const uint8_t * device_id, uint16_t device_type, char* device_name, uint32_t * device_default, uint32_t * device_native_data_format_count, uint16_t * device_native_data_format, uint32_t * device_native_data_channels, uint32_t * device_native_data_sample_rate, uint32_t * device_native_data_exclusive_mode);
 // Configure an audio device ready for playback. Will setup the context, device, audio buffers, and callbacks.
-extern "C" LV_DLL_EXPORT GA_RESULT configure_audio_device(uint16_t backend, const uint8_t* device_id, uint16_t device_type, uint32_t channels, uint32_t sample_rate, uint16_t format, uint8_t exclusive_mode, uint32_t period_size, uint32_t num_periods, int32_t buffer_size, int32_t* refnum);
+extern "C" LV_DLL_EXPORT ga_result configure_audio_device(uint16_t backend, const uint8_t* device_id, uint16_t device_type, uint32_t channels, uint32_t sample_rate, uint16_t format, uint8_t exclusive_mode, uint32_t period_size, uint32_t num_periods, int32_t buffer_size, int32_t* refnum);
 // Get the currently configured backend
-extern "C" LV_DLL_EXPORT GA_RESULT get_configured_backend(uint16_t* backend);
+extern "C" LV_DLL_EXPORT ga_result get_configured_backend(uint16_t* backend);
 // Get all of the configured audio device refnums
-extern "C" LV_DLL_EXPORT GA_RESULT get_configured_audio_devices(int32_t* playback_refnums, int32_t* num_playback_refnums, int32_t* capture_refnums, int32_t* num_capture_refnums, int32_t* loopback_refnums, int32_t* num_loopback_refnums);
+extern "C" LV_DLL_EXPORT ga_result get_configured_audio_devices(int32_t* playback_refnums, int32_t* num_playback_refnums, int32_t* capture_refnums, int32_t* num_capture_refnums, int32_t* loopback_refnums, int32_t* num_loopback_refnums);
 // Get the device ID associated with the refnum.
-extern "C" LV_DLL_EXPORT GA_RESULT get_configured_audio_device_info(int32_t refnum, uint8_t* config_device_id, uint8_t* actual_device_id);
+extern "C" LV_DLL_EXPORT ga_result get_configured_audio_device_info(int32_t refnum, uint8_t* config_device_id, uint8_t* actual_device_id);
 // Get info on the configured audio device, primarily for allocating memory in LabVIEW
-extern "C" LV_DLL_EXPORT GA_RESULT get_audio_device_configuration(int32_t refnum, uint32_t* sample_rate, uint32_t* channels, uint16_t* format, uint8_t* exclusive_mode, uint32_t* period_size, uint32_t* num_periods);
+extern "C" LV_DLL_EXPORT ga_result get_audio_device_configuration(int32_t refnum, uint32_t* sample_rate, uint32_t* channels, uint16_t* format, uint8_t* exclusive_mode, uint32_t* period_size, uint32_t* num_periods);
 // Start the audio device playback or capture.
-extern "C" LV_DLL_EXPORT GA_RESULT start_audio_device(int32_t refnum);
+extern "C" LV_DLL_EXPORT ga_result start_audio_device(int32_t refnum);
 // Write audio data to the device's buffer for playback. Will block if the audio buffer is full.
-extern "C" LV_DLL_EXPORT GA_RESULT playback_audio(int32_t refnum, void* buffer, int32_t num_frames, uint32_t channels, ga_data_type audio_type);
+extern "C" LV_DLL_EXPORT ga_result playback_audio(int32_t refnum, void* buffer, int32_t num_frames, uint32_t channels, ga_data_type audio_type);
 // Read audio data from the device's buffer. Will block until the specified number of frames has been captured.
-extern "C" LV_DLL_EXPORT GA_RESULT capture_audio(int32_t refnum, void* buffer, int32_t* num_frames, ga_data_type audio_type);
+extern "C" LV_DLL_EXPORT ga_result capture_audio(int32_t refnum, void* buffer, int32_t* num_frames, ga_data_type audio_type);
 // Wait until the buffer has been emptied by the playback_callback routine.
-extern "C" LV_DLL_EXPORT GA_RESULT playback_wait(int32_t refnum);
+extern "C" LV_DLL_EXPORT ga_result playback_wait(int32_t refnum);
 // Stop the audio device from playing. Doesn't clear the buffer.
-extern "C" LV_DLL_EXPORT GA_RESULT stop_audio_device(int32_t refnum);
+extern "C" LV_DLL_EXPORT ga_result stop_audio_device(int32_t refnum);
 // Uninitializes the audio device. Will also uninitialize the backend context if no other audio devices are active.
-extern "C" LV_DLL_EXPORT GA_RESULT clear_audio_device(int32_t refnum);
+extern "C" LV_DLL_EXPORT ga_result clear_audio_device(int32_t refnum);
 // Uninitializes the backend context. Will also uninitialize all audio devices.
-extern "C" LV_DLL_EXPORT GA_RESULT clear_audio_backend();
+extern "C" LV_DLL_EXPORT ga_result clear_audio_backend();
 
 void playback_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount);
 void capture_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount);
 void stop_callback(ma_device* pDevice);
 inline ma_bool32 device_is_started(ma_device* pDevice);
-inline GA_RESULT check_and_start_audio_device(ma_device* pDevice);
+inline ga_result check_and_start_audio_device(ma_device* pDevice);
 
 ////////////////////////////
 // LabVIEW Audio Data API //
 ////////////////////////////
-extern "C" LV_DLL_EXPORT GA_RESULT channel_converter(ga_data_type audio_type, uint64_t num_frames, void* audio_buffer_in, uint32_t channels_in, void* audio_buffer_out, uint32_t channels_out);
+extern "C" LV_DLL_EXPORT ga_result channel_converter(ga_data_type audio_type, uint64_t num_frames, void* audio_buffer_in, uint32_t channels_in, void* audio_buffer_out, uint32_t channels_out);
 
 inline ma_format ga_data_type_to_ma_format(ga_data_type audio_type);
 
@@ -283,45 +302,45 @@ inline ma_format ga_data_type_to_ma_format(ga_data_type audio_type);
 // FLAC codec wrappers //
 /////////////////////////
 
-inline GA_RESULT convert_flac_result(int32_t result);
-GA_RESULT get_flac_info(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, uint32_t* bits_per_sample);
-int16_t* load_flac(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, GA_RESULT* result);
+inline ga_result convert_flac_result(int32_t result);
+ga_result get_flac_info(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, uint32_t* bits_per_sample);
+int16_t* load_flac(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, ga_result* result);
 void free_flac(int16_t* buffer);
-GA_RESULT open_flac_file(const char* file_name, void** decoder);
-GA_RESULT get_basic_flac_file_info(void* decoder, uint32_t* channels, uint32_t* sample_rate, uint64_t* read_offset);
-GA_RESULT seek_flac_file(void* decoder, uint64_t offset, uint64_t* new_offset);
-GA_RESULT read_flac_file(void* decoder, uint64_t frames_to_read, ga_data_type audio_type, uint64_t* frames_read, void* output_buffer);
-GA_RESULT close_flac_file(void* decoder);
+ga_result open_flac_file(const char* file_name, void** decoder);
+ga_result get_basic_flac_file_info(void* decoder, uint32_t* channels, uint32_t* sample_rate, uint64_t* read_offset);
+ga_result seek_flac_file(void* decoder, uint64_t offset, uint64_t* new_offset);
+ga_result read_flac_file(void* decoder, uint64_t frames_to_read, ga_data_type audio_type, uint64_t* frames_read, void* output_buffer);
+ga_result close_flac_file(void* decoder);
 
 
 ////////////////////////
 // MP3 codec wrappers //
 ////////////////////////
 
-inline GA_RESULT convert_mp3_result(int32_t result);
-GA_RESULT get_mp3_info(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, uint32_t* bits_per_sample);
-int16_t* load_mp3(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, GA_RESULT* result);
+inline ga_result convert_mp3_result(int32_t result);
+ga_result get_mp3_info(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, uint32_t* bits_per_sample);
+int16_t* load_mp3(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, ga_result* result);
 void free_mp3(int16_t* buffer);
-GA_RESULT open_mp3_file(const char* file_name, void** decoder);
-GA_RESULT get_basic_mp3_file_info(void* decoder, uint32_t* channels, uint32_t* sample_rate, uint64_t* read_offset);
-GA_RESULT seek_mp3_file(void* decoder, uint64_t offset, uint64_t* new_offset);
-GA_RESULT read_mp3_file(void* decoder, uint64_t frames_to_read, ga_data_type audio_type, uint64_t* frames_read, void* output_buffer);
-GA_RESULT close_mp3_file(void* decoder);
+ga_result open_mp3_file(const char* file_name, void** decoder);
+ga_result get_basic_mp3_file_info(void* decoder, uint32_t* channels, uint32_t* sample_rate, uint64_t* read_offset);
+ga_result seek_mp3_file(void* decoder, uint64_t offset, uint64_t* new_offset);
+ga_result read_mp3_file(void* decoder, uint64_t frames_to_read, ga_data_type audio_type, uint64_t* frames_read, void* output_buffer);
+ga_result close_mp3_file(void* decoder);
 
 
 ///////////////////////////
 // Vorbis codec wrappers //
 ///////////////////////////
 
-inline GA_RESULT convert_vorbis_result(int32_t result);
-GA_RESULT get_vorbis_info(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, uint32_t* bits_per_sample);
-int16_t* load_vorbis(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, GA_RESULT* result);
+inline ga_result convert_vorbis_result(int32_t result);
+ga_result get_vorbis_info(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, uint32_t* bits_per_sample);
+int16_t* load_vorbis(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, ga_result* result);
 void free_vorbis(int16_t* buffer);
-GA_RESULT open_vorbis_file(const char* file_name, void** decoder);
-GA_RESULT get_basic_vorbis_file_info(void* decoder, uint32_t* channels, uint32_t* sample_rate, uint64_t* read_offset);
-GA_RESULT seek_vorbis_file(void* decoder, uint64_t offset, uint64_t* new_offset);
-GA_RESULT read_vorbis_file(void* decoder, uint64_t frames_to_read, ga_data_type audio_type, uint64_t* frames_read, void* output_buffer);
-GA_RESULT close_vorbis_file(void* decoder);
+ga_result open_vorbis_file(const char* file_name, void** decoder);
+ga_result get_basic_vorbis_file_info(void* decoder, uint32_t* channels, uint32_t* sample_rate, uint64_t* read_offset);
+ga_result seek_vorbis_file(void* decoder, uint64_t offset, uint64_t* new_offset);
+ga_result read_vorbis_file(void* decoder, uint64_t frames_to_read, ga_data_type audio_type, uint64_t* frames_read, void* output_buffer);
+ga_result close_vorbis_file(void* decoder);
 
 
 ////////////////////////
@@ -334,17 +353,17 @@ typedef struct
 	uint32_t data_format;
 } wav_specific;
 
-inline GA_RESULT convert_wav_result(int32_t result);
-GA_RESULT get_wav_info(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, uint32_t* bits_per_sample);
-int16_t* load_wav(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, GA_RESULT* result);
+inline ga_result convert_wav_result(int32_t result);
+ga_result get_wav_info(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, uint32_t* bits_per_sample);
+int16_t* load_wav(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, ga_result* result);
 void free_wav(int16_t* sample_data);
-GA_RESULT open_wav_file(const char* file_name, void** decoder);
-GA_RESULT open_wav_file_write(const char* file_name, uint32_t channels, uint32_t sample_rate, uint32_t bits_per_sample, void* codec_specific, void** encoder);
-GA_RESULT get_basic_wav_file_info(void* decoder, uint32_t* channels, uint32_t* sample_rate, uint64_t* read_offset);
-GA_RESULT seek_wav_file(void* decoder, uint64_t offset, uint64_t* new_offset);
-GA_RESULT read_wav_file(void* decoder, uint64_t frames_to_read, ga_data_type audio_type, uint64_t* frames_read, void* output_buffer);
-GA_RESULT write_wav_file(void* encoder, uint64_t frames_to_write, void* input_buffer, uint64_t* frames_written);
-GA_RESULT close_wav_file(void* decoder);
+ga_result open_wav_file(const char* file_name, void** decoder);
+ga_result open_wav_file_write(const char* file_name, uint32_t channels, uint32_t sample_rate, uint32_t bits_per_sample, void* codec_specific, void** encoder);
+ga_result get_basic_wav_file_info(void* decoder, uint32_t* channels, uint32_t* sample_rate, uint64_t* read_offset);
+ga_result seek_wav_file(void* decoder, uint64_t offset, uint64_t* new_offset);
+ga_result read_wav_file(void* decoder, uint64_t frames_to_read, ga_data_type audio_type, uint64_t* frames_read, void* output_buffer);
+ga_result write_wav_file(void* encoder, uint64_t frames_to_write, void* input_buffer, uint64_t* frames_written);
+ga_result close_wav_file(void* decoder);
 
 
 /////////////////////////

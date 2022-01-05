@@ -1,7 +1,7 @@
-<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2021-12-17 02:22:06" Creator="Dataflow_G" Comments="" ID="940883213c2802ea76d3b4fbcf7f22df">
+<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2022-01-05 02:29:36" Creator="Dataflow_G" Comments="" ID="49c8414c5a5de13016048877d04852a1">
   <Library_General_Settings>
     <Package_File_Name>Dataflow_G_lib_G_Audio</Package_File_Name>
-    <Library_Version>0.3.1.3</Library_Version>
+    <Library_Version>0.3.1.4</Library_Version>
     <Auto_Increment_Version>false</Auto_Increment_Version>
     <Library_Source_Folder>..</Library_Source_Folder>
     <Library_Output_Folder>.</Library_Output_Folder>
@@ -46,8 +46,9 @@
 * Raspberry Pi / LINX support
 * Advanced device configuration (exclusive mode, period size, num periods)
 * New VI `Get Audio Device Configuration.vi` used to query info of an already configured device
-* `Query Audio Devices.vi` returns additional device info (default device, min/max sample rate, min/max channels, supported formats)
-* Prevent duplicate device configuration on PulseAudio backend (issue #10), warn of duplicate device config on other backends</Release_Notes>
+* `Query Audio Devices.vi` returns additional device info (default device, native sample rates, native channels, native formats)
+* Warn of duplicate device config
+* Update miniaudio to v0.11.2 (fixes #10)</Release_Notes>
     </Description>
     <Destinations>
       <Toolkit_VIs>
@@ -108,6 +109,12 @@
         <Preserve_Hierarchy>true</Preserve_Hierarchy>
         <Path/>
       </QuickDrop_Plugins>
+      <Additional_Destination>
+        <Name>Palette</Name>
+        <LLB>false</LLB>
+        <Preserve_Hierarchy>true</Preserve_Hierarchy>
+        <Path>&lt;vi.lib&gt;\addons</Path>
+      </Additional_Destination>
     </Destinations>
     <Source_Files>
       <Destination_Overrides>
@@ -130,9 +137,6 @@
         <Path>Unit Tests</Path>
       </Exclusions>
       <Exclusions>
-        <Path>VIPM</Path>
-      </Exclusions>
-      <Exclusions>
         <Path>G-Audio.lvproj</Path>
       </Exclusions>
       <Exclusions>
@@ -144,11 +148,17 @@
       <Exclusions>
         <Path>G-Audio/Examples/Sample Pad Example (Arduino Controller).vi</Path>
       </Exclusions>
+      <Exclusions>
+        <Path>VIPM</Path>
+      </Exclusions>
       <Place_Folder_Contents>
         <Path/>
       </Place_Folder_Contents>
       <Place_Folder_Contents>
         <Path>Examples</Path>
+      </Place_Folder_Contents>
+      <Place_Folder_Contents>
+        <Path>Palatte</Path>
       </Place_Folder_Contents>
     </Source_Files>
     <License_Agreement_Filepath/>
@@ -291,7 +301,7 @@
         <Path>..\unnamed</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>A0B052AFC35C5FD0C3E09FA63111DD54</GUID>
+      <GUID>6F2178F258DAC933C258572201CDB936</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -438,7 +448,7 @@
         <Path>..\G-Audio\Audio Files\Get Audio File Info.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>A5C19C3D8685CF2630AC27D1FB93A3F5</GUID>
+      <GUID>B33EB00967A7FC39D070D95AB4AF836D</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -613,7 +623,7 @@
         <Path>..\G-Audio\Audio Devices\Get Audio Device Configuration.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>9995FBDD5389BE4EDE96CBCC9A5F9F4D</GUID>
+      <GUID>767ACF49B927233C26A4434C1EDD84C0</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -788,7 +798,7 @@
         <Path>..\unnamed</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>A4B1AB93ADC32CE14E1602D8676B06F5</GUID>
+      <GUID>822E6B95953A2F8B41B333D283779E74</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -949,7 +959,7 @@
         <Path>..\G-Audio\Mixer\Mixer\Channel Volume.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>7B1024A1F2AC17DC43DD9F4DC766044C</GUID>
+      <GUID>96A6D0F853EA060C531176D959EF5F6B</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>3</Parent_Palette_Index>
@@ -998,7 +1008,7 @@
         <Path>..\G-Audio\Examples\LINX\Sample Pad Example (LINX).vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>6D8B20F84A30A81DD85AB0057BA7304C</GUID>
+      <GUID>50AED8643F5F08C35A337FC205E78F8C</GUID>
     </Functions_Palette_Data>
   </Library_Palette_Definition>
 </VI_Package_Builder_Settings>

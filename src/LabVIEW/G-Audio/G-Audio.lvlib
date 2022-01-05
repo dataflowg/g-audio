@@ -61,6 +61,7 @@ https://github.com/dataflowg/g-audio</Property>
 		<Item Name="Audio Device Config.ctl" Type="VI" URL="../Controls/Audio Device Config.ctl"/>
 		<Item Name="Audio Device Format.ctl" Type="VI" URL="../Controls/Audio Device Format.ctl"/>
 		<Item Name="Audio Device Info.ctl" Type="VI" URL="../Controls/Audio Device Info.ctl"/>
+		<Item Name="Audio Device Native Data Format.ctl" Type="VI" URL="../Controls/Audio Device Native Data Format.ctl"/>
 		<Item Name="Audio Device Refnum.ctl" Type="VI" URL="../Controls/Audio Device Refnum.ctl"/>
 		<Item Name="Audio Device Type.ctl" Type="VI" URL="../Controls/Audio Device Type.ctl"/>
 		<Item Name="Audio File Codec.ctl" Type="VI" URL="../Controls/Audio File Codec.ctl"/>
@@ -102,6 +103,7 @@ https://github.com/dataflowg/g-audio</Property>
 		<Item Name="Interleaved Sample Data To Audio Data.vim" Type="VI" URL="../Private/Interleaved Sample Data To Audio Data.vim"/>
 		<Item Name="ma_format To Audio Data Format.vi" Type="VI" URL="../Private/ma_format To Audio Data Format.vi"/>
 		<Item Name="MAX_DEVICES.vi" Type="VI" URL="../Private/MAX_DEVICES.vi"/>
+		<Item Name="NATIVE_DATA_FORMAT_COUNT.vi" Type="VI" URL="../Private/NATIVE_DATA_FORMAT_COUNT.vi"/>
 		<Item Name="Path To UTF-8 String.vi" Type="VI" URL="../Private/Path To UTF-8 String.vi"/>
 		<Item Name="Result To Error.vi" Type="VI" URL="../Private/Result To Error.vi"/>
 		<Item Name="Value To Audio Device Refnum.vi" Type="VI" URL="../Private/Value To Audio Device Refnum.vi"/>

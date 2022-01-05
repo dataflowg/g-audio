@@ -3,8 +3,9 @@
 * Raspberry Pi / LINX support
 * Advanced device configuration (exclusive mode, period size, num periods)
 * New VI `Get Audio Device Configuration.vi` used to query info of an already configured device
-* `Query Audio Devices.vi` returns additional device info (default device, min/max sample rate, min/max channels, supported formats)
-* Prevent duplicate device configuration on PulseAudio backend (issue #10), warn of duplicate device config on other backends
+* `Query Audio Devices.vi` returns additional device info (default device, native sample rates, native channels, native formats)
+* Warn of duplicate device config
+* Update miniaudio to v0.11.2 (fixes #10)
 
 ##### API Changes
 * `Configure Audio Device.vi`:
