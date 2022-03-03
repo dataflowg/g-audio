@@ -1,8 +1,7 @@
 # =========================
 # Project Specific
 # =========================
-# WaveIO files must be downloaded from website
-external/waveio_108/*
+Post Install
 
 # =========================
 # LabVIEW Files

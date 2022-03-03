@@ -1,4 +1,4 @@
-<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2022-01-05 02:29:36" Creator="Dataflow_G" Comments="" ID="49c8414c5a5de13016048877d04852a1">
+<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2022-03-03 14:32:19" Creator="Dataflow_G" Comments="" ID="f07e3aec653984edd20c5c18c0a20d0c">
   <Library_General_Settings>
     <Package_File_Name>Dataflow_G_lib_G_Audio</Package_File_Name>
     <Library_Version>0.3.1.4</Library_Version>
@@ -301,7 +301,7 @@
         <Path>..\unnamed</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>6F2178F258DAC933C258572201CDB936</GUID>
+      <GUID>7A6604A672D7A6A423A16CAF5BEE5DAD</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -448,7 +448,7 @@
         <Path>..\G-Audio\Audio Files\Get Audio File Info.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>B33EB00967A7FC39D070D95AB4AF836D</GUID>
+      <GUID>C88B34313183309B075145E61BF633F9</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -623,7 +623,7 @@
         <Path>..\G-Audio\Audio Devices\Get Audio Device Configuration.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>767ACF49B927233C26A4434C1EDD84C0</GUID>
+      <GUID>34B1C34E2C0F96B6AA189645001780E5</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -798,7 +798,7 @@
         <Path>..\unnamed</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>822E6B95953A2F8B41B333D283779E74</GUID>
+      <GUID>477FCD5CFCD097F74F15C9CA8370A7E5</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -959,7 +959,7 @@
         <Path>..\G-Audio\Mixer\Mixer\Channel Volume.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>96A6D0F853EA060C531176D959EF5F6B</GUID>
+      <GUID>D32FEEB0D856653D9F908E6BC850B709</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>3</Parent_Palette_Index>
@@ -1008,7 +1008,7 @@
         <Path>..\G-Audio\Examples\LINX\Sample Pad Example (LINX).vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>50AED8643F5F08C35A337FC205E78F8C</GUID>
+      <GUID>A475C1BBC7DBE8F06AC4B3D77FF2D9F0</GUID>
     </Functions_Palette_Data>
   </Library_Palette_Definition>
 </VI_Package_Builder_Settings>
