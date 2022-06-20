@@ -160,6 +160,7 @@
     <ClInclude Include="dr_flac.h" />
     <ClInclude Include="g_audio.h" />
     <ClInclude Include="dr_wav.h" />
+    <ClInclude Include="id3tag.h" />
     <ClInclude Include="miniaudio.h" />
     <ClInclude Include="minimp3.h" />
     <ClInclude Include="minimp3_ex.h" />

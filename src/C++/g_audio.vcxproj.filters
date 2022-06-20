@@ -54,6 +54,9 @@
     <ClInclude Include="miniaudio.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="id3tag.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

@@ -20,6 +20,7 @@ A cross-platform LabVIEW library for audio device playback and capture, and for 
 ## <a id="whats-new"></a>What's New?
 * Raspberry Pi / LINX support!
     * See the [Installation](#installation) section to get started.
+* Metadata tag reading support (ID3v2, ID3v1, Vorbis Comments, RIFF INFO)
 * Advanced device configuration options
 
 ## <a id="features"></a>Features
@@ -27,6 +28,7 @@ A cross-platform LabVIEW library for audio device playback and capture, and for 
 * Playback and capture using selectable backends (WASAPI, DirectSound, Core Audio, PulseAudio, ALSA, etc)
 * Multi-channel audio mixer
 * Read MP3, FLAC, Ogg Vorbis, and WAV formats
+* Read metadata tags (ID3v2, ID3v1, Vorbis Comments, RIFF INFO)
 * Write WAV format (PCM and IEEE Float, with Sony Wave64 support for large files)
 * Unicode path support (UTF-8)
 * Cross-platform (Windows, macOS, Linux, Raspberry Pi / LINX), 32-bit and 64-bit
@@ -84,6 +86,26 @@ The `Playback Audio`, `Capture Audio`, `Audio File Read`, and `Audio File Write`
 #### Malleable VIs and broken wires
 If a malleable VI has broken wire inputs and errors about unsupported types, even though the type is supported, try hold Ctrl and click the run arrow. This will force LabVIEW to recompile the VI, and should hopefully fix those broken wires.
 
+### Supported Metadata Tags
+G-Audio supports reading ID3v2 and ID3v1 tags from MP3 files, Vorbis Comments from FLAC and Ogg Vorbis files, and RIFF INFO data from WAV files. All tag data is returned as a string array from `Read Audio File Tags.vi`, where each string is in the form `FIELD=Value`. Depending on the tag format, `FIELD` is directly from the tag (in the case of Vorbis Comments), or mapped to a commonly named field.
+
+Field | Description | ID3v2 | ID3v1 | RIFF INFO
+------|-------------|-------|-------|-----------
+TITLE | The title of the track. | `TIT2`, `TT2` | Title | `INAM`
+ARTIST | The track artist. | `TPE1`, `TP1` | Artist | `IART`
+ALBUMARTIST | The album artist. | `TPE2`, `TP2` | :x: | :x:
+ALBUM | The album title. | `TALB`, `TAL` | Album | `IPRD`
+GENRE | The track's genre. | `TCON`, `TCO` | Genre ID | `IGNR`
+DATE | The release date, typically the year. | `TYER`, `TYE` | Year | `ICRD`
+TRACKNUMBER | The track's number in an album. | `TRCK`, `TRK` (**nn** / NN) | Comment[29] | `ITRK`
+TRACKTOTAL | The total number of tracks in an album. | `TRCK`, `TRK` (nn / **NN**) | :x: | :x:
+DISCNUMBER | The disc number within an album. | `TPOS`, `TPA` (**nn** / NN) | :x: | :x:
+DISCTOTAL | The total number of discs in an album. | `TPOS`, `TPA` (nn / **NN**) | :x: | :x:
+BPM | Beats Per Minute of the track. | `TBPM`, `TBP` | :x: | :x:
+COMMENT | Notes and comments on the track. | `COMM`, `COM` | Comment[0-27] | `ICMT`
+
+The tag field mapping is based on the [Tag Mapping article](https://wiki.hydrogenaud.io/index.php?title=Tag_Mapping) on the hydrogenaudio wiki.
+
 ## <a id="compiling"></a>Compiling
 Under Windows, Microsoft Visual Studio Community 2019 is used to compile and test the DLL called by LabVIEW.
 
@@ -133,6 +155,7 @@ Sample Accurate MP3 Length?  | :heavy_check_mark:  | -                   | :x:
 Read FLAC                    | :heavy_check_mark:  | :x:                 | :x:
 Read Ogg Vorbis              | :heavy_check_mark:  | :x:                 | :x:
 Read WMA                     | :x:                 | :x:                 | :heavy_check_mark:
+Read metadata tags           | :heavy_check_mark:  | :x:                 | :x:
 Write WAV (PCM)              | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark:
 Write WAV (IEEE Float)       | :heavy_check_mark:  | :heavy_check_mark:¹ | :heavy_check_mark:¹
 Write WAV (64-bit Float)     | :heavy_check_mark:  | :x:                 | :x:

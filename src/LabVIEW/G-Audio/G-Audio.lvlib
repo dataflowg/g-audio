@@ -17,10 +17,12 @@ https://github.com/dataflowg/g-audio</Property>
 		<Item Name="Clear Audio Device.vi" Type="VI" URL="../Audio Devices/Clear Audio Device.vi"/>
 		<Item Name="Configure Audio Device.vi" Type="VI" URL="../Audio Devices/Configure Audio Device.vi"/>
 		<Item Name="Get Audio Device Configuration.vi" Type="VI" URL="../Audio Devices/Get Audio Device Configuration.vi"/>
+		<Item Name="Get Audio Device Volume.vi" Type="VI" URL="../Audio Devices/Get Audio Device Volume.vi"/>
 		<Item Name="Playback Audio.vim" Type="VI" URL="../Audio Devices/Playback Audio.vim"/>
 		<Item Name="Playback Wait.vi" Type="VI" URL="../Audio Devices/Playback Wait.vi"/>
 		<Item Name="Query Audio Backends.vi" Type="VI" URL="../Audio Devices/Query Audio Backends.vi"/>
 		<Item Name="Query Audio Devices.vi" Type="VI" URL="../Audio Devices/Query Audio Devices.vi"/>
+		<Item Name="Set Audio Device Volume.vi" Type="VI" URL="../Audio Devices/Set Audio Device Volume.vi"/>
 		<Item Name="Start Audio Device.vi" Type="VI" URL="../Audio Devices/Start Audio Device.vi"/>
 		<Item Name="Stop Audio Device.vi" Type="VI" URL="../Audio Devices/Stop Audio Device.vi"/>
 	</Item>
@@ -35,10 +37,13 @@ https://github.com/dataflowg/g-audio</Property>
 			<Item Name="Quick Load Audio File (UTF-8).vi" Type="VI" URL="../Audio Files/Polymorphic VIs/Quick Load Audio File (UTF-8).vi"/>
 			<Item Name="Open Audio File Write (WAV).vi" Type="VI" URL="../Audio Files/Polymorphic VIs/Open Audio File Write (WAV).vi"/>
 			<Item Name="Open Audio File Write (WAV) (UTF-8).vi" Type="VI" URL="../Audio Files/Polymorphic VIs/Open Audio File Write (WAV) (UTF-8).vi"/>
+			<Item Name="Get Audio File Tags (Path).vi" Type="VI" URL="../Audio Files/Polymorphic VIs/Get Audio File Tags (Path).vi"/>
+			<Item Name="Get Audio File Tags (UTF-8).vi" Type="VI" URL="../Audio Files/Polymorphic VIs/Get Audio File Tags (UTF-8).vi"/>
 		</Item>
 		<Item Name="Private" Type="Folder">
 			<Property Name="NI.LibItem.Scope" Type="Int">2</Property>
 			<Item Name="Get Audio File Info (Core).vi" Type="VI" URL="../Audio Files/Private/Get Audio File Info (Core).vi"/>
+			<Item Name="Get Audio File Tags (Core).vi" Type="VI" URL="../Audio Files/Private/Get Audio File Tags (Core).vi"/>
 			<Item Name="Open Audio File Read (Core).vi" Type="VI" URL="../Audio Files/Private/Open Audio File Read (Core).vi"/>
 			<Item Name="Open Audio File Write (WAV) (Core).vi" Type="VI" URL="../Audio Files/Private/Open Audio File Write (WAV) (Core).vi"/>
 			<Item Name="Quick Load Audio File (Core).vi" Type="VI" URL="../Audio Files/Private/Quick Load Audio File (Core).vi"/>
@@ -46,6 +51,7 @@ https://github.com/dataflowg/g-audio</Property>
 		<Item Name="Close Audio File.vi" Type="VI" URL="../Audio Files/Close Audio File.vi"/>
 		<Item Name="Get Audio File Info.vi" Type="VI" URL="../Audio Files/Get Audio File Info.vi"/>
 		<Item Name="Get Audio File Position.vi" Type="VI" URL="../Audio Files/Get Audio File Position.vi"/>
+		<Item Name="Get Audio File Tags.vi" Type="VI" URL="../Audio Files/Get Audio File Tags.vi"/>
 		<Item Name="Open Audio File Read.vi" Type="VI" URL="../Audio Files/Open Audio File Read.vi"/>
 		<Item Name="Open Audio File Write.vi" Type="VI" URL="../Audio Files/Open Audio File Write.vi"/>
 		<Item Name="Quick Load Audio File.vi" Type="VI" URL="../Audio Files/Quick Load Audio File.vi"/>

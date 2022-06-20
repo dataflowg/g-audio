@@ -388,20 +388,57 @@ extern "C" LV_DLL_EXPORT ga_result close_audio_file(int32_t refnum)
 	return GA_SUCCESS;
 }
 
+extern "C" LV_DLL_EXPORT ga_result get_audio_file_tags(const char* file_name, int32_t* count, intptr_t* tags, intptr_t* lengths)
+{
+	ga_result result;
+	ga_codec codec;
+
+	result = get_audio_file_codec(file_name, &codec);
+
+	if (result != GA_SUCCESS)
+	{
+		return result;
+	}
+
+	switch (codec)
+	{
+		case ga_codec_flac: return get_flac_tags(file_name, count, tags, lengths); break;
+		case ga_codec_mp3: return get_id3_tags(file_name, count, tags, lengths); break;
+		case ga_codec_vorbis: return get_vorbis_tags(file_name, count, tags, lengths); break;
+		case ga_codec_wav: return get_wav_tags(file_name, count, tags, lengths); break;
+		case ga_codec_unsupported: return GA_E_UNSUPPORTED_TAG; break;
+		default: break;
+	}
+
+	return GA_SUCCESS;
+}
+
+extern "C" LV_DLL_EXPORT ga_result free_audio_file_tags(int32_t count, intptr_t tags, intptr_t lengths)
+{
+	char** tags_ptr = (char**)tags;
+	int32_t* lengths_ptr = (int32_t*)lengths;
+
+	for (int i = 0; i < count; i++)
+	{
+		free(tags_ptr[i]);
+		tags_ptr[i] = NULL;
+	}
+	free(tags_ptr);
+	tags_ptr = NULL;
+
+	free(lengths_ptr);
+	lengths_ptr = NULL;
+
+	return GA_SUCCESS;
+}
+
 ga_result get_audio_file_codec(const char* file_name, ga_codec* codec)
 {
 	FILE* pFile;
 
 	*codec = ga_codec_unsupported;
 
-#if defined(_WIN32) && defined(__STDC_WANT_SECURE_LIB__)
-	if (0 != _wfopen_s(&pFile, widen(file_name), L"rb"))
-		pFile = NULL;
-#elif defined(_WIN32)
-	pFile = _wfopen(widen(file_name), L"rb");
-#else
-	pFile = fopen(file_name, "rb");
-#endif
+	pFile = ga_fopen(file_name);
 	if (pFile == NULL)
 	{
 		return GA_E_FILE;
@@ -626,6 +663,65 @@ ga_result close_flac_file(void* decoder)
 	}
 
 	drflac_close((drflac*)decoder);
+
+	return GA_SUCCESS;
+}
+
+void flac_metadata_callback(void* pUserData, drflac_metadata* meta)
+{
+	audio_file_tags* tag_info = (audio_file_tags*)pUserData;
+	switch (meta->type)
+	{
+		case DRFLAC_METADATA_BLOCK_TYPE_VORBIS_COMMENT:
+		{
+			drflac_vorbis_comment_iterator iterator;
+			const char* comment;
+			uint32_t length;
+			int i = 0;
+
+			tag_info->count = meta->data.vorbis_comment.commentCount;
+
+			if (tag_info->count > 0)
+			{
+				tag_info->tags = (char**)malloc(sizeof(char*) * tag_info->count);
+				tag_info->lengths = (int32_t*)malloc(sizeof(int32_t) * tag_info->count);
+
+				drflac_init_vorbis_comment_iterator(&iterator, meta->data.vorbis_comment.commentCount, meta->data.vorbis_comment.pComments);
+				while ((comment = drflac_next_vorbis_comment(&iterator, &length)) != NULL)
+				{
+					tag_info->tags[i] = (char*)malloc(sizeof(char) * length);
+					tag_info->lengths[i] = length;
+					memcpy(tag_info->tags[i], comment, length);
+					i++;
+				}
+			}
+			break;
+		}
+		default: break;
+	}
+}
+
+ga_result get_flac_tags(const char* file_name, int32_t* count, intptr_t* tags, intptr_t* lengths)
+{
+	drflac* decoder;
+	audio_file_tags tag_info = {};
+
+#if defined(_WIN32)
+	decoder = drflac_open_file_with_metadata_w(widen(file_name), flac_metadata_callback, &tag_info, NULL);
+#else
+	decoder = drflac_open_file_with_metadata(file_name, flac_metadata_callback, &tag_info, NULL);
+#endif
+
+	if (decoder == NULL)
+	{
+		return GA_E_TAG;
+	}
+
+	drflac_close(decoder);
+
+	*count = tag_info.count;
+	*tags = (intptr_t)tag_info.tags;
+	*lengths = (intptr_t)tag_info.lengths;
 
 	return GA_SUCCESS;
 }
@@ -862,6 +958,141 @@ ga_result close_mp3_file(void* decoder)
 	return GA_SUCCESS;
 }
 
+id3tag_t* load_id3_tag(const char* file_name)
+{
+	FILE* pFile;
+	ID3TAG_U8 tag_size_data[10];
+	size_t tag_size;
+	void* tag_data;
+	id3tag_t* id3tag;
+
+	pFile = ga_fopen(file_name);
+	if (pFile == NULL)
+	{
+		return NULL;
+	}
+
+	fseek(pFile, 0, SEEK_SET);
+	fread(&tag_size_data, 1, sizeof(tag_size_data), pFile);
+
+	tag_size = id3tag_size(tag_size_data);
+	// ID3v2 tag found
+	if (tag_size > 0)
+	{
+		tag_data = malloc(tag_size);
+
+		if (tag_data == NULL)
+		{
+			fclose(pFile);
+			return NULL;
+		}
+
+		fseek(pFile, 0, SEEK_SET);
+		fread(tag_data, 1, tag_size, pFile);
+		fclose(pFile);
+		id3tag = id3tag_load(tag_data, tag_size, ID3TAG_ALL_FIELDS, NULL);
+		free(tag_data);
+	}
+	// No ID3V2 tag, try ID3v1
+	else
+	{
+		tag_data = malloc(128);
+
+		if (tag_data == NULL)
+		{
+			fclose(pFile);
+			return NULL;
+		}
+
+		fseek(pFile, -128, SEEK_END);
+		fread(tag_data, 1, 128, pFile);
+		fclose(pFile);
+		id3tag = id3tag_load_id3v1(tag_data, 128, NULL);
+		free(tag_data);
+	}
+
+	return id3tag;
+}
+
+ga_result get_id3_tags(const char* file_name, int32_t* count, intptr_t* tags, intptr_t* lengths)
+{
+	enum fields_t
+	{
+		FIELD_TITLE,
+		FIELD_ARTIST,
+		FIELD_ALBUM_ARTIST,
+		FIELD_ALBUM,
+		FIELD_GENRE,
+		FIELD_YEAR,
+		FIELD_TRACK,
+		FIELD_TRACKS,
+		FIELD_DISC,
+		FIELD_DISCS,
+		FIELD_COMPILATION,
+		FIELD_BPM,
+		FIELD_COMMENT,
+
+		FIELDCOUNT
+	};
+
+	const char* tag_field_prefix[FIELDCOUNT] = { "TITLE=", "ARTIST=", "ALBUMARTIST=", "ALBUM=", "GENRE=", "DATE=", "TRACKNUMBER=", "TRACKTOTAL=", "DISCNUMBER=", "DISCTOTAL=", "COMPILATION=", "BPM=", "COMMENT=" };
+
+	audio_file_tags tag_info = {};
+	const char* current_tag = NULL;
+	id3tag_t* id3tag;
+
+	id3tag = load_id3_tag(file_name);
+
+	if (id3tag == NULL)
+	{
+		return GA_E_TAG;
+	}
+
+	tag_info.count = 0;
+	for (int field_index = 0; field_index < FIELDCOUNT; field_index++)
+	{
+		current_tag = NULL;
+		switch (field_index)
+		{
+			case FIELD_TITLE:        if (id3tag->title != NULL) { current_tag = id3tag->title; } break;
+			case FIELD_ARTIST:       if (id3tag->artist != NULL) { current_tag = id3tag->artist; } break;
+			case FIELD_ALBUM_ARTIST: if (id3tag->album_artist != NULL) { current_tag = id3tag->album_artist; } break;
+			case FIELD_ALBUM:        if (id3tag->album != NULL) { current_tag = id3tag->album; } break;
+			case FIELD_GENRE:        if (id3tag->genre != NULL) { current_tag = id3tag->genre; } break;
+			case FIELD_YEAR:         if (id3tag->year != NULL) { current_tag = id3tag->year; } break;
+			case FIELD_TRACK:        if (id3tag->track != NULL) { current_tag = id3tag->track; } break;
+			case FIELD_TRACKS:       if (id3tag->tracks != NULL) { current_tag = id3tag->tracks; } break;
+			case FIELD_DISC:         if (id3tag->disc != NULL) { current_tag = id3tag->disc; } break;
+			case FIELD_DISCS:        if (id3tag->discs != NULL) { current_tag = id3tag->discs; } break;
+			case FIELD_COMPILATION:  if (id3tag->compilation != NULL) { current_tag = id3tag->compilation; } break;
+			case FIELD_BPM:          if (id3tag->bpm != NULL) { current_tag = id3tag->bpm; } break;
+			case FIELD_COMMENT:      if (id3tag->comment != NULL) { current_tag = id3tag->comment; } break;
+			default:                 current_tag = NULL; break;
+		}
+
+		if (current_tag != NULL)
+		{
+			int tag_index = tag_info.count;
+			tag_info.count++;
+			tag_info.tags = (char**)realloc(tag_info.tags, sizeof(char*) * tag_info.count);
+			tag_info.lengths = (int32_t*)realloc(tag_info.lengths, sizeof(int32_t) * tag_info.count);
+
+			tag_info.lengths[tag_index] = strlen(tag_field_prefix[field_index]) + strlen(current_tag);
+			tag_info.tags[tag_index] = (char*)malloc(sizeof(char) * tag_info.lengths[tag_index]);
+			memcpy(tag_info.tags[tag_index], tag_field_prefix[field_index], strlen(tag_field_prefix[field_index]));
+			memcpy(tag_info.tags[tag_index] + strlen(tag_field_prefix[field_index]), current_tag, strlen(current_tag));
+		}
+	}
+
+	id3tag_free(id3tag);
+
+	*count = tag_info.count;
+	*tags = (intptr_t)tag_info.tags;
+	*lengths = (intptr_t)tag_info.lengths;
+
+	return GA_SUCCESS;
+}
+
 
 /////////////////////////////////
 // Ogg Vorbis decoding wrapper //
@@ -1076,6 +1307,49 @@ ga_result close_vorbis_file(void* decoder)
 	stb_vorbis_close((stb_vorbis*)decoder);
 
 	return GA_SUCCESS;
+}
+
+ga_result get_vorbis_tags(const char* file_name, int32_t* count, intptr_t* tags, intptr_t* lengths)
+{
+	ga_result result = GA_SUCCESS;
+	int error = 0;
+	stb_vorbis* vorbis_decoder;
+	audio_file_tags tag_info = {};
+
+#if defined(_WIN32)
+	vorbis_decoder = stb_vorbis_open_filename_w(widen(file_name), &error, NULL);
+#else
+	vorbis_decoder = stb_vorbis_open_filename(file_name, &error, NULL);
+#endif
+
+	result = convert_vorbis_result(error);
+
+	if (vorbis_decoder == NULL || result != GA_SUCCESS)
+	{
+		return GA_E_TAG;
+	}
+
+	tag_info.count = vorbis_decoder->comment_list_length;
+	if (tag_info.count > 0)
+	{
+		tag_info.tags = (char**)malloc(sizeof(char*) * tag_info.count);
+		tag_info.lengths = (int32_t*)malloc(sizeof(int32_t) * tag_info.count);
+
+		for (int i = 0; i < vorbis_decoder->comment_list_length; i++)
+		{
+			tag_info.lengths[i] = strlen(vorbis_decoder->comment_list[i]);
+			tag_info.tags[i] = (char*)malloc(sizeof(char) * tag_info.lengths[i]);
+			memcpy(tag_info.tags[i], vorbis_decoder->comment_list[i], tag_info.lengths[i]);
+		}
+	}
+
+	stb_vorbis_close(vorbis_decoder);
+
+	*count = tag_info.count;
+	*tags = (intptr_t)tag_info.tags;
+	*lengths = (intptr_t)tag_info.lengths;
+
+	return result;
 }
 
 
@@ -1343,6 +1617,87 @@ ga_result close_wav_file(void* decoder)
 	return GA_SUCCESS;
 }
 
+ga_result get_wav_tags(const char* file_name, int32_t* count, intptr_t* tags, intptr_t* lengths)
+{
+	enum fields_t
+	{
+		FIELD_TITLE,
+		FIELD_ARTIST,
+		FIELD_ALBUM,
+		FIELD_GENRE,
+		FIELD_YEAR,
+		FIELD_TRACK,
+		FIELD_COMMENT,
+
+		FIELD_COUNT
+	};
+
+	const char* tag_field_prefix[FIELD_COUNT] = { "TITLE=", "ARTIST=", "ALBUM=", "GENRE=", "DATE=", "TRACKNUMBER=", "COMMENT=" };
+
+	audio_file_tags tag_info = {};
+	drwav_bool32 result = DRWAV_FALSE;
+	drwav* wav_decoder = (drwav*)malloc(sizeof(drwav));
+	int field_index = -1;
+
+	if (wav_decoder == NULL)
+	{
+		return GA_E_MEMORY;
+	}
+
+#if defined(_WIN32)
+	result = drwav_init_file_with_metadata_w(wav_decoder, widen(file_name), 0, NULL);
+#else
+	result = drwav_init_file_with_metadata(wav_decoder, file_name, NULL);
+#endif
+
+	if (result == DRWAV_FALSE)
+	{
+		free(wav_decoder);
+		wav_decoder = NULL;
+		return GA_E_GENERIC;
+	}
+
+	tag_info.count = 0;
+	tag_info.tags = NULL;
+	tag_info.lengths = NULL;
+	for (int i = 0; i < wav_decoder->metadataCount; i++)
+	{
+		field_index = -1;
+		switch (wav_decoder->pMetadata[i].type)
+		{
+			case drwav_metadata_type_list_info_title:       field_index = FIELD_TITLE; break;
+			case drwav_metadata_type_list_info_artist:      field_index = FIELD_ARTIST; break;
+			case drwav_metadata_type_list_info_album:       field_index = FIELD_ALBUM; break;
+			case drwav_metadata_type_list_info_genre:       field_index = FIELD_GENRE; break;
+			case drwav_metadata_type_list_info_date:        field_index = FIELD_YEAR; break;
+			case drwav_metadata_type_list_info_tracknumber: field_index = FIELD_TRACK; break;
+			case drwav_metadata_type_list_info_comment:     field_index = FIELD_COMMENT; break;
+			default: field_index = -1; break;
+		}
+
+		if (field_index >= 0)
+		{
+			int tag_index = tag_info.count;
+			tag_info.count++;
+			tag_info.tags = (char**)realloc(tag_info.tags, sizeof(char*) * tag_info.count);
+			tag_info.lengths = (int32_t*)realloc(tag_info.lengths, sizeof(int32_t) * tag_info.count);
+
+			tag_info.lengths[tag_index] = strlen(tag_field_prefix[field_index]) + wav_decoder->pMetadata[i].data.infoText.stringLength;
+			tag_info.tags[tag_index] = (char*)malloc(sizeof(char) * tag_info.lengths[tag_index]);
+			memcpy(tag_info.tags[tag_index], tag_field_prefix[field_index], strlen(tag_field_prefix[field_index]));
+			memcpy(tag_info.tags[tag_index] + strlen(tag_field_prefix[field_index]), wav_decoder->pMetadata[i].data.infoText.pString, wav_decoder->pMetadata[i].data.infoText.stringLength);
+		}
+	}
+
+	drwav_uninit(wav_decoder);
+	free(wav_decoder);
+
+	*count = tag_info.count;
+	*tags = (intptr_t)tag_info.tags;
+	*lengths = (intptr_t)tag_info.lengths;
+
+	return GA_SUCCESS;
+}
 
 
 
@@ -1767,6 +2122,44 @@ extern "C" LV_DLL_EXPORT ga_result get_audio_device_configuration(int32_t refnum
 		*period_size = pDevice->device.playback.internalPeriodSizeInFrames;
 		*num_periods = pDevice->device.playback.internalPeriods;
 		break;
+	}
+
+	return GA_SUCCESS;
+}
+
+extern "C" LV_DLL_EXPORT ga_result get_audio_device_volume(int32_t refnum, float* volume)
+{
+	ga_combined_result result;
+	audio_device* pDevice = (audio_device*)get_reference_data(ga_refnum_audio_device, refnum);
+
+	if (pDevice == NULL)
+	{
+		return GA_E_REFNUM;
+	}
+
+	result.ma = ma_device_get_master_volume(&pDevice->device, volume);
+	if (result.ma != MA_SUCCESS)
+	{
+		return ga_return_code(result);
+	}
+    
+	return GA_SUCCESS;
+}
+
+extern "C" LV_DLL_EXPORT ga_result set_audio_device_volume(int32_t refnum, float volume)
+{
+	ga_combined_result result;
+	audio_device* pDevice = (audio_device*)get_reference_data(ga_refnum_audio_device, refnum);
+
+	if (pDevice == NULL)
+	{
+		return GA_E_REFNUM;
+	}
+
+	result.ma = ma_device_set_master_volume(&pDevice->device, volume);
+	if (result.ma != MA_SUCCESS)
+	{
+		return ga_return_code(result);
 	}
 
 	return GA_SUCCESS;

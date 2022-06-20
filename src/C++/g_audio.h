@@ -81,12 +81,14 @@ For more information, please refer to <http://unlicense.org/>
 #define MINIMP3_IMPLEMENTATION
 //#define MINIMP3_FLOAT_OUTPUT
 #define DR_WAV_IMPLEMENTATION
+#define ID3TAG_IMPLEMENTATION
 
 #include "thread_safety.h"
 #include "dr_flac.h"
 #include "minimp3_ex.h"
 #include "stb_vorbis.h"
 #include "dr_wav.h"
+#include "id3tag.h"
 
 // Don't define miniaudio's encoders and decoders, as we're using those libraries separately.
 #define MA_NO_DECODING
@@ -140,6 +142,8 @@ typedef int32_t ga_result;
 #define GA_E_PLAYBACK_MODE		-14		// Device type is playback, but tried capture operation
 #define GA_E_CAPTURE_MODE		-15		// Device type is capture, but tried playback operation
 #define GA_E_UNSUPPORTED_DEVICE	-16		// Unsupported device type (duplex)
+#define GA_E_UNSUPPORTED_TAG    -17     // Unsupported tag format
+#define GA_E_TAG                -18     // An error ocurred trying to read the tags
 #define MA_ERROR_OFFSET			-1000	// Add this to miniaudio error codes for return to LabVIEW.
 // WARNINGS
 #define GA_W_BUFFER_SIZE		1		// The specified buffer size is smaller than the period, may cause glitches
@@ -216,6 +220,13 @@ typedef struct
 	ma_int32 buffer_size;
 } audio_device;
 
+typedef struct
+{
+	int32_t count;
+	char** tags;
+	int32_t* lengths;
+} audio_file_tags;
+
 ////////////////////////////
 // LabVIEW CLFN Callbacks //
 ////////////////////////////
@@ -247,6 +258,10 @@ extern "C" LV_DLL_EXPORT ga_result write_audio_file(int32_t refnum, uint64_t fra
 // Close the audio file and release any resources allocated in the refnum.
 extern "C" LV_DLL_EXPORT ga_result close_audio_file(int32_t refnum);
 
+// Get the tag data for the associated file.
+extern "C" LV_DLL_EXPORT ga_result get_audio_file_tags(const char* file_name, int32_t* count, intptr_t* tags, intptr_t* lengths);
+extern "C" LV_DLL_EXPORT ga_result free_audio_file_tags(int32_t count, intptr_t tags, intptr_t lengths);
+
 // Determine the codec of the audio file
 ga_result get_audio_file_codec(const char* file_name, ga_codec* codec);
 
@@ -270,6 +285,10 @@ extern "C" LV_DLL_EXPORT ga_result get_configured_audio_devices(int32_t* playbac
 extern "C" LV_DLL_EXPORT ga_result get_configured_audio_device_info(int32_t refnum, uint8_t* config_device_id, uint8_t* actual_device_id);
 // Get info on the configured audio device, primarily for allocating memory in LabVIEW
 extern "C" LV_DLL_EXPORT ga_result get_audio_device_configuration(int32_t refnum, uint32_t* sample_rate, uint32_t* channels, uint16_t* format, uint8_t* exclusive_mode, uint32_t* period_size, uint32_t* num_periods);
+// Get the audio device playback or capture volume.
+extern "C" LV_DLL_EXPORT ga_result get_audio_device_volume(int32_t refnum, float* volume);
+// Set the audio device playback or capture volume. Volume should be between 0 and 1 inclusive. A volume < 0 returns an error. A volume > 1 can cause clipping.
+extern "C" LV_DLL_EXPORT ga_result set_audio_device_volume(int32_t refnum, float volume);
 // Start the audio device playback or capture.
 extern "C" LV_DLL_EXPORT ga_result start_audio_device(int32_t refnum);
 // Write audio data to the device's buffer for playback. Will block if the audio buffer is full.
@@ -311,6 +330,7 @@ ga_result get_basic_flac_file_info(void* decoder, uint32_t* channels, uint32_t* 
 ga_result seek_flac_file(void* decoder, uint64_t offset, uint64_t* new_offset);
 ga_result read_flac_file(void* decoder, uint64_t frames_to_read, ga_data_type audio_type, uint64_t* frames_read, void* output_buffer);
 ga_result close_flac_file(void* decoder);
+ga_result get_flac_tags(const char* file_name, int32_t* count, intptr_t* tags, intptr_t* lengths);
 
 
 ////////////////////////
@@ -326,7 +346,7 @@ ga_result get_basic_mp3_file_info(void* decoder, uint32_t* channels, uint32_t* s
 ga_result seek_mp3_file(void* decoder, uint64_t offset, uint64_t* new_offset);
 ga_result read_mp3_file(void* decoder, uint64_t frames_to_read, ga_data_type audio_type, uint64_t* frames_read, void* output_buffer);
 ga_result close_mp3_file(void* decoder);
-
+ga_result get_id3_tags(const char* file_name, int32_t* count, intptr_t* tags, intptr_t* lengths);
 
 ///////////////////////////
 // Vorbis codec wrappers //
@@ -341,6 +361,7 @@ ga_result get_basic_vorbis_file_info(void* decoder, uint32_t* channels, uint32_t
 ga_result seek_vorbis_file(void* decoder, uint64_t offset, uint64_t* new_offset);
 ga_result read_vorbis_file(void* decoder, uint64_t frames_to_read, ga_data_type audio_type, uint64_t* frames_read, void* output_buffer);
 ga_result close_vorbis_file(void* decoder);
+ga_result get_vorbis_tags(const char* file_name, int32_t* count, intptr_t* tags, intptr_t* lengths);
 
 
 ////////////////////////
@@ -364,6 +385,7 @@ ga_result seek_wav_file(void* decoder, uint64_t offset, uint64_t* new_offset);
 ga_result read_wav_file(void* decoder, uint64_t frames_to_read, ga_data_type audio_type, uint64_t* frames_read, void* output_buffer);
 ga_result write_wav_file(void* encoder, uint64_t frames_to_write, void* input_buffer, uint64_t* frames_written);
 ga_result close_wav_file(void* decoder);
+ga_result get_wav_tags(const char* file_name, int32_t* count, intptr_t* tags, intptr_t* lengths);
 
 
 /////////////////////////
@@ -394,6 +416,22 @@ wchar_t* widen(const char* utf8_string)
 	return wide_string;
 }
 #endif
+
+FILE* ga_fopen(const char* file_name)
+{
+	FILE* pFile;
+
+#if defined(_WIN32) && defined(__STDC_WANT_SECURE_LIB__)
+	if (0 != _wfopen_s(&pFile, widen(file_name), L"rb"))
+		pFile = NULL;
+#elif defined(_WIN32)
+	pFile = _wfopen(widen(file_name), L"rb");
+#else
+	pFile = fopen(file_name, "rb");
+#endif
+
+	return pFile;
+}
 
 
 //////////////////////////
