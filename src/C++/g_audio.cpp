@@ -1031,6 +1031,7 @@ ga_result get_id3_tags(const char* file_name, int32_t* count, intptr_t* tags, in
 		FIELD_COMPILATION,
 		FIELD_BPM,
 		FIELD_COMMENT,
+		FIELD_USER_TEXT,
 
 		FIELDCOUNT
 	};
@@ -1077,10 +1078,34 @@ ga_result get_id3_tags(const char* file_name, int32_t* count, intptr_t* tags, in
 			tag_info.tags = (char**)realloc(tag_info.tags, sizeof(char*) * tag_info.count);
 			tag_info.lengths = (int32_t*)realloc(tag_info.lengths, sizeof(int32_t) * tag_info.count);
 
-			tag_info.lengths[tag_index] = strlen(tag_field_prefix[field_index]) + strlen(current_tag);
+			int field_length = strlen(tag_field_prefix[field_index]);
+			int value_length = strlen(current_tag);
+			tag_info.lengths[tag_index] = field_length + value_length;
 			tag_info.tags[tag_index] = (char*)malloc(sizeof(char) * tag_info.lengths[tag_index]);
-			memcpy(tag_info.tags[tag_index], tag_field_prefix[field_index], strlen(tag_field_prefix[field_index]));
-			memcpy(tag_info.tags[tag_index] + strlen(tag_field_prefix[field_index]), current_tag, strlen(current_tag));
+			memcpy(tag_info.tags[tag_index], tag_field_prefix[field_index], field_length);
+			memcpy(tag_info.tags[tag_index] + field_length, current_tag, value_length);
+		}
+
+		if (field_index == FIELD_USER_TEXT && id3tag->user_text != NULL && id3tag->user_text_count > 0)
+		{
+			int tag_offset = tag_info.count;
+			int tag_index = 0;
+			tag_info.count += id3tag->user_text_count;
+			tag_info.tags = (char**)realloc(tag_info.tags, sizeof(char*) * tag_info.count);
+			tag_info.lengths = (int32_t*)realloc(tag_info.lengths, sizeof(int32_t) * tag_info.count);
+
+			for (int user_text_index = 0; user_text_index < id3tag->user_text_count; user_text_index++)
+			{
+				int field_length = strlen(id3tag->user_text[user_text_index].desc);
+				int value_length = strlen(id3tag->user_text[user_text_index].value);
+
+				tag_index = tag_offset + user_text_index;
+				tag_info.lengths[tag_index] = field_length + value_length + 1; // +1 is for the '=' separator
+				tag_info.tags[tag_index] = (char*)malloc(sizeof(char) * tag_info.lengths[tag_index]);
+				memcpy(tag_info.tags[tag_index], id3tag->user_text[user_text_index].desc, field_length);
+				*(tag_info.tags[tag_index] + field_length) = '=';
+				memcpy(tag_info.tags[tag_index] + field_length + 1, id3tag->user_text[user_text_index].value, value_length);
+			}
 		}
 	}
 
@@ -1682,10 +1707,12 @@ ga_result get_wav_tags(const char* file_name, int32_t* count, intptr_t* tags, in
 			tag_info.tags = (char**)realloc(tag_info.tags, sizeof(char*) * tag_info.count);
 			tag_info.lengths = (int32_t*)realloc(tag_info.lengths, sizeof(int32_t) * tag_info.count);
 
-			tag_info.lengths[tag_index] = strlen(tag_field_prefix[field_index]) + wav_decoder->pMetadata[i].data.infoText.stringLength;
+			int field_length = strlen(tag_field_prefix[field_index]);
+			int value_length = wav_decoder->pMetadata[i].data.infoText.stringLength;
+			tag_info.lengths[tag_index] = field_length + value_length;
 			tag_info.tags[tag_index] = (char*)malloc(sizeof(char) * tag_info.lengths[tag_index]);
-			memcpy(tag_info.tags[tag_index], tag_field_prefix[field_index], strlen(tag_field_prefix[field_index]));
-			memcpy(tag_info.tags[tag_index] + strlen(tag_field_prefix[field_index]), wav_decoder->pMetadata[i].data.infoText.pString, wav_decoder->pMetadata[i].data.infoText.stringLength);
+			memcpy(tag_info.tags[tag_index], tag_field_prefix[field_index], field_length);
+			memcpy(tag_info.tags[tag_index] + field_length, wav_decoder->pMetadata[i].data.infoText.pString, value_length);
 		}
 	}
 

@@ -35,6 +35,13 @@ typedef struct id3tag_pic_t
     } id3tag_pic_t;
 
 
+typedef struct id3tag_user_text_t
+{
+    char const* desc;
+    char const* value;
+} id3tag_user_text_t;
+
+
 typedef struct id3tag_t
     {
     char const* title;
@@ -60,6 +67,9 @@ typedef struct id3tag_t
 
     int pics_count;
     id3tag_pic_t const* pics;
+
+    int user_text_count;
+    id3tag_user_text_t const* user_text;
     } id3tag_t;
 
 #define ID3TAG_ALL_FIELDS ( 0xFFFFFFFF )
@@ -83,6 +93,7 @@ typedef struct id3tag_t
 #define ID3TAG_FIELD_TRACK_LENGTH ( 1U << 17U )
 #define ID3TAG_FIELD_BPM ( 1U << 18U )
 #define ID3TAG_FIELD_COMMENT ( 1U << 19U )
+#define ID3TAG_FIELD_USER_TEXT ( 1U << 20U )
 
 size_t id3tag_size( void const* first_ten_bytes );
 
@@ -128,6 +139,7 @@ typedef struct id3tag_internal_t
     id3tag_t tag;
     void* memctx;
     int pics_capacity;
+    int user_text_capacity;
 } id3tag_internal_t;
 
 
@@ -923,6 +935,37 @@ id3tag_t* id3tag_load( void const* data, size_t size, ID3TAG_U32 fields, void* m
                 }
             }
 
+        if ((fields & ID3TAG_FIELD_USER_TEXT) && (strcmp(frame_id, "TXXX") == 0 || strcmp(frame_id, "TXX") == 0))
+            {
+            if (!tag->tag.user_text)
+                {
+                tag->user_text_capacity = 16;
+                tag->tag.user_text = (id3tag_user_text_t*)ID3TAG_MALLOC(memctx, sizeof(id3tag_user_text_t) * tag->user_text_capacity);
+                tag->tag.user_text_count = 0;
+                }
+            if (tag->tag.user_text_count >= tag->user_text_capacity)
+                {
+                tag->user_text_capacity *= 2;
+                id3tag_user_text_t* new_user_text = (id3tag_user_text_t*)ID3TAG_MALLOC(memctx, sizeof(id3tag_user_text_t) * tag->user_text_capacity);
+                memcpy(new_user_text, tag->tag.user_text, sizeof(id3tag_user_text_t) * tag->tag.user_text_count);
+                ID3TAG_FREE(memctx, (id3tag_user_text_t*)tag->tag.user_text);
+                tag->tag.user_text = new_user_text;
+                }
+
+            int encoding = *ptr++;
+            --frame_size;
+
+            id3tag_user_text_t* user_text = (id3tag_user_text_t*)&tag->tag.user_text[tag->tag.user_text_count++];
+            memset(user_text, 0, sizeof(*user_text));
+
+            int bytes = 0;
+            user_text->desc = id3tag_internal_get_string(encoding, ptr, frame_size, memctx, &bytes);
+            ptr += bytes;
+            frame_size -= bytes;
+
+            user_text->value = id3tag_internal_get_string(encoding, ptr, frame_size, memctx, NULL);
+            }
+
         ptr += frame_size;
         }
 
@@ -962,6 +1005,17 @@ void id3tag_free( id3tag_t* id3tag )
             }
 
         if( internal->tag.pics ) ID3TAG_FREE( internal->memctx, (id3tag_pic_t*) internal->tag.pics );
+        }
+
+    if (internal->tag.user_text)
+        {
+        for (int i = 0; i < internal->tag.user_text_count; ++i)
+            {
+            if (internal->tag.user_text[i].desc) ID3TAG_FREE(internal->memctx, (char*)internal->tag.user_text[i].desc);
+            if (internal->tag.user_text[i].value) ID3TAG_FREE(internal->memctx, (char*)internal->tag.user_text[i].value);
+            }
+
+        if (internal->tag.user_text) ID3TAG_FREE(internal->memctx, (id3tag_user_text_t*)internal->tag.user_text);
         }
 
     ID3TAG_FREE( internal->memctx, id3tag );
