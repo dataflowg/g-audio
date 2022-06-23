@@ -87,22 +87,22 @@ The `Playback Audio`, `Capture Audio`, `Audio File Read`, and `Audio File Write`
 If a malleable VI has broken wire inputs and errors about unsupported types, even though the type is supported, try hold Ctrl and click the run arrow. This will force LabVIEW to recompile the VI, and should hopefully fix those broken wires.
 
 ### Supported Metadata Tags
-G-Audio supports reading ID3v2 and ID3v1 tags from MP3 files, Vorbis Comments from FLAC and Ogg Vorbis files, and RIFF INFO data from WAV files. All tag data is returned as a string array from `Read Audio File Tags.vi`, where each string is in the form `FIELD=Value`. Depending on the tag format, `FIELD` is directly from the tag (in the case of Vorbis Comments), or mapped to a commonly named field.
+G-Audio supports reading ID3v2 and ID3v1 tags from MP3 files, Vorbis Comments from FLAC and Ogg Vorbis files, and RIFF INFO data from WAV files. All tag data is returned as a string array from `Read Audio File Tags.vi`, where each string is in the form `FIELD=Value`. Depending on the tag format, `FIELD` is directly from the tag (in the case of Vorbis Comments and ID3v2 `TXXX` fields), or mapped to a commonly named field.
 
-Field | Description | ID3v2 | ID3v1 | RIFF INFO
-------|-------------|-------|-------|-----------
-TITLE | The title of the track. | `TIT2`, `TT2` | Title | `INAM`
-ARTIST | The track artist. | `TPE1`, `TP1` | Artist | `IART`
-ALBUMARTIST | The album artist. | `TPE2`, `TP2` | :x: | :x:
-ALBUM | The album title. | `TALB`, `TAL` | Album | `IPRD`
-GENRE | The track's genre. | `TCON`, `TCO` | Genre ID | `IGNR`
-DATE | The release date, typically the year. | `TYER`, `TYE` | Year | `ICRD`
-TRACKNUMBER | The track's number in an album. | `TRCK`, `TRK` (**nn** / NN) | Comment[29] | `ITRK`
-TRACKTOTAL | The total number of tracks in an album. | `TRCK`, `TRK` (nn / **NN**) | :x: | :x:
-DISCNUMBER | The disc number within an album. | `TPOS`, `TPA` (**nn** / NN) | :x: | :x:
-DISCTOTAL | The total number of discs in an album. | `TPOS`, `TPA` (nn / **NN**) | :x: | :x:
-BPM | Beats Per Minute of the track. | `TBPM`, `TBP` | :x: | :x:
-COMMENT | Notes and comments on the track. | `COMM`, `COM` | Comment[0-27] | `ICMT`
+Field       | Description                             | ID3v2                       | ID3v1         | RIFF INFO
+------------|-----------------------------------------|-----------------------------|---------------|-----------
+TITLE       | The title of the track.                 | `TIT2`, `TT2`               | Title         | `INAM`
+ARTIST      | The track artist.                       | `TPE1`, `TP1`               | Artist        | `IART`
+ALBUMARTIST | The album artist.                       | `TPE2`, `TP2`               | :x:           | :x:
+ALBUM       | The album title.                        | `TALB`, `TAL`               | Album         | `IPRD`
+GENRE       | The track's genre.                      | `TCON`, `TCO`               | Genre ID      | `IGNR`
+DATE        | The release date, typically the year.   | `TYER`, `TYE`               | Year          | `ICRD`
+TRACKNUMBER | The track's number in an album.         | `TRCK`, `TRK` (**nn** / NN) | Comment[29]   | `ITRK`
+TRACKTOTAL  | The total number of tracks in an album. | `TRCK`, `TRK` (nn / **NN**) | :x:           | :x:
+DISCNUMBER  | The disc number within an album.        | `TPOS`, `TPA` (**nn** / NN) | :x:           | :x:
+DISCTOTAL   | The total number of discs in an album.  | `TPOS`, `TPA` (nn / **NN**) | :x:           | :x:
+BPM         | Beats Per Minute of the track.          | `TBPM`, `TBP`               | :x:           | :x:
+COMMENT     | Notes and comments on the track.        | `COMM`, `COM`               | Comment[0-27] | `ICMT`
 
 The tag field mapping is based on the [Tag Mapping article](https://wiki.hydrogenaud.io/index.php?title=Tag_Mapping) on the hydrogenaudio wiki.
 

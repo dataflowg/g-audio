@@ -1,7 +1,7 @@
-<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2022-03-03 14:32:19" Creator="Dataflow_G" Comments="" ID="f07e3aec653984edd20c5c18c0a20d0c">
+<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2022-06-21 07:41:38" Creator="Dataflow_G" Comments="" ID="4509b3b05c5d66683a275e073c52b3ea">
   <Library_General_Settings>
     <Package_File_Name>Dataflow_G_lib_G_Audio</Package_File_Name>
-    <Library_Version>0.3.1.4</Library_Version>
+    <Library_Version>0.3.1.5</Library_Version>
     <Auto_Increment_Version>false</Auto_Increment_Version>
     <Library_Source_Folder>..</Library_Source_Folder>
     <Library_Output_Folder>.</Library_Output_Folder>
@@ -44,11 +44,14 @@
       <URL>https://github.com/dataflowg/g-audio</URL>
       <Release_Notes>[THIS IS A DEV BUILD, NOT A FINAL RELEASE]
 * Raspberry Pi / LINX support
+* Metadata tag reading support (ID3v2, ID3v1, Vorbis Comments, RIFF INFO)
 * Advanced device configuration (exclusive mode, period size, num periods)
-* New VI `Get Audio Device Configuration.vi` used to query info of an already configured device
-* `Query Audio Devices.vi` returns additional device info (default device, native sample rates, native channels, native formats)
+* Device volume adjustment (feature request #13)
+* Get the configuration settings of an already configured device
+* Query more detailed device info (default device, native sample rates, native channels, native formats)
 * Warn of duplicate device config
-* Update miniaudio to v0.11.2 (fixes #10)</Release_Notes>
+* Update miniaudio to v0.11.2 (fixes #10)
+* Reduced VIPM package installation time</Release_Notes>
     </Description>
     <Destinations>
       <Toolkit_VIs>
@@ -301,7 +304,7 @@
         <Path>..\unnamed</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>7A6604A672D7A6A423A16CAF5BEE5DAD</GUID>
+      <GUID>7920599E79ABA1CE332FCCFAFEE003F0</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -381,20 +384,6 @@
       <Items_Data>
         <Type>Item</Type>
         <Sub_Palette_Index>-1</Sub_Palette_Index>
-        <NameSub_Menu_Name>Get Audio File Position.vi</NameSub_Menu_Name>
-        <Short_Name/>
-        <is_Merge_VI>false</is_Merge_VI>
-        <Position>
-          <Row>3</Row>
-          <Column>3</Column>
-        </Position>
-        <Icon>00000000</Icon>
-        <Path>..\G-Audio\Audio Files\Get Audio File Position.vi</Path>
-        <VI_Title/>
-      </Items_Data>
-      <Items_Data>
-        <Type>Item</Type>
-        <Sub_Palette_Index>-1</Sub_Palette_Index>
         <NameSub_Menu_Name>Open Audio File Read.vi</NameSub_Menu_Name>
         <Short_Name/>
         <is_Merge_VI>false</is_Merge_VI>
@@ -448,7 +437,35 @@
         <Path>..\G-Audio\Audio Files\Get Audio File Info.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>C88B34313183309B075145E61BF633F9</GUID>
+      <Items_Data>
+        <Type>Item</Type>
+        <Sub_Palette_Index>-1</Sub_Palette_Index>
+        <NameSub_Menu_Name>Get Audio File Position.vi</NameSub_Menu_Name>
+        <Short_Name/>
+        <is_Merge_VI>false</is_Merge_VI>
+        <Position>
+          <Row>3</Row>
+          <Column>4</Column>
+        </Position>
+        <Icon>00000000</Icon>
+        <Path>..\G-Audio\Audio Files\Get Audio File Position.vi</Path>
+        <VI_Title/>
+      </Items_Data>
+      <Items_Data>
+        <Type>Item</Type>
+        <Sub_Palette_Index>-1</Sub_Palette_Index>
+        <NameSub_Menu_Name>Get Audio File Tags.vi</NameSub_Menu_Name>
+        <Short_Name/>
+        <is_Merge_VI>false</is_Merge_VI>
+        <Position>
+          <Row>3</Row>
+          <Column>3</Column>
+        </Position>
+        <Icon>00000000</Icon>
+        <Path>..\G-Audio\Audio Files\Get Audio File Tags.vi</Path>
+        <VI_Title/>
+      </Items_Data>
+      <GUID>E8AAD6627A54ECEB9F64FCC854527DEA</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -623,7 +640,7 @@
         <Path>..\G-Audio\Audio Devices\Get Audio Device Configuration.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>34B1C34E2C0F96B6AA189645001780E5</GUID>
+      <GUID>98707B7EB15230D4D54BDD3E7EFDC9CF</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -798,7 +815,7 @@
         <Path>..\unnamed</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>477FCD5CFCD097F74F15C9CA8370A7E5</GUID>
+      <GUID>E545D7DBF67424C5BF34E3335C9365A1</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -959,7 +976,7 @@
         <Path>..\G-Audio\Mixer\Mixer\Channel Volume.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>D32FEEB0D856653D9F908E6BC850B709</GUID>
+      <GUID>09451675BE20E2D5147DF62D4BDA3527</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>3</Parent_Palette_Index>
@@ -1008,7 +1025,7 @@
         <Path>..\G-Audio\Examples\LINX\Sample Pad Example (LINX).vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>A475C1BBC7DBE8F06AC4B3D77FF2D9F0</GUID>
+      <GUID>F254CF195D29F86417127AE39BF06CCB</GUID>
     </Functions_Palette_Data>
   </Library_Palette_Definition>
 </VI_Package_Builder_Settings>

@@ -510,7 +510,9 @@ ga_result get_flac_info(const char* file_name, uint64_t* num_frames, uint32_t* c
 	drflac* pFlac = NULL;
 
 #if defined(_WIN32)
-	pFlac = drflac_open_file_w(widen(file_name), NULL);
+	wchar_t* wide_file_name = widen(file_name);
+	pFlac = drflac_open_file_w(wide_file_name, NULL);
+	free(wide_file_name);
 #else
 	pFlac = drflac_open_file(file_name, NULL);
 #endif
@@ -537,7 +539,9 @@ int16_t* load_flac(const char* file_name, uint64_t* num_frames, uint32_t* channe
 	int16_t* sample_data = NULL;
 
 #if defined(_WIN32)
-	sample_data = drflac_open_file_and_read_pcm_frames_s16_w(widen(file_name), &flac_channels, &flac_sample_rate, &flac_num_frames, NULL);
+	wchar_t* wide_file_name = widen(file_name);
+	sample_data = drflac_open_file_and_read_pcm_frames_s16_w(wide_file_name, &flac_channels, &flac_sample_rate, &flac_num_frames, NULL);
+	free(wide_file_name);
 #else
 	sample_data = drflac_open_file_and_read_pcm_frames_s16(file_name, &flac_channels, &flac_sample_rate, &flac_num_frames, NULL);
 #endif
@@ -564,7 +568,9 @@ void free_flac(int16_t* sample_data)
 ga_result open_flac_file(const char* file_name, void** decoder)
 {
 #if defined(_WIN32)
-	*decoder = (void*)drflac_open_file_w(widen(file_name), NULL);
+	wchar_t* wide_file_name = widen(file_name);
+	*decoder = (void*)drflac_open_file_w(wide_file_name, NULL);
+	free(wide_file_name);
 #else
 	*decoder = (void*)drflac_open_file(file_name, NULL);
 #endif
@@ -689,9 +695,10 @@ void flac_metadata_callback(void* pUserData, drflac_metadata* meta)
 				drflac_init_vorbis_comment_iterator(&iterator, meta->data.vorbis_comment.commentCount, meta->data.vorbis_comment.pComments);
 				while ((comment = drflac_next_vorbis_comment(&iterator, &length)) != NULL)
 				{
-					tag_info->tags[i] = (char*)malloc(sizeof(char) * length);
+					tag_info->tags[i] = (char*)malloc(length + 1);
 					tag_info->lengths[i] = length;
 					memcpy(tag_info->tags[i], comment, length);
+					tag_info->tags[i][length] = '\0';
 					i++;
 				}
 			}
@@ -703,11 +710,13 @@ void flac_metadata_callback(void* pUserData, drflac_metadata* meta)
 
 ga_result get_flac_tags(const char* file_name, int32_t* count, intptr_t* tags, intptr_t* lengths)
 {
-	drflac* decoder;
+	drflac* decoder = NULL;
 	audio_file_tags tag_info = {};
 
 #if defined(_WIN32)
-	decoder = drflac_open_file_with_metadata_w(widen(file_name), flac_metadata_callback, &tag_info, NULL);
+	wchar_t* wide_file_name = widen(file_name);
+	decoder = drflac_open_file_with_metadata_w(wide_file_name, flac_metadata_callback, &tag_info, NULL);
+	free(wide_file_name);
 #else
 	decoder = drflac_open_file_with_metadata(file_name, flac_metadata_callback, &tag_info, NULL);
 #endif
@@ -761,7 +770,9 @@ ga_result get_mp3_info(const char* file_name, uint64_t* num_frames, uint32_t* ch
 	mp3dec_file_info_t info;
 
 #if defined(_WIN32)
-	result = convert_mp3_result(mp3dec_load_w_no_decode(&mp3d, widen(file_name), &info, NULL, NULL));
+	wchar_t* wide_file_name = widen(file_name);
+	result = convert_mp3_result(mp3dec_load_w_no_decode(&mp3d, wide_file_name, &info, NULL, NULL));
+	free(wide_file_name);
 #else
 	result = convert_mp3_result(mp3dec_load_no_decode(&mp3d, file_name, &info, NULL, NULL));
 #endif
@@ -792,7 +803,9 @@ int16_t* load_mp3(const char* file_name, uint64_t* num_frames, uint32_t* channel
 	mp3dec_file_info_t info;
 
 #if defined(_WIN32)
-	*result = convert_mp3_result(mp3dec_load_w(&mp3d, widen(file_name), &info, NULL, NULL));
+	wchar_t* wide_file_name = widen(file_name);
+	*result = convert_mp3_result(mp3dec_load_w(&mp3d, wide_file_name, &info, NULL, NULL));
+	free(wide_file_name);
 #else
 	*result = convert_mp3_result(mp3dec_load(&mp3d, file_name, &info, NULL, NULL));
 #endif
@@ -832,7 +845,9 @@ ga_result open_mp3_file(const char* file_name, void** decoder)
 	}
 
 #if defined(_WIN32)
-	result = convert_mp3_result(mp3dec_ex_open_w(mp3_decoder, widen(file_name), MP3D_SEEK_TO_SAMPLE));
+	wchar_t* wide_file_name = widen(file_name);
+	result = convert_mp3_result(mp3dec_ex_open_w(mp3_decoder, wide_file_name, MP3D_SEEK_TO_SAMPLE));
+	free(wide_file_name);
 #else
 	result = convert_mp3_result(mp3dec_ex_open(mp3_decoder, file_name, MP3D_SEEK_TO_SAMPLE));
 #endif
@@ -1036,7 +1051,22 @@ ga_result get_id3_tags(const char* file_name, int32_t* count, intptr_t* tags, in
 		FIELDCOUNT
 	};
 
-	const char* tag_field_prefix[FIELDCOUNT] = { "TITLE=", "ARTIST=", "ALBUMARTIST=", "ALBUM=", "GENRE=", "DATE=", "TRACKNUMBER=", "TRACKTOTAL=", "DISCNUMBER=", "DISCTOTAL=", "COMPILATION=", "BPM=", "COMMENT=" };
+	const char* tag_field_prefix[FIELDCOUNT] =
+	{
+		"TITLE",
+		"ARTIST",
+		"ALBUMARTIST",
+		"ALBUM",
+		"GENRE",
+		"DATE",
+		"TRACKNUMBER",
+		"TRACKTOTAL",
+		"DISCNUMBER",
+		"DISCTOTAL",
+		"COMPILATION",
+		"BPM",
+		"COMMENT"
+	};
 
 	audio_file_tags tag_info = {};
 	const char* current_tag = NULL;
@@ -1050,6 +1080,9 @@ ga_result get_id3_tags(const char* file_name, int32_t* count, intptr_t* tags, in
 	}
 
 	tag_info.count = 0;
+	tag_info.tags = (char**)malloc(sizeof(char*) * FIELDCOUNT);
+	tag_info.lengths = (int32_t*)malloc(sizeof(int32_t) * FIELDCOUNT);
+
 	for (int field_index = 0; field_index < FIELDCOUNT; field_index++)
 	{
 		current_tag = NULL;
@@ -1075,15 +1108,11 @@ ga_result get_id3_tags(const char* file_name, int32_t* count, intptr_t* tags, in
 		{
 			int tag_index = tag_info.count;
 			tag_info.count++;
-			tag_info.tags = (char**)realloc(tag_info.tags, sizeof(char*) * tag_info.count);
-			tag_info.lengths = (int32_t*)realloc(tag_info.lengths, sizeof(int32_t) * tag_info.count);
 
-			int field_length = strlen(tag_field_prefix[field_index]);
-			int value_length = strlen(current_tag);
-			tag_info.lengths[tag_index] = field_length + value_length;
-			tag_info.tags[tag_index] = (char*)malloc(sizeof(char) * tag_info.lengths[tag_index]);
-			memcpy(tag_info.tags[tag_index], tag_field_prefix[field_index], field_length);
-			memcpy(tag_info.tags[tag_index] + field_length, current_tag, value_length);
+			tag_info.lengths[tag_index] = strlen(tag_field_prefix[field_index]) + strlen(current_tag) + 1; // Add 1 for '=' separator
+			tag_info.tags[tag_index] = (char*)malloc(tag_info.lengths[tag_index] + 1); // Add 1 for '\0' terminatation
+
+			snprintf(tag_info.tags[tag_index], tag_info.lengths[tag_index] + 1, "%s=%s", tag_field_prefix[field_index], current_tag);
 		}
 
 		if (field_index == FIELD_USER_TEXT && id3tag->user_text != NULL && id3tag->user_text_count > 0)
@@ -1091,20 +1120,18 @@ ga_result get_id3_tags(const char* file_name, int32_t* count, intptr_t* tags, in
 			int tag_offset = tag_info.count;
 			int tag_index = 0;
 			tag_info.count += id3tag->user_text_count;
-			tag_info.tags = (char**)realloc(tag_info.tags, sizeof(char*) * tag_info.count);
-			tag_info.lengths = (int32_t*)realloc(tag_info.lengths, sizeof(int32_t) * tag_info.count);
+			char** temp_tags_ptr = tag_info.tags;
+			int32_t* temp_lengths_ptr = tag_info.lengths;
+			tag_info.tags = (char**)realloc(temp_tags_ptr, sizeof(char*) * tag_info.count);
+			tag_info.lengths = (int32_t*)realloc(temp_lengths_ptr, sizeof(int32_t) * tag_info.count);
 
 			for (int user_text_index = 0; user_text_index < id3tag->user_text_count; user_text_index++)
 			{
-				int field_length = strlen(id3tag->user_text[user_text_index].desc);
-				int value_length = strlen(id3tag->user_text[user_text_index].value);
-
 				tag_index = tag_offset + user_text_index;
-				tag_info.lengths[tag_index] = field_length + value_length + 1; // +1 is for the '=' separator
-				tag_info.tags[tag_index] = (char*)malloc(sizeof(char) * tag_info.lengths[tag_index]);
-				memcpy(tag_info.tags[tag_index], id3tag->user_text[user_text_index].desc, field_length);
-				*(tag_info.tags[tag_index] + field_length) = '=';
-				memcpy(tag_info.tags[tag_index] + field_length + 1, id3tag->user_text[user_text_index].value, value_length);
+				tag_info.lengths[tag_index] = strlen(id3tag->user_text[user_text_index].desc) + strlen(id3tag->user_text[user_text_index].value) + 1; // Add 1 for '=' separator, and 
+				tag_info.tags[tag_index] = (char*)malloc(tag_info.lengths[tag_index] + 1); // Add 1 for '\0' terminatation
+
+				snprintf(tag_info.tags[tag_index], tag_info.lengths[tag_index] + 1, "%s=%s", id3tag->user_text[user_text_index].desc, id3tag->user_text[user_text_index].value);
 			}
 		}
 	}
@@ -1160,7 +1187,9 @@ ga_result get_vorbis_info(const char* file_name, uint64_t* num_frames, uint32_t*
 	stb_vorbis* info;
 
 #if defined(_WIN32)
-	info = stb_vorbis_open_filename_w(widen(file_name), &error, NULL);
+	wchar_t* wide_file_name = widen(file_name);
+	info = stb_vorbis_open_filename_w(wide_file_name, &error, NULL);
+	free(wide_file_name);
 #else
 	info = stb_vorbis_open_filename(file_name, &error, NULL);
 #endif
@@ -1192,7 +1221,9 @@ int16_t* load_vorbis(const char* file_name, uint64_t* num_frames, uint32_t* chan
 	short* sample_data = NULL;
 
 #if defined(_WIN32)
-	ogg_num_frames = stb_vorbis_decode_filename_w(widen(file_name), &ogg_channels, &ogg_sample_rate, &sample_data);
+	wchar_t* wide_file_name = widen(file_name);
+	ogg_num_frames = stb_vorbis_decode_filename_w(wide_file_name, &ogg_channels, &ogg_sample_rate, &sample_data);
+	free(wide_file_name);
 #else
 	ogg_num_frames = stb_vorbis_decode_filename(file_name, &ogg_channels, &ogg_sample_rate, &sample_data);
 #endif
@@ -1223,7 +1254,9 @@ ga_result open_vorbis_file(const char* file_name, void** decoder)
 	stb_vorbis* vorbis_decoder;
 
 #if defined(_WIN32)
-	vorbis_decoder = stb_vorbis_open_filename_w(widen(file_name), &error, NULL);
+	wchar_t* wide_file_name = widen(file_name);
+	vorbis_decoder = stb_vorbis_open_filename_w(wide_file_name, &error, NULL);
+	free(wide_file_name);
 #else
 	vorbis_decoder = stb_vorbis_open_filename(file_name, &error, NULL);
 #endif
@@ -1342,7 +1375,9 @@ ga_result get_vorbis_tags(const char* file_name, int32_t* count, intptr_t* tags,
 	audio_file_tags tag_info = {};
 
 #if defined(_WIN32)
-	vorbis_decoder = stb_vorbis_open_filename_w(widen(file_name), &error, NULL);
+	wchar_t* wide_file_name = widen(file_name);
+	vorbis_decoder = stb_vorbis_open_filename_w(wide_file_name, &error, NULL);
+	free(wide_file_name);
 #else
 	vorbis_decoder = stb_vorbis_open_filename(file_name, &error, NULL);
 #endif
@@ -1363,8 +1398,9 @@ ga_result get_vorbis_tags(const char* file_name, int32_t* count, intptr_t* tags,
 		for (int i = 0; i < vorbis_decoder->comment_list_length; i++)
 		{
 			tag_info.lengths[i] = strlen(vorbis_decoder->comment_list[i]);
-			tag_info.tags[i] = (char*)malloc(sizeof(char) * tag_info.lengths[i]);
+			tag_info.tags[i] = (char*)malloc(tag_info.lengths[i] + 1);
 			memcpy(tag_info.tags[i], vorbis_decoder->comment_list[i], tag_info.lengths[i]);
+			tag_info.tags[i][tag_info.lengths[i]] = '\0';
 		}
 	}
 
@@ -1401,7 +1437,9 @@ ga_result get_wav_info(const char* file_name, uint64_t* num_frames, uint32_t* ch
 	drwav_bool32 init_ok = DRWAV_FALSE;
 
 #if defined(_WIN32)
-	init_ok = drwav_init_file_w(&pWav, widen(file_name), NULL);
+	wchar_t* wide_file_name = widen(file_name);
+	init_ok = drwav_init_file_w(&pWav, wide_file_name, NULL);
+	free(wide_file_name);
 #else
 	init_ok = drwav_init_file(&pWav, file_name, NULL);
 #endif
@@ -1429,7 +1467,9 @@ int16_t* load_wav(const char* file_name, uint64_t* num_frames, uint32_t* channel
 	int16_t* sample_data = NULL;
 
 #if defined(_WIN32)
-	sample_data = drwav_open_file_and_read_pcm_frames_s16_w(widen(file_name), &wav_channels, &wav_sample_rate, &wav_num_frames, NULL);
+	wchar_t* wide_file_name = widen(file_name);
+	sample_data = drwav_open_file_and_read_pcm_frames_s16_w(wide_file_name, &wav_channels, &wav_sample_rate, &wav_num_frames, NULL);
+	free(wide_file_name);
 #else
 	sample_data = drwav_open_file_and_read_pcm_frames_s16(file_name, &wav_channels, &wav_sample_rate, &wav_num_frames, NULL);
 #endif
@@ -1463,7 +1503,9 @@ ga_result open_wav_file(const char* file_name, void** decoder)
 	}
 
 #if defined(_WIN32)
-	result = drwav_init_file_w(wav_decoder, widen(file_name), NULL);
+	wchar_t* wide_file_name = widen(file_name);
+	result = drwav_init_file_w(wav_decoder, wide_file_name, NULL);
+	free(wide_file_name);
 #else
 	result = drwav_init_file(wav_decoder, file_name, NULL);
 #endif
@@ -1507,7 +1549,9 @@ ga_result open_wav_file_write(const char* file_name, uint32_t channels, uint32_t
 	}
 
 #if defined(_WIN32)
-	result = drwav_init_file_write_w(wav_encoder, widen(file_name), &format, NULL);
+	wchar_t* wide_file_name = widen(file_name);
+	result = drwav_init_file_write_w(wav_encoder, wide_file_name, &format, NULL);
+	free(wide_file_name);
 #else
 	result = drwav_init_file_write(wav_encoder, file_name, &format, NULL);
 #endif
@@ -1657,7 +1701,16 @@ ga_result get_wav_tags(const char* file_name, int32_t* count, intptr_t* tags, in
 		FIELD_COUNT
 	};
 
-	const char* tag_field_prefix[FIELD_COUNT] = { "TITLE=", "ARTIST=", "ALBUM=", "GENRE=", "DATE=", "TRACKNUMBER=", "COMMENT=" };
+	const char* tag_field_prefix[FIELD_COUNT] =
+	{
+		"TITLE",
+		"ARTIST",
+		"ALBUM",
+		"GENRE",
+		"DATE",
+		"TRACKNUMBER",
+		"COMMENT"
+	};
 
 	audio_file_tags tag_info = {};
 	drwav_bool32 result = DRWAV_FALSE;
@@ -1670,7 +1723,9 @@ ga_result get_wav_tags(const char* file_name, int32_t* count, intptr_t* tags, in
 	}
 
 #if defined(_WIN32)
-	result = drwav_init_file_with_metadata_w(wav_decoder, widen(file_name), 0, NULL);
+	wchar_t* wide_file_name = widen(file_name);
+	result = drwav_init_file_with_metadata_w(wav_decoder, wide_file_name, 0, NULL);
+	free(wide_file_name);
 #else
 	result = drwav_init_file_with_metadata(wav_decoder, file_name, NULL);
 #endif
@@ -1683,8 +1738,9 @@ ga_result get_wav_tags(const char* file_name, int32_t* count, intptr_t* tags, in
 	}
 
 	tag_info.count = 0;
-	tag_info.tags = NULL;
-	tag_info.lengths = NULL;
+	tag_info.tags = (char**)malloc(sizeof(char*) * FIELD_COUNT);
+	tag_info.lengths = (int32_t*)malloc(sizeof(int32_t) * FIELD_COUNT);
+
 	for (int i = 0; i < wav_decoder->metadataCount; i++)
 	{
 		field_index = -1;
@@ -1704,15 +1760,11 @@ ga_result get_wav_tags(const char* file_name, int32_t* count, intptr_t* tags, in
 		{
 			int tag_index = tag_info.count;
 			tag_info.count++;
-			tag_info.tags = (char**)realloc(tag_info.tags, sizeof(char*) * tag_info.count);
-			tag_info.lengths = (int32_t*)realloc(tag_info.lengths, sizeof(int32_t) * tag_info.count);
 
-			int field_length = strlen(tag_field_prefix[field_index]);
-			int value_length = wav_decoder->pMetadata[i].data.infoText.stringLength;
-			tag_info.lengths[tag_index] = field_length + value_length;
-			tag_info.tags[tag_index] = (char*)malloc(sizeof(char) * tag_info.lengths[tag_index]);
-			memcpy(tag_info.tags[tag_index], tag_field_prefix[field_index], field_length);
-			memcpy(tag_info.tags[tag_index] + field_length, wav_decoder->pMetadata[i].data.infoText.pString, value_length);
+			tag_info.lengths[tag_index] = strlen(tag_field_prefix[field_index]) + wav_decoder->pMetadata[i].data.infoText.stringLength + 1; // Add 1 for '=' separator
+			tag_info.tags[tag_index] = (char*)malloc(tag_info.lengths[tag_index] + 1); // Add 1 for '\0' termination
+
+			snprintf(tag_info.tags[tag_index], tag_info.lengths[tag_index] + 1, "%s=%s", tag_field_prefix[field_index], wav_decoder->pMetadata[i].data.infoText.pString);
 		}
 	}
 

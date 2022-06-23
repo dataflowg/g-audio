@@ -397,6 +397,7 @@ ga_result get_wav_tags(const char* file_name, int32_t* count, intptr_t* tags, in
 // Convert an ASCII / UTF8 string to a UTF-16 LE wide char representation.
 // Use for interfacing with wide Win32 file APIs.
 // Assumes strings are null terminated (which they should be, coming from LabVIEW)
+// NOTE: Caller must free returned wchar_t*
 wchar_t* widen(const char* utf8_string)
 {
 	if (utf8_string == NULL)
@@ -421,11 +422,15 @@ FILE* ga_fopen(const char* file_name)
 {
 	FILE* pFile;
 
-#if defined(_WIN32) && defined(__STDC_WANT_SECURE_LIB__)
-	if (0 != _wfopen_s(&pFile, widen(file_name), L"rb"))
-		pFile = NULL;
-#elif defined(_WIN32)
-	pFile = _wfopen(widen(file_name), L"rb");
+#if defined(_WIN32)
+	wchar_t* wide_file_name = widen(file_name);
+	#if defined(__STDC_WANT_SECURE_LIB__)
+		if (0 != _wfopen_s(&pFile, wide_file_name, L"rb"))
+			pFile = NULL;
+	#else
+		pFile = _wfopen(wide_file_name, L"rb");
+	#endif
+	free(wide_file_name);
 #else
 	pFile = fopen(file_name, "rb");
 #endif

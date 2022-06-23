@@ -120,6 +120,9 @@
 			<Item Name="Test Tag Read Vorbis.vi" Type="VI" URL="../Unit Tests/Test Tag Read Vorbis.vi"/>
 			<Item Name="Test Tag Read WAV.vi" Type="VI" URL="../Unit Tests/Test Tag Read WAV.vi"/>
 			<Item Name="Test Unicode Path UTF8.vi" Type="VI" URL="../Unit Tests/Test Unicode Path UTF8.vi"/>
+			<Item Name="Test Unicode Tag FLAC.vi" Type="VI" URL="../Unit Tests/Test Unicode Tag FLAC.vi"/>
+			<Item Name="Test Unicode Tag ID3v2.vi" Type="VI" URL="../Unit Tests/Test Unicode Tag ID3v2.vi"/>
+			<Item Name="Test Unicode Tag Vorbis.vi" Type="VI" URL="../Unit Tests/Test Unicode Tag Vorbis.vi"/>
 			<Item Name="Waveform Array In Range Comparison.vim" Type="VI" URL="../Unit Tests/Waveform Array In Range Comparison.vim"/>
 		</Item>
 		<Item Name="G-Audio.lvlib" Type="Library" URL="../G-Audio/G-Audio.lvlib"/>
@@ -201,6 +204,9 @@
 				<Item Name="whitespace.ctl" Type="VI" URL="/&lt;vilib&gt;/Utility/error.llb/whitespace.ctl"/>
 			</Item>
 			<Item Name="g_audio_32.dll" Type="Document" URL="../G-Audio/lib/g_audio_32.dll"/>
+			<Item Name="kernel32.dll" Type="Document" URL="kernel32.dll">
+				<Property Name="NI.PreserveRelativePath" Type="Bool">true</Property>
+			</Item>
 			<Item Name="lvanlys.dll" Type="Document" URL="/&lt;resource&gt;/lvanlys.dll"/>
 			<Item Name="lvsound2.dll" Type="Document" URL="/&lt;resource&gt;/lvsound2.dll"/>
 		</Item>

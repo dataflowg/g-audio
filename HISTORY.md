@@ -1,17 +1,28 @@
 # G-Audio Release History
-### v0.4.0 - 2021-12-xx
+### v0.4.0 - 2022-06-xx
 * Raspberry Pi / LINX support
+* Metadata tag reading support (ID3v2, ID3v1, Vorbis Comments, RIFF INFO)
 * Advanced device configuration (exclusive mode, period size, num periods)
-* New VI `Get Audio Device Configuration.vi` used to query info of an already configured device
-* `Query Audio Devices.vi` returns additional device info (default device, native sample rates, native channels, native formats)
+* Device volume adjustment (feature request #13)
+* Get the configuration settings of an already configured device
+* Query more detailed device info (default device, native sample rates, native channels, native formats)
 * Warn of duplicate device config
 * Update miniaudio to v0.11.2 (fixes #10)
+* Reduced VIPM package installation time
+* (Windows) Fix memory leak when using UTF-16 converted file name
+
+##### New APIs
+* `Get Audio File Tags.vi`
+* `Set Audio Device Volume.vi`
+* `Get Audio Device Volume.vi`
+* `Get Audio Device Configuration.vi`
 
 ##### API Changes
 * `Configure Audio Device.vi`:
     * Added `Audio Device Advanced Config.ctl` input
     * Added `Audio Device Config.ctl` and `Audio Device Advanced Config.ctl` outputs which contain the device's actual configuration, and can differ from the requested configuration
 * Exclusive Mode flag moved from `Audio Device Config.ctl` to `Audio Device Advanced Config.ctl`
+* `Query Audio Devices.vi` returns additional device info (default device, native sample rates, native channels, native formats)
 
 
 

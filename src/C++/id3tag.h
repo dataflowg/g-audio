@@ -497,7 +497,7 @@ char* id3tag_internal_get_string( int encoding, ID3TAG_U8* ptr, int size, void* 
             *bytes_consumed = ( *bytes_consumed ) + 2;
             }
 
-        utf8_to_latin1( str );
+        //utf8_to_latin1( str );
         return str;
         }
     else if( encoding == 2 ) // UTF16BE without BOM
@@ -516,7 +516,7 @@ char* id3tag_internal_get_string( int encoding, ID3TAG_U8* ptr, int size, void* 
             *bytes_consumed = ( *bytes_consumed ) + 2;
         }
 
-        utf8_to_latin1( str );
+        //utf8_to_latin1( str );
         return str;
         }
     else if( encoding == 3 ) // UTF8
