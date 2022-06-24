@@ -76,19 +76,29 @@ For more information, please refer to <http://unlicense.org/>
 #endif
 #include <vector>
 
-// Single header decoder definitions. These must appear before including decoders.
+///////////////////////////////
+// Single header definitions //
+///////////////////////////////
+
 #define DR_FLAC_IMPLEMENTATION
+#include "dr_flac.h"
+
 #define MINIMP3_IMPLEMENTATION
 //#define MINIMP3_FLOAT_OUTPUT
-#define DR_WAV_IMPLEMENTATION
-#define ID3TAG_IMPLEMENTATION
-
-#include "thread_safety.h"
-#include "dr_flac.h"
 #include "minimp3_ex.h"
-#include "stb_vorbis.h"
+
+#define DR_WAV_IMPLEMENTATION
 #include "dr_wav.h"
+
+#define ID3TAG_IMPLEMENTATION
 #include "id3tag.h"
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
+#include "stb_vorbis.h"
+#include "thread_safety.h"
+
 
 // Don't define miniaudio's encoders and decoders, as we're using those libraries separately.
 #define MA_NO_DECODING

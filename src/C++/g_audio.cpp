@@ -418,13 +418,16 @@ extern "C" LV_DLL_EXPORT ga_result free_audio_file_tags(int32_t count, intptr_t 
 	char** tags_ptr = (char**)tags;
 	int32_t* lengths_ptr = (int32_t*)lengths;
 
-	for (int i = 0; i < count; i++)
+	if (tags_ptr != NULL)
 	{
-		free(tags_ptr[i]);
-		tags_ptr[i] = NULL;
-	}
-	free(tags_ptr);
-	tags_ptr = NULL;
+		for (int i = 0; i < count; i++)
+		{
+			free(tags_ptr[i]);
+			tags_ptr[i] = NULL;
+		}
+		free(tags_ptr);
+		tags_ptr = NULL;
+    }
 
 	free(lengths_ptr);
 	lengths_ptr = NULL;
@@ -675,6 +678,11 @@ ga_result close_flac_file(void* decoder)
 
 void flac_metadata_callback(void* pUserData, drflac_metadata* meta)
 {
+	if (pUserData == NULL)
+	{
+		return;
+	}
+
 	audio_file_tags* tag_info = (audio_file_tags*)pUserData;
 	switch (meta->type)
 	{
@@ -683,23 +691,39 @@ void flac_metadata_callback(void* pUserData, drflac_metadata* meta)
 			drflac_vorbis_comment_iterator iterator;
 			const char* comment;
 			uint32_t length;
-			int i = 0;
 
-			tag_info->count = meta->data.vorbis_comment.commentCount;
-
-			if (tag_info->count > 0)
+			tag_info->count = 0;
+			if (meta->data.vorbis_comment.commentCount > 0)
 			{
-				tag_info->tags = (char**)malloc(sizeof(char*) * tag_info->count);
-				tag_info->lengths = (int32_t*)malloc(sizeof(int32_t) * tag_info->count);
+				// Use calloc instead of malloc so all char* are set NULL
+				tag_info->tags = (char**)calloc(meta->data.vorbis_comment.commentCount, sizeof(char*));
+				tag_info->lengths = (int32_t*)malloc(sizeof(int32_t) * meta->data.vorbis_comment.commentCount);
+
+				if (tag_info->tags == NULL || tag_info->lengths == NULL)
+				{
+					free_audio_file_tags(tag_info->count, (intptr_t)tag_info->tags, (intptr_t)tag_info->lengths);
+					free(pUserData);
+					pUserData = NULL;
+					return;
+				}
 
 				drflac_init_vorbis_comment_iterator(&iterator, meta->data.vorbis_comment.commentCount, meta->data.vorbis_comment.pComments);
 				while ((comment = drflac_next_vorbis_comment(&iterator, &length)) != NULL)
 				{
-					tag_info->tags[i] = (char*)malloc(length + 1);
-					tag_info->lengths[i] = length;
-					memcpy(tag_info->tags[i], comment, length);
-					tag_info->tags[i][length] = '\0';
-					i++;
+					tag_info->tags[tag_info->count] = (char*)malloc(length + 1);
+
+					if (tag_info->tags[tag_info->count] == NULL)
+					{
+						free_audio_file_tags(tag_info->count, (intptr_t)tag_info->tags, (intptr_t)tag_info->lengths);
+						free(pUserData);
+						pUserData = NULL;
+						return;
+					}
+
+					tag_info->lengths[tag_info->count] = length;
+					memcpy(tag_info->tags[tag_info->count], comment, length);
+					tag_info->tags[tag_info->count][length] = '\0';
+					tag_info->count++;
 				}
 			}
 			break;
@@ -711,11 +735,16 @@ void flac_metadata_callback(void* pUserData, drflac_metadata* meta)
 ga_result get_flac_tags(const char* file_name, int32_t* count, intptr_t* tags, intptr_t* lengths)
 {
 	drflac* decoder = NULL;
-	audio_file_tags tag_info = {};
+	audio_file_tags* tag_info = (audio_file_tags*)malloc(sizeof(audio_file_tags));
+
+	if (tag_info == NULL)
+	{
+		return GA_E_MEMORY;
+	}
 
 #if defined(_WIN32)
 	wchar_t* wide_file_name = widen(file_name);
-	decoder = drflac_open_file_with_metadata_w(wide_file_name, flac_metadata_callback, &tag_info, NULL);
+	decoder = drflac_open_file_with_metadata_w(wide_file_name, flac_metadata_callback, tag_info, NULL);
 	free(wide_file_name);
 #else
 	decoder = drflac_open_file_with_metadata(file_name, flac_metadata_callback, &tag_info, NULL);
@@ -723,14 +752,22 @@ ga_result get_flac_tags(const char* file_name, int32_t* count, intptr_t* tags, i
 
 	if (decoder == NULL)
 	{
+		free(tag_info);
 		return GA_E_TAG;
 	}
 
 	drflac_close(decoder);
 
-	*count = tag_info.count;
-	*tags = (intptr_t)tag_info.tags;
-	*lengths = (intptr_t)tag_info.lengths;
+	if (tag_info == NULL)
+	{
+		return GA_E_MEMORY;
+	}
+
+	*count = tag_info->count;
+	*tags = (intptr_t)tag_info->tags;
+	*lengths = (intptr_t)tag_info->lengths;
+
+	free(tag_info);
 
 	return GA_SUCCESS;
 }
@@ -1080,8 +1117,15 @@ ga_result get_id3_tags(const char* file_name, int32_t* count, intptr_t* tags, in
 	}
 
 	tag_info.count = 0;
-	tag_info.tags = (char**)malloc(sizeof(char*) * FIELDCOUNT);
+	tag_info.tags = (char**)calloc(FIELDCOUNT, sizeof(char*));
 	tag_info.lengths = (int32_t*)malloc(sizeof(int32_t) * FIELDCOUNT);
+
+	if (tag_info.tags == NULL || tag_info.lengths == NULL)
+	{
+		free_audio_file_tags(tag_info.count, (intptr_t)tag_info.tags, (intptr_t)tag_info.lengths);
+		id3tag_free(id3tag);
+		return GA_E_MEMORY;
+	}
 
 	for (int field_index = 0; field_index < FIELDCOUNT; field_index++)
 	{
@@ -1107,29 +1151,60 @@ ga_result get_id3_tags(const char* file_name, int32_t* count, intptr_t* tags, in
 		if (current_tag != NULL)
 		{
 			int tag_index = tag_info.count;
-			tag_info.count++;
 
 			tag_info.lengths[tag_index] = strlen(tag_field_prefix[field_index]) + strlen(current_tag) + 1; // Add 1 for '=' separator
 			tag_info.tags[tag_index] = (char*)malloc(tag_info.lengths[tag_index] + 1); // Add 1 for '\0' terminatation
 
+			if (tag_info.tags[tag_index] == NULL)
+			{
+				free_audio_file_tags(tag_info.count, (intptr_t)tag_info.tags, (intptr_t)tag_info.lengths);
+				id3tag_free(id3tag);
+				return GA_E_MEMORY;
+			}
+
 			snprintf(tag_info.tags[tag_index], tag_info.lengths[tag_index] + 1, "%s=%s", tag_field_prefix[field_index], current_tag);
+			tag_info.count++;
 		}
 
 		if (field_index == FIELD_USER_TEXT && id3tag->user_text != NULL && id3tag->user_text_count > 0)
 		{
 			int tag_offset = tag_info.count;
 			int tag_index = 0;
-			tag_info.count += id3tag->user_text_count;
+			int temp_count = tag_info.count + id3tag->user_text_count;
 			char** temp_tags_ptr = tag_info.tags;
 			int32_t* temp_lengths_ptr = tag_info.lengths;
-			tag_info.tags = (char**)realloc(temp_tags_ptr, sizeof(char*) * tag_info.count);
+
+			tag_info.tags = (char**)realloc(temp_tags_ptr, sizeof(char*) * temp_count);
+			if (tag_info.tags == NULL)
+			{
+				free_audio_file_tags(tag_info.count, (intptr_t)temp_tags_ptr, (intptr_t)tag_info.lengths);
+				id3tag_free(id3tag);
+				return GA_E_MEMORY;
+			}
+
+			memset(tag_info.tags + tag_offset, 0, id3tag->user_text_count);
+			tag_info.count = temp_count;
+
 			tag_info.lengths = (int32_t*)realloc(temp_lengths_ptr, sizeof(int32_t) * tag_info.count);
+			if (tag_info.lengths == NULL)
+			{
+				free_audio_file_tags(tag_info.count, (intptr_t)tag_info.tags, (intptr_t)temp_lengths_ptr);
+				id3tag_free(id3tag);
+				return GA_E_MEMORY;
+			}
 
 			for (int user_text_index = 0; user_text_index < id3tag->user_text_count; user_text_index++)
 			{
 				tag_index = tag_offset + user_text_index;
 				tag_info.lengths[tag_index] = strlen(id3tag->user_text[user_text_index].desc) + strlen(id3tag->user_text[user_text_index].value) + 1; // Add 1 for '=' separator, and 
 				tag_info.tags[tag_index] = (char*)malloc(tag_info.lengths[tag_index] + 1); // Add 1 for '\0' terminatation
+
+				if (tag_info.tags[tag_index] == NULL)
+				{
+					free_audio_file_tags(tag_info.count, (intptr_t)tag_info.tags, (intptr_t)tag_info.lengths);
+					id3tag_free(id3tag);
+					return GA_E_MEMORY;
+				}
 
 				snprintf(tag_info.tags[tag_index], tag_info.lengths[tag_index] + 1, "%s=%s", id3tag->user_text[user_text_index].desc, id3tag->user_text[user_text_index].value);
 			}
@@ -1389,18 +1464,34 @@ ga_result get_vorbis_tags(const char* file_name, int32_t* count, intptr_t* tags,
 		return GA_E_TAG;
 	}
 
-	tag_info.count = vorbis_decoder->comment_list_length;
-	if (tag_info.count > 0)
+	tag_info.count = 0;
+	if (vorbis_decoder->comment_list_length > 0)
 	{
-		tag_info.tags = (char**)malloc(sizeof(char*) * tag_info.count);
-		tag_info.lengths = (int32_t*)malloc(sizeof(int32_t) * tag_info.count);
+		tag_info.tags = (char**)calloc(vorbis_decoder->comment_list_length, sizeof(char*));
+		tag_info.lengths = (int32_t*)malloc(sizeof(int32_t) * vorbis_decoder->comment_list_length);
+
+		if (tag_info.tags == NULL || tag_info.lengths == NULL)
+		{
+			free_audio_file_tags(tag_info.count, (intptr_t)tag_info.tags, (intptr_t)tag_info.lengths);
+			stb_vorbis_close(vorbis_decoder);
+			return GA_E_MEMORY;
+		}
 
 		for (int i = 0; i < vorbis_decoder->comment_list_length; i++)
 		{
 			tag_info.lengths[i] = strlen(vorbis_decoder->comment_list[i]);
 			tag_info.tags[i] = (char*)malloc(tag_info.lengths[i] + 1);
+
+			if (tag_info.tags[i] == NULL)
+			{
+				free_audio_file_tags(i, (intptr_t)tag_info.tags, (intptr_t)tag_info.lengths);
+				stb_vorbis_close(vorbis_decoder);
+				return GA_E_MEMORY;
+			}
+
 			memcpy(tag_info.tags[i], vorbis_decoder->comment_list[i], tag_info.lengths[i]);
 			tag_info.tags[i][tag_info.lengths[i]] = '\0';
+			tag_info.count++;
 		}
 	}
 
@@ -1714,17 +1805,12 @@ ga_result get_wav_tags(const char* file_name, int32_t* count, intptr_t* tags, in
 
 	audio_file_tags tag_info = {};
 	drwav_bool32 result = DRWAV_FALSE;
-	drwav* wav_decoder = (drwav*)malloc(sizeof(drwav));
+	drwav wav_decoder = {};
 	int field_index = -1;
-
-	if (wav_decoder == NULL)
-	{
-		return GA_E_MEMORY;
-	}
 
 #if defined(_WIN32)
 	wchar_t* wide_file_name = widen(file_name);
-	result = drwav_init_file_with_metadata_w(wav_decoder, wide_file_name, 0, NULL);
+	result = drwav_init_file_with_metadata_w(&wav_decoder, wide_file_name, 0, NULL);
 	free(wide_file_name);
 #else
 	result = drwav_init_file_with_metadata(wav_decoder, file_name, NULL);
@@ -1732,19 +1818,24 @@ ga_result get_wav_tags(const char* file_name, int32_t* count, intptr_t* tags, in
 
 	if (result == DRWAV_FALSE)
 	{
-		free(wav_decoder);
-		wav_decoder = NULL;
 		return GA_E_GENERIC;
 	}
 
 	tag_info.count = 0;
-	tag_info.tags = (char**)malloc(sizeof(char*) * FIELD_COUNT);
+	tag_info.tags = (char**)calloc(FIELD_COUNT, sizeof(char*));
 	tag_info.lengths = (int32_t*)malloc(sizeof(int32_t) * FIELD_COUNT);
 
-	for (int i = 0; i < wav_decoder->metadataCount; i++)
+	if (tag_info.tags == NULL || tag_info.lengths == NULL)
+	{
+		free_audio_file_tags(tag_info.count, (intptr_t)tag_info.tags, (intptr_t)tag_info.lengths);
+		drwav_uninit(&wav_decoder);
+		return GA_E_MEMORY;
+	}
+
+	for (int i = 0; i < wav_decoder.metadataCount; i++)
 	{
 		field_index = -1;
-		switch (wav_decoder->pMetadata[i].type)
+		switch (wav_decoder.pMetadata[i].type)
 		{
 			case drwav_metadata_type_list_info_title:       field_index = FIELD_TITLE; break;
 			case drwav_metadata_type_list_info_artist:      field_index = FIELD_ARTIST; break;
@@ -1759,17 +1850,23 @@ ga_result get_wav_tags(const char* file_name, int32_t* count, intptr_t* tags, in
 		if (field_index >= 0)
 		{
 			int tag_index = tag_info.count;
-			tag_info.count++;
 
-			tag_info.lengths[tag_index] = strlen(tag_field_prefix[field_index]) + wav_decoder->pMetadata[i].data.infoText.stringLength + 1; // Add 1 for '=' separator
+			tag_info.lengths[tag_index] = strlen(tag_field_prefix[field_index]) + wav_decoder.pMetadata[i].data.infoText.stringLength + 1; // Add 1 for '=' separator
 			tag_info.tags[tag_index] = (char*)malloc(tag_info.lengths[tag_index] + 1); // Add 1 for '\0' termination
 
-			snprintf(tag_info.tags[tag_index], tag_info.lengths[tag_index] + 1, "%s=%s", tag_field_prefix[field_index], wav_decoder->pMetadata[i].data.infoText.pString);
+			if (tag_info.tags == NULL || tag_info.lengths == NULL)
+			{
+				free_audio_file_tags(tag_info.count, (intptr_t)tag_info.tags, (intptr_t)tag_info.lengths);
+				drwav_uninit(&wav_decoder);
+				return GA_E_MEMORY;
+			}
+
+			snprintf(tag_info.tags[tag_index], tag_info.lengths[tag_index] + 1, "%s=%s", tag_field_prefix[field_index], wav_decoder.pMetadata[i].data.infoText.pString);
+			tag_info.count++;
 		}
 	}
 
-	drwav_uninit(wav_decoder);
-	free(wav_decoder);
+	drwav_uninit(&wav_decoder);
 
 	*count = tag_info.count;
 	*tags = (intptr_t)tag_info.tags;

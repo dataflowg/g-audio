@@ -1,6 +1,6 @@
 ﻿<?xml version='1.0' encoding='UTF-8'?>
 <Project Type="Project" LVVersion="20008000">
-	<Property Name="CCSymbols" Type="Str">DEBUG_LIB,FALSE;</Property>
+	<Property Name="CCSymbols" Type="Str">DEBUG_LIB,TRUE;</Property>
 	<Property Name="NI.LV.All.SourceOnly" Type="Bool">true</Property>
 	<Property Name="NI.Project.Description" Type="Str"></Property>
 	<Property Name="utf.calculate.project.code.coverage" Type="Bool">true</Property>
