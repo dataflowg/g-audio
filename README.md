@@ -87,7 +87,7 @@ The `Playback Audio`, `Capture Audio`, `Audio File Read`, and `Audio File Write`
 If a malleable VI has broken wire inputs and errors about unsupported types, even though the type is supported, try hold Ctrl and click the run arrow. This will force LabVIEW to recompile the VI, and should hopefully fix those broken wires.
 
 ### Supported Metadata Tags
-G-Audio supports reading ID3v2 and ID3v1 tags from MP3 files, Vorbis Comments from FLAC and Ogg Vorbis files, and RIFF INFO data from WAV files. All tag data is returned as a string array from `Read Audio File Tags.vi`, where each string is in the form `FIELD=Value`. Depending on the tag format, `FIELD` is directly from the tag (in the case of Vorbis Comments and ID3v2 `TXXX` fields), or mapped to a commonly named field.
+G-Audio supports reading ID3v2 and ID3v1 tags from MP3 files, Vorbis Comments from FLAC and Ogg Vorbis files, and RIFF INFO data from WAV files. All tag data is returned as an array of `Field` \ `Value` clusters from `Read Audio File Tags.vi`. The text encoding of `Value` can be set to support tags containing unicode (note the `Field` text is always ASCII). Depending on the tag format, `Field` is directly from the tag (in the case of Vorbis Comments and ID3v2 `TXXX` fields), or mapped to a commonly named field.
 
 Field       | Description                             | ID3v2                       | ID3v1         | RIFF INFO
 ------------|-----------------------------------------|-----------------------------|---------------|-----------

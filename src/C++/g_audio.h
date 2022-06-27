@@ -230,12 +230,37 @@ typedef struct
 	ma_int32 buffer_size;
 } audio_device;
 
+// NOTE: This struct is replicated as a cluster in LabVIEW.
+// Be careful of alignment issues - LV 32-bit is byte aligned, LV 64-bit is naturally aligned.
 typedef struct
 {
-	int32_t count;
-	char** tags;
-	int32_t* lengths;
-} audio_file_tags;
+	char* field;
+	char* value;
+	int32_t field_length;
+	int32_t value_length;
+} audio_file_tag;
+
+// NOTE: This struct is replicated as a cluster in LabVIEW.
+// Be careful of alignment issues - LV 32-bit is byte aligned, LV 64-bit is naturally aligned.
+typedef struct
+{
+	uint8_t* data;
+	uint32_t data_size;
+	uint32_t type;
+	uint32_t width;
+	uint32_t height;
+	uint32_t depth;
+} audio_file_picture;
+
+typedef struct
+{
+	audio_file_tag* tags;
+	audio_file_picture* pictures;
+	int32_t tag_count;
+	int32_t picture_count;
+	uint8_t read_pictures;
+} audio_file_tag_info;
+
 
 ////////////////////////////
 // LabVIEW CLFN Callbacks //
@@ -269,8 +294,9 @@ extern "C" LV_DLL_EXPORT ga_result write_audio_file(int32_t refnum, uint64_t fra
 extern "C" LV_DLL_EXPORT ga_result close_audio_file(int32_t refnum);
 
 // Get the tag data for the associated file.
-extern "C" LV_DLL_EXPORT ga_result get_audio_file_tags(const char* file_name, int32_t* count, intptr_t* tags, intptr_t* lengths);
-extern "C" LV_DLL_EXPORT ga_result free_audio_file_tags(int32_t count, intptr_t tags, intptr_t lengths);
+extern "C" LV_DLL_EXPORT ga_result get_audio_file_tags(const char* file_name, uint8_t read_pictures, intptr_t* tags, int32_t* tag_count, intptr_t* pictures, int32_t* picture_count);
+ga_result free_audio_file_tags(audio_file_tag_info tag_info);
+extern "C" LV_DLL_EXPORT ga_result free_audio_file_tags(intptr_t tags, int32_t tag_count, intptr_t pictures, int32_t picture_count);
 
 // Determine the codec of the audio file
 ga_result get_audio_file_codec(const char* file_name, ga_codec* codec);
@@ -340,7 +366,7 @@ ga_result get_basic_flac_file_info(void* decoder, uint32_t* channels, uint32_t* 
 ga_result seek_flac_file(void* decoder, uint64_t offset, uint64_t* new_offset);
 ga_result read_flac_file(void* decoder, uint64_t frames_to_read, ga_data_type audio_type, uint64_t* frames_read, void* output_buffer);
 ga_result close_flac_file(void* decoder);
-ga_result get_flac_tags(const char* file_name, int32_t* count, intptr_t* tags, intptr_t* lengths);
+ga_result get_flac_tags(const char* file_name, uint8_t read_pictures, intptr_t* tags, int32_t* tag_count, intptr_t* pictures, int32_t* picture_count);
 
 
 ////////////////////////
@@ -356,7 +382,7 @@ ga_result get_basic_mp3_file_info(void* decoder, uint32_t* channels, uint32_t* s
 ga_result seek_mp3_file(void* decoder, uint64_t offset, uint64_t* new_offset);
 ga_result read_mp3_file(void* decoder, uint64_t frames_to_read, ga_data_type audio_type, uint64_t* frames_read, void* output_buffer);
 ga_result close_mp3_file(void* decoder);
-ga_result get_id3_tags(const char* file_name, int32_t* count, intptr_t* tags, intptr_t* lengths);
+ga_result get_id3_tags(const char* file_name, uint8_t read_pictures, intptr_t* tags, int32_t* tag_count, intptr_t* pictures, int32_t* picture_count);
 
 ///////////////////////////
 // Vorbis codec wrappers //
@@ -371,7 +397,7 @@ ga_result get_basic_vorbis_file_info(void* decoder, uint32_t* channels, uint32_t
 ga_result seek_vorbis_file(void* decoder, uint64_t offset, uint64_t* new_offset);
 ga_result read_vorbis_file(void* decoder, uint64_t frames_to_read, ga_data_type audio_type, uint64_t* frames_read, void* output_buffer);
 ga_result close_vorbis_file(void* decoder);
-ga_result get_vorbis_tags(const char* file_name, int32_t* count, intptr_t* tags, intptr_t* lengths);
+ga_result get_vorbis_tags(const char* file_name, int32_t* count, intptr_t* tags);
 
 
 ////////////////////////
@@ -395,7 +421,7 @@ ga_result seek_wav_file(void* decoder, uint64_t offset, uint64_t* new_offset);
 ga_result read_wav_file(void* decoder, uint64_t frames_to_read, ga_data_type audio_type, uint64_t* frames_read, void* output_buffer);
 ga_result write_wav_file(void* encoder, uint64_t frames_to_write, void* input_buffer, uint64_t* frames_written);
 ga_result close_wav_file(void* decoder);
-ga_result get_wav_tags(const char* file_name, int32_t* count, intptr_t* tags, intptr_t* lengths);
+ga_result get_wav_tags(const char* file_name, int32_t* count, intptr_t* tags);
 
 
 /////////////////////////
@@ -448,6 +474,24 @@ FILE* ga_fopen(const char* file_name)
 	return pFile;
 }
 
+// Find the index of the first character past the specified token, or -1 if not found.
+int32_t ga_find_token(const char* string, char token)
+{
+	const char* ptr = string;
+	int32_t offset = 0;
+
+	while (ptr != NULL || *ptr != '\0')
+	{
+		if (*ptr == token)
+		{
+			return offset + 1;
+		}
+		offset++;
+		ptr++;
+	}
+
+	return -1;
+}
 
 //////////////////////////
 // Conversion functions //

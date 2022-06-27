@@ -71,8 +71,11 @@ https://github.com/dataflowg/g-audio</Property>
 		<Item Name="Audio Device Refnum.ctl" Type="VI" URL="../Controls/Audio Device Refnum.ctl"/>
 		<Item Name="Audio Device Type.ctl" Type="VI" URL="../Controls/Audio Device Type.ctl"/>
 		<Item Name="Audio File Codec.ctl" Type="VI" URL="../Controls/Audio File Codec.ctl"/>
+		<Item Name="Audio File Image Type.ctl" Type="VI" URL="../Controls/Audio File Image Type.ctl"/>
+		<Item Name="Audio File Image.ctl" Type="VI" URL="../Controls/Audio File Image.ctl"/>
 		<Item Name="Audio File Info.ctl" Type="VI" URL="../Controls/Audio File Info.ctl"/>
 		<Item Name="Audio File Refnum.ctl" Type="VI" URL="../Controls/Audio File Refnum.ctl"/>
+		<Item Name="Audio File Tag.ctl" Type="VI" URL="../Controls/Audio File Tag.ctl"/>
 		<Item Name="Backends.ctl" Type="VI" URL="../Controls/Backends.ctl"/>
 		<Item Name="Text Encoding.ctl" Type="VI" URL="../Controls/Text Encoding.ctl"/>
 		<Item Name="WAV Codec Specific Info.ctl" Type="VI" URL="../Controls/WAV Codec Specific Info.ctl"/>
