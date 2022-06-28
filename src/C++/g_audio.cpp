@@ -404,7 +404,7 @@ extern "C" LV_DLL_EXPORT ga_result get_audio_file_tags(const char* file_name, ui
 	{
 		case ga_codec_flac: return get_flac_tags(file_name, read_pictures, tags, tag_count, pictures, picture_count); break;
 		case ga_codec_mp3: return get_id3_tags(file_name, read_pictures, tags, tag_count, pictures, picture_count); break;
-		case ga_codec_vorbis: return get_vorbis_tags(file_name, tag_count, tags); break;
+		case ga_codec_vorbis: return get_vorbis_tags(file_name, read_pictures, tags, tag_count, pictures, picture_count); break;
 		case ga_codec_wav: return get_wav_tags(file_name, tag_count, tags); break;
 		case ga_codec_unsupported:
 		default:
@@ -1552,7 +1552,7 @@ ga_result close_vorbis_file(void* decoder)
 	return GA_SUCCESS;
 }
 
-ga_result get_vorbis_tags(const char* file_name, int32_t* count, intptr_t* tags)
+ga_result get_vorbis_tags(const char* file_name, uint8_t read_pictures, intptr_t* tags, int32_t* tag_count, intptr_t* pictures, int32_t* picture_count)
 {
 	ga_result result = GA_SUCCESS;
 	int error = 0;
@@ -1600,31 +1600,55 @@ ga_result get_vorbis_tags(const char* file_name, int32_t* count, intptr_t* tags)
 				value_length = length - token_offset;
 				field_length = length - value_length - 1;
 
-				tag_info.tags[tag_info.tag_count].field = (char*)malloc(field_length + 1);
-				tag_info.tags[tag_info.tag_count].value = (char*)malloc(value_length + 1);
-
-				if (tag_info.tags[tag_info.tag_count].field == NULL || tag_info.tags[tag_info.tag_count].value == NULL)
+				if (strncmp(vorbis_decoder->comment_list[i], "METADATA_BLOCK_PICTURE", field_length) == 0)
 				{
-					free_audio_file_tags(tag_info);
-					stb_vorbis_close(vorbis_decoder);
-					return GA_E_MEMORY;
-				}
+					audio_file_picture* temp_pictures_ptr = tag_info.pictures;
+					tag_info.pictures = (audio_file_picture*)realloc(temp_pictures_ptr, sizeof(audio_file_picture) * (tag_info.picture_count + 1));
 
-				memcpy(tag_info.tags[tag_info.tag_count].field, vorbis_decoder->comment_list[i], field_length);
-				tag_info.tags[tag_info.tag_count].field[field_length] = '\0';
-				tag_info.tags[tag_info.tag_count].field_length = field_length;
-				memcpy(tag_info.tags[tag_info.tag_count].value, vorbis_decoder->comment_list[i] + token_offset, value_length);
-				tag_info.tags[tag_info.tag_count].value[value_length] = '\0';
-				tag_info.tags[tag_info.tag_count].value_length = value_length;
-				tag_info.tag_count++;
+					if (tag_info.pictures == NULL)
+					{
+						tag_info.pictures = temp_pictures_ptr;
+						free_audio_file_tags(tag_info);
+						stb_vorbis_close(vorbis_decoder);
+						return GA_E_MEMORY;
+					}
+
+					int32_t block_size;
+					const uint8_t* picture_block = (const uint8_t*)base64_dec_malloc(vorbis_decoder->comment_list[i] + token_offset, &block_size);
+					parse_metadata_block_picture(picture_block, block_size, tag_info.pictures + tag_info.picture_count);
+					tag_info.picture_count++;
+					free((void*)picture_block);
+				}
+				else
+				{
+					tag_info.tags[tag_info.tag_count].field = (char*)malloc(field_length + 1);
+					tag_info.tags[tag_info.tag_count].value = (char*)malloc(value_length + 1);
+
+					if (tag_info.tags[tag_info.tag_count].field == NULL || tag_info.tags[tag_info.tag_count].value == NULL)
+					{
+						free_audio_file_tags(tag_info);
+						stb_vorbis_close(vorbis_decoder);
+						return GA_E_MEMORY;
+					}
+
+					memcpy(tag_info.tags[tag_info.tag_count].field, vorbis_decoder->comment_list[i], field_length);
+					tag_info.tags[tag_info.tag_count].field[field_length] = '\0';
+					tag_info.tags[tag_info.tag_count].field_length = field_length;
+					memcpy(tag_info.tags[tag_info.tag_count].value, vorbis_decoder->comment_list[i] + token_offset, value_length);
+					tag_info.tags[tag_info.tag_count].value[value_length] = '\0';
+					tag_info.tags[tag_info.tag_count].value_length = value_length;
+					tag_info.tag_count++;
+				}
 			}
 		}
 	}
 
 	stb_vorbis_close(vorbis_decoder);
 
-	*count = tag_info.tag_count;
 	*tags = (intptr_t)tag_info.tags;
+	*tag_count = tag_info.tag_count;
+	*pictures = (intptr_t)tag_info.pictures;
+	*picture_count = tag_info.picture_count;
 
 	return result;
 }

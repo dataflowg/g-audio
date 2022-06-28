@@ -98,7 +98,7 @@ For more information, please refer to <http://unlicense.org/>
 
 #include "stb_vorbis.h"
 #include "thread_safety.h"
-
+#include "base64.h"
 
 // Don't define miniaudio's encoders and decoders, as we're using those libraries separately.
 #define MA_NO_DECODING
@@ -397,7 +397,7 @@ ga_result get_basic_vorbis_file_info(void* decoder, uint32_t* channels, uint32_t
 ga_result seek_vorbis_file(void* decoder, uint64_t offset, uint64_t* new_offset);
 ga_result read_vorbis_file(void* decoder, uint64_t frames_to_read, ga_data_type audio_type, uint64_t* frames_read, void* output_buffer);
 ga_result close_vorbis_file(void* decoder);
-ga_result get_vorbis_tags(const char* file_name, int32_t* count, intptr_t* tags);
+ga_result get_vorbis_tags(const char* file_name, uint8_t read_pictures, intptr_t* tags, int32_t* tag_count, intptr_t* pictures, int32_t* picture_count);
 
 
 ////////////////////////
@@ -480,7 +480,12 @@ int32_t ga_find_token(const char* string, char token)
 	const char* ptr = string;
 	int32_t offset = 0;
 
-	while (ptr != NULL || *ptr != '\0')
+	if (ptr == NULL)
+	{
+		return -1;
+	}
+
+	while (*ptr != '\0')
 	{
 		if (*ptr == token)
 		{
@@ -1275,6 +1280,67 @@ int stb_vorbis_decode_filename_w(const wchar_t *filename, int *channels, int *sa
 }
 #endif // _WIN32
 #endif // STB_VORBIS_NO_STDIO
+
+ga_result parse_metadata_block_picture(const uint8_t* block, int32_t block_size, audio_file_picture* picture)
+{
+	if (picture == NULL || block == NULL)
+	{
+		return GA_E_GENERIC;
+	}
+
+	if (block_size < 32)
+	{
+		return GA_E_TAG;
+	}
+
+	const char* pRunningData;
+	const char* pRunningDataEnd;
+
+	pRunningData = (const char*)block;
+	pRunningDataEnd = (const char*)block + block_size;
+
+	int32_t type = drflac__be2host_32_ptr_unaligned(pRunningData); pRunningData += 4;
+	int32_t mimeLength = drflac__be2host_32_ptr_unaligned(pRunningData); pRunningData += 4;
+
+	/* Need space for the rest of the block */
+	if ((pRunningDataEnd - pRunningData) - 24 < (drflac_int64)mimeLength) { /* <-- Note the order of operations to avoid overflow to a valid value */
+		return GA_E_TAG;
+	}
+	const char* mime = pRunningData; pRunningData += mimeLength;
+	int32_t descriptionLength = drflac__be2host_32_ptr_unaligned(pRunningData); pRunningData += 4;
+
+	/* Need space for the rest of the block */
+	if ((pRunningDataEnd - pRunningData) - 20 < (drflac_int64)descriptionLength) { /* <-- Note the order of operations to avoid overflow to a valid value */
+		return GA_E_TAG;
+	}
+	const char* description = pRunningData; pRunningData += descriptionLength;
+	/*metadata.data.picture.width = drflac__be2host_32_ptr_unaligned(pRunningData); pRunningData += 4;
+	metadata.data.picture.height = drflac__be2host_32_ptr_unaligned(pRunningData); pRunningData += 4;
+	metadata.data.picture.colorDepth = drflac__be2host_32_ptr_unaligned(pRunningData); pRunningData += 4;
+	metadata.data.picture.indexColorCount = drflac__be2host_32_ptr_unaligned(pRunningData); pRunningData += 4;*/
+	pRunningData += 16;
+	int32_t pictureDataSize = drflac__be2host_32_ptr_unaligned(pRunningData); pRunningData += 4;
+
+	/* Need space for the picture after the block */
+	if (pRunningDataEnd - pRunningData < (drflac_int64)pictureDataSize) { /* <-- Note the order of operations to avoid overflow to a valid value */
+		return GA_E_TAG;
+	}
+
+	int32_t x, y, n;
+	picture->data = stbi_load_from_memory((uint8_t*)pRunningData, pictureDataSize, &x, &y, &n, 4);
+	if (picture->data == NULL)
+	{
+		return GA_E_MEMORY;
+	}
+
+	picture->data_size = sizeof(uint8_t) * x * y * 4;
+	picture->type = type;
+	picture->width = x;
+	picture->height = y;
+	picture->depth = n * 8;
+
+	return GA_SUCCESS;
+}
 
 // Get the ma_backend enum given a string. Performs reverse of ma_get_backend_name().
 MA_API ma_backend ma_get_backend_enum(const char* backend_name)
