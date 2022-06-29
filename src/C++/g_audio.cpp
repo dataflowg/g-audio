@@ -405,7 +405,7 @@ extern "C" LV_DLL_EXPORT ga_result get_audio_file_tags(const char* file_name, ui
 		case ga_codec_flac: return get_flac_tags(file_name, read_pictures, tags, tag_count, pictures, picture_count); break;
 		case ga_codec_mp3: return get_id3_tags(file_name, read_pictures, tags, tag_count, pictures, picture_count); break;
 		case ga_codec_vorbis: return get_vorbis_tags(file_name, read_pictures, tags, tag_count, pictures, picture_count); break;
-		case ga_codec_wav: return get_wav_tags(file_name, tag_count, tags); break;
+		case ga_codec_wav: return get_wav_tags(file_name, read_pictures, tags, tag_count, pictures, picture_count); break;
 		case ga_codec_unsupported:
 		default:
 			return GA_E_UNSUPPORTED_TAG;
@@ -1602,22 +1602,25 @@ ga_result get_vorbis_tags(const char* file_name, uint8_t read_pictures, intptr_t
 
 				if (strncmp(vorbis_decoder->comment_list[i], "METADATA_BLOCK_PICTURE", field_length) == 0)
 				{
-					audio_file_picture* temp_pictures_ptr = tag_info.pictures;
-					tag_info.pictures = (audio_file_picture*)realloc(temp_pictures_ptr, sizeof(audio_file_picture) * (tag_info.picture_count + 1));
-
-					if (tag_info.pictures == NULL)
+					if (read_pictures)
 					{
-						tag_info.pictures = temp_pictures_ptr;
-						free_audio_file_tags(tag_info);
-						stb_vorbis_close(vorbis_decoder);
-						return GA_E_MEMORY;
-					}
+						audio_file_picture* temp_pictures_ptr = tag_info.pictures;
+						tag_info.pictures = (audio_file_picture*)realloc(temp_pictures_ptr, sizeof(audio_file_picture) * (tag_info.picture_count + 1));
 
-					int32_t block_size;
-					const uint8_t* picture_block = (const uint8_t*)base64_dec_malloc(vorbis_decoder->comment_list[i] + token_offset, &block_size);
-					parse_metadata_block_picture(picture_block, block_size, tag_info.pictures + tag_info.picture_count);
-					tag_info.picture_count++;
-					free((void*)picture_block);
+						if (tag_info.pictures == NULL)
+						{
+							tag_info.pictures = temp_pictures_ptr;
+							free_audio_file_tags(tag_info);
+							stb_vorbis_close(vorbis_decoder);
+							return GA_E_MEMORY;
+						}
+
+						int32_t block_size;
+						const uint8_t* picture_block = (const uint8_t*)base64_dec_malloc(vorbis_decoder->comment_list[i] + token_offset, &block_size);
+						parse_metadata_block_picture(picture_block, block_size, tag_info.pictures + tag_info.picture_count);
+						tag_info.picture_count++;
+						free((void*)picture_block);
+					}
 				}
 				else
 				{
@@ -1926,7 +1929,7 @@ ga_result close_wav_file(void* decoder)
 	return GA_SUCCESS;
 }
 
-ga_result get_wav_tags(const char* file_name, int32_t* count, intptr_t* tags)
+ga_result get_wav_tags(const char* file_name, uint8_t read_pictures, intptr_t* tags, int32_t* tag_count, intptr_t* pictures, int32_t* picture_count)
 {
 	enum fields_t
 	{
@@ -1962,7 +1965,7 @@ ga_result get_wav_tags(const char* file_name, int32_t* count, intptr_t* tags)
 	result = drwav_init_file_with_metadata_w(&wav_decoder, wide_file_name, 0, NULL);
 	free(wide_file_name);
 #else
-	result = drwav_init_file_with_metadata(wav_decoder, file_name, NULL);
+	result = drwav_init_file_with_metadata(&wav_decoder, file_name, 0, NULL);
 #endif
 
 	if (result == DRWAV_FALSE)
@@ -2022,8 +2025,15 @@ ga_result get_wav_tags(const char* file_name, int32_t* count, intptr_t* tags)
 
 	drwav_uninit(&wav_decoder);
 
-	*count = tag_info.tag_count;
 	*tags = (intptr_t)tag_info.tags;
+	*tag_count = tag_info.tag_count;
+	*pictures = NULL;
+	*picture_count = 0;
+
+	if (read_pictures)
+	{
+		return GA_W_EMBEDDED_ARTWORK;
+	}
 
 	return GA_SUCCESS;
 }

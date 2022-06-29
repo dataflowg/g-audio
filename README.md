@@ -20,7 +20,8 @@ A cross-platform LabVIEW library for audio device playback and capture, and for 
 ## <a id="whats-new"></a>What's New?
 * Raspberry Pi / LINX support!
     * See the [Installation](#installation) section to get started.
-* Metadata tag reading support (ID3v2, ID3v1, Vorbis Comments, RIFF INFO)
+* Support for reading metadata tags (ID3v2, ID3v1, Vorbis Comments, RIFF INFO)
+* Support for reading embedded artwork
 * Advanced device configuration options
 
 ## <a id="features"></a>Features
@@ -28,7 +29,7 @@ A cross-platform LabVIEW library for audio device playback and capture, and for 
 * Playback and capture using selectable backends (WASAPI, DirectSound, Core Audio, PulseAudio, ALSA, etc)
 * Multi-channel audio mixer
 * Read MP3, FLAC, Ogg Vorbis, and WAV formats
-* Read metadata tags (ID3v2, ID3v1, Vorbis Comments, RIFF INFO)
+* Read metadata tags (ID3v2, ID3v1, Vorbis Comments, RIFF INFO) and embedded artwork
 * Write WAV format (PCM and IEEE Float, with Sony Wave64 support for large files)
 * Unicode path support (UTF-8)
 * Cross-platform (Windows, macOS, Linux, Raspberry Pi / LINX), 32-bit and 64-bit
@@ -87,14 +88,14 @@ The `Playback Audio`, `Capture Audio`, `Audio File Read`, and `Audio File Write`
 If a malleable VI has broken wire inputs and errors about unsupported types, even though the type is supported, try hold Ctrl and click the run arrow. This will force LabVIEW to recompile the VI, and should hopefully fix those broken wires.
 
 ### Supported Metadata Tags
-G-Audio supports reading ID3v2 and ID3v1 tags from MP3 files, Vorbis Comments from FLAC and Ogg Vorbis files, and RIFF INFO data from WAV files. All tag data is returned as an array of `Field` \ `Value` clusters from `Read Audio File Tags.vi`. The text encoding of `Value` can be set to support tags containing unicode (note the `Field` text is always ASCII). Depending on the tag format, `Field` is directly from the tag (in the case of Vorbis Comments and ID3v2 `TXXX` fields), or mapped to a commonly named field.
+G-Audio supports reading ID3v2 and ID3v1 tags from MP3 files, Vorbis Comments from FLAC and Ogg Vorbis files, and RIFF INFO data from WAV files. All tag data is returned as an array of `Field` \ `Value` clusters from `Read Audio File Tags.vi`. The text encoding of `Value` can be specified to support tags containing unicode (note the `Field` text is always ASCII). Depending on the tag format, `Field` is named based on the tag (in the case of Vorbis Comments and ID3v2 `TXXX` fields), or mapped to a commonly named field. The table below shows the mapping between a common Field name and various tags.
 
 Field       | Description                             | ID3v2                       | ID3v1         | RIFF INFO
 ------------|-----------------------------------------|-----------------------------|---------------|-----------
 TITLE       | The title of the track.                 | `TIT2`, `TT2`               | Title         | `INAM`
 ARTIST      | The track artist.                       | `TPE1`, `TP1`               | Artist        | `IART`
-ALBUMARTIST | The album artist.                       | `TPE2`, `TP2`               | :x:           | :x:
 ALBUM       | The album title.                        | `TALB`, `TAL`               | Album         | `IPRD`
+ALBUMARTIST | The album artist.                       | `TPE2`, `TP2`               | :x:           | :x:
 GENRE       | The track's genre.                      | `TCON`, `TCO`               | Genre ID      | `IGNR`
 DATE        | The release date, typically the year.   | `TYER`, `TYE`               | Year          | `ICRD`
 TRACKNUMBER | The track's number in an album.         | `TRCK`, `TRK` (**nn** / NN) | Comment[29]   | `ITRK`
@@ -104,7 +105,7 @@ DISCTOTAL   | The total number of discs in an album.  | `TPOS`, `TPA` (nn / **NN
 BPM         | Beats Per Minute of the track.          | `TBPM`, `TBP`               | :x:           | :x:
 COMMENT     | Notes and comments on the track.        | `COMM`, `COM`               | Comment[0-27] | `ICMT`
 
-The tag field mapping is based on the [Tag Mapping article](https://wiki.hydrogenaud.io/index.php?title=Tag_Mapping) on the hydrogenaudio wiki.
+The field / tag mapping is based on the [Tag Mapping article](https://wiki.hydrogenaud.io/index.php?title=Tag_Mapping) on the hydrogenaudio wiki.
 
 ## <a id="compiling"></a>Compiling
 Under Windows, Microsoft Visual Studio Community 2019 is used to compile and test the DLL called by LabVIEW.
@@ -156,6 +157,7 @@ Read FLAC                    | :heavy_check_mark:  | :x:                 | :x:
 Read Ogg Vorbis              | :heavy_check_mark:  | :x:                 | :x:
 Read WMA                     | :x:                 | :x:                 | :heavy_check_mark:
 Read metadata tags           | :heavy_check_mark:  | :x:                 | :x:
+Read embedded artwork        | :heavy_check_mark:  | :x:                 | :x:
 Write WAV (PCM)              | :heavy_check_mark:  | :heavy_check_mark:  | :heavy_check_mark:
 Write WAV (IEEE Float)       | :heavy_check_mark:  | :heavy_check_mark:¹ | :heavy_check_mark:¹
 Write WAV (64-bit Float)     | :heavy_check_mark:  | :x:                 | :x:
@@ -194,9 +196,15 @@ This library is built using public domain audio decoders and libraries. As such,
 
 ## <a id="acknowledgments"></a>Acknowledgments
 This library uses the following public domain libraries. Massive thanks to these authors.
-* [miniaudio.h](https://github.com/mackron/miniaudio) by mackron
-* [dr_flac.h](https://github.com/mackron/dr_libs) by mackron
-* [dr_wav.h](https://github.com/mackron/dr_libs) by mackron
-* [minimp3](https://github.com/lieff/minimp3) by lieff
-* [stb_vorbis.c](https://github.com/nothings/stb) by nothings
-* [thread.h](https://github.com/mattiasgustavsson/libs) by mattiasgustavsson
+
+Library | Author | Public Domain License
+--------|--------|----------------------
+[miniaudio](https://github.com/mackron/miniaudio) | David Reid | [Unlicense / MIT0](https://github.com/mackron/miniaudio/blob/master/LICENSE)
+[dr_flac.h](https://github.com/mackron/dr_libs) | David Reid | [Unlicense / MIT0](https://github.com/mackron/dr_libs/blob/master/LICENSE)
+[dr_wav.h](https://github.com/mackron/dr_libs) | David Reid | [Unlicense / MIT0](https://github.com/mackron/dr_libs/blob/master/LICENSE)
+[minimp3](https://github.com/lieff/minimp3) | lieff | [CC0](https://github.com/lieff/minimp3/blob/master/LICENSE)
+[stb_image.h](https://github.com/nothings/stb) | Sean Barrett | [Unlicense / MIT](https://github.com/nothings/stb/blob/master/LICENSE)
+[stb_vorbis.c](https://github.com/nothings/stb) | Sean Barrett | [Unlicense / MIT](https://github.com/nothings/stb/blob/master/LICENSE)
+[id3tag.h](https://github.com/mattiasgustavsson/i-love-music/tree/main/source/libs) | Mattias Gustavsson | [Unlicense / MIT](https://github.com/mattiasgustavsson/i-love-music/blob/main/LICENSE)
+[thread.h](https://github.com/mattiasgustavsson/libs) | Mattias Gustavsson | [Unlicense / MIT](https://github.com/mattiasgustavsson/libs/blob/main/thread.h)
+[base64](https://github.com/badzong/base64) | Manuel Badzong | [Unlicense](https://github.com/badzong/base64/blob/master/LICENSE)

@@ -157,6 +157,8 @@ typedef int32_t ga_result;
 #define MA_ERROR_OFFSET			-1000	// Add this to miniaudio error codes for return to LabVIEW.
 // WARNINGS
 #define GA_W_BUFFER_SIZE		1		// The specified buffer size is smaller than the period, may cause glitches
+#define GA_W_UTF8_TO_UTF16		2		// UTF-8 to UTF-16 is unsupported on this OS
+#define GA_W_EMBEDDED_ARTWORK	3		// The file does not support embedded artwork
 
 typedef struct
 {
@@ -421,7 +423,7 @@ ga_result seek_wav_file(void* decoder, uint64_t offset, uint64_t* new_offset);
 ga_result read_wav_file(void* decoder, uint64_t frames_to_read, ga_data_type audio_type, uint64_t* frames_read, void* output_buffer);
 ga_result write_wav_file(void* encoder, uint64_t frames_to_write, void* input_buffer, uint64_t* frames_written);
 ga_result close_wav_file(void* decoder);
-ga_result get_wav_tags(const char* file_name, int32_t* count, intptr_t* tags);
+ga_result get_wav_tags(const char* file_name, uint8_t read_pictures, intptr_t* tags, int32_t* tag_count, intptr_t* pictures, int32_t* picture_count);
 
 
 /////////////////////////

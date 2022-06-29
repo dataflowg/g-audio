@@ -1,7 +1,8 @@
 # G-Audio Release History
 ### v0.4.0 - 2022-06-xx
 * Raspberry Pi / LINX support
-* Metadata tag reading support (ID3v2, ID3v1, Vorbis Comments, RIFF INFO)
+* Support for reading metadata tags (ID3v2, ID3v1, Vorbis Comments, RIFF INFO)
+* Support for reading embedded artwork
 * Advanced device configuration (exclusive mode, period size, num periods)
 * Device volume adjustment (feature request #13)
 * Get the configuration settings of an already configured device
