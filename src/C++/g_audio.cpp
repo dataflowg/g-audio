@@ -701,6 +701,12 @@ void flac_metadata_callback(void* pUserData, drflac_metadata* meta)
 	}
 
 	audio_file_tag_info* tag_info = (audio_file_tag_info*)pUserData;
+
+	if (tag_info->result != GA_SUCCESS)
+	{
+		return;
+	}
+
 	switch (meta->type)
 	{
 		case DRFLAC_METADATA_BLOCK_TYPE_VORBIS_COMMENT:
@@ -720,9 +726,7 @@ void flac_metadata_callback(void* pUserData, drflac_metadata* meta)
 
 				if (tag_info->tags == NULL)
 				{
-					free_audio_file_tags(*tag_info);
-					free(pUserData);
-					pUserData = NULL;
+					tag_info->result = GA_E_MEMORY;
 					return;
 				}
 
@@ -741,9 +745,7 @@ void flac_metadata_callback(void* pUserData, drflac_metadata* meta)
 
 						if (tag_info->tags[tag_info->tag_count].field == NULL || tag_info->tags[tag_info->tag_count].value == NULL)
 						{
-							free_audio_file_tags(*tag_info);
-							free(pUserData);
-							pUserData = NULL;
+							tag_info->result = GA_E_MEMORY;
 							return;
 						}
 
@@ -770,9 +772,7 @@ void flac_metadata_callback(void* pUserData, drflac_metadata* meta)
 				if (tag_info->pictures == NULL)
 				{
 					tag_info->pictures = temp_pictures_ptr;
-					free_audio_file_tags(*tag_info);
-					free(pUserData);
-					pUserData = NULL;
+					tag_info->result = GA_E_MEMORY;
 					return;
 				}
 
@@ -780,10 +780,7 @@ void flac_metadata_callback(void* pUserData, drflac_metadata* meta)
 
 				if (tag_info->pictures[tag_info->picture_count].data == NULL)
 				{
-
-					free_audio_file_tags(*tag_info);
-					free(pUserData);
-					pUserData = NULL;
+					tag_info->result = GA_E_PICTURE;
 					return;
 				}
 
@@ -828,9 +825,12 @@ ga_result get_flac_tags(const char* file_name, uint8_t read_pictures, intptr_t* 
 
 	drflac_close(decoder);
 
-	if (tag_info == NULL)
+	if (tag_info->result != GA_SUCCESS)
 	{
-		return GA_E_MEMORY;
+		ga_result result = tag_info->result;
+		free_audio_file_tags(*tag_info);
+		free(tag_info);
+		return result;
 	}
 
 	*tags = (intptr_t)tag_info->tags;
@@ -2027,7 +2027,7 @@ ga_result get_wav_tags(const char* file_name, uint8_t read_pictures, intptr_t* t
 
 	*tags = (intptr_t)tag_info.tags;
 	*tag_count = tag_info.tag_count;
-	*pictures = NULL;
+	*pictures = 0;
 	*picture_count = 0;
 
 	if (read_pictures)

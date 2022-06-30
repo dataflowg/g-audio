@@ -152,8 +152,9 @@ typedef int32_t ga_result;
 #define GA_E_PLAYBACK_MODE		-14		// Device type is playback, but tried capture operation
 #define GA_E_CAPTURE_MODE		-15		// Device type is capture, but tried playback operation
 #define GA_E_UNSUPPORTED_DEVICE	-16		// Unsupported device type (duplex)
-#define GA_E_UNSUPPORTED_TAG    -17     // Unsupported tag format
-#define GA_E_TAG                -18     // An error ocurred trying to read the tags
+#define GA_E_UNSUPPORTED_TAG	-17     // Unsupported tag format
+#define GA_E_TAG				-18     // An error ocurred trying to read the tags
+#define GA_E_PICTURE			-19     // An error ocurred trying to read the picture
 #define MA_ERROR_OFFSET			-1000	// Add this to miniaudio error codes for return to LabVIEW.
 // WARNINGS
 #define GA_W_BUFFER_SIZE		1		// The specified buffer size is smaller than the period, may cause glitches
@@ -261,6 +262,7 @@ typedef struct
 	int32_t tag_count;
 	int32_t picture_count;
 	uint8_t read_pictures;
+	ga_result result;
 } audio_file_tag_info;
 
 
