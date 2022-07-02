@@ -31,7 +31,7 @@ A cross-platform LabVIEW library for audio device playback and capture, and for 
 * Read MP3, FLAC, Ogg Vorbis, and WAV formats
 * Read metadata tags (ID3v2, ID3v1, Vorbis Comments, RIFF INFO) and embedded artwork
 * Write WAV format (PCM and IEEE Float, with Sony Wave64 support for large files)
-* Unicode path support (UTF-8)
+* Unicode path support (UTF-8) and unicode tag support
 * Cross-platform (Windows, macOS, Linux, Raspberry Pi / LINX), 32-bit and 64-bit
 * Simple to use API
 

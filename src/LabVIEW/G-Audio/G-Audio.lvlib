@@ -116,7 +116,7 @@ https://github.com/dataflowg/g-audio</Property>
 		<Item Name="NATIVE_DATA_FORMAT_COUNT.vi" Type="VI" URL="../Private/NATIVE_DATA_FORMAT_COUNT.vi"/>
 		<Item Name="Path To UTF-8 String.vi" Type="VI" URL="../Private/Path To UTF-8 String.vi"/>
 		<Item Name="Result To Error.vi" Type="VI" URL="../Private/Result To Error.vi"/>
-		<Item Name="UTF-8 To UTF-16.vi" Type="VI" URL="../../Unit Tests/UTF-8 To UTF-16.vi"/>
+		<Item Name="UTF-8 To UTF-16.vi" Type="VI" URL="../Private/UTF-8 To UTF-16.vi"/>
 		<Item Name="Value To Audio Device Refnum.vi" Type="VI" URL="../Private/Value To Audio Device Refnum.vi"/>
 		<Item Name="Value To Audio File Refnum.vi" Type="VI" URL="../Private/Value To Audio File Refnum.vi"/>
 	</Item>

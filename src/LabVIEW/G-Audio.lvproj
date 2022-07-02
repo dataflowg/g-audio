@@ -76,6 +76,7 @@
 				<Item Name="Music Visualizer (Queue Only).vi" Type="VI" URL="../G-Audio/Examples/SubVIs/Music Visualizer (Queue Only).vi"/>
 			</Item>
 			<Item Name="Audio Capture Example.vi" Type="VI" URL="../G-Audio/Examples/Audio Capture Example.vi"/>
+			<Item Name="Audio File Tags Example.vi" Type="VI" URL="../G-Audio/Examples/Audio File Tags Example.vi"/>
 			<Item Name="Audio Loopback Example.vi" Type="VI" URL="../G-Audio/Examples/Audio Loopback Example.vi"/>
 			<Item Name="Audio Playback Example.vi" Type="VI" URL="../G-Audio/Examples/Audio Playback Example.vi"/>
 			<Item Name="IEEE Float Compare Example.vi" Type="VI" URL="../G-Audio/Examples/IEEE Float Compare Example.vi"/>
@@ -85,7 +86,6 @@
 			<Item Name="Music Visualizer Example.vi" Type="VI" URL="../G-Audio/Examples/Music Visualizer Example.vi"/>
 			<Item Name="Playback Latency Compare Example.vi" Type="VI" URL="../G-Audio/Examples/Playback Latency Compare Example.vi"/>
 			<Item Name="Query Audio Devices Example.vi" Type="VI" URL="../G-Audio/Examples/Query Audio Devices Example.vi"/>
-			<Item Name="Read Audio File Tags.vi" Type="VI" URL="../G-Audio/Examples/Read Audio File Tags.vi"/>
 			<Item Name="Sample Pad Example (Arduino Controller).vi" Type="VI" URL="../G-Audio/Examples/Sample Pad Example (Arduino Controller).vi"/>
 			<Item Name="Sample Pad Example.vi" Type="VI" URL="../G-Audio/Examples/Sample Pad Example.vi"/>
 			<Item Name="Write Audio File Example.vi" Type="VI" URL="../G-Audio/Examples/Write Audio File Example.vi"/>

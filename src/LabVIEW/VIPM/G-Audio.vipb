@@ -1,4 +1,4 @@
-<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2022-06-21 07:41:38" Creator="Dataflow_G" Comments="" ID="4509b3b05c5d66683a275e073c52b3ea">
+<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2022-06-30 16:33:46" Creator="Dataflow_G" Comments="" ID="161e46b4756ac43950220a4f645d31af">
   <Library_General_Settings>
     <Package_File_Name>Dataflow_G_lib_G_Audio</Package_File_Name>
     <Library_Version>0.3.1.5</Library_Version>
@@ -35,23 +35,26 @@
 * Playback and capture using selectable backends (WASAPI, DirectSound, Core Audio, PulseAudio, ALSA, etc)
 * Multi-channel audio mixer
 * Read MP3, FLAC, Ogg Vorbis, and WAV formats
+* Read metadata tags (ID3v2, ID3v1, Vorbis Comments, RIFF INFO) and embedded artwork
 * Write WAV format (PCM and IEEE Float, with Sony Wave64 support for large files)
-* Unicode path support (UTF-8)
-* Cross-platform, 32-bit and 64-bit
+* Unicode path support (UTF-8) and unicode tag support
+* Cross-platform (Windows, macOS, Linux, Raspberry Pi / LINX), 32-bit and 64-bit
 * Simple to use API</Description>
       <Copyright>Public domain</Copyright>
       <Packager/>
       <URL>https://github.com/dataflowg/g-audio</URL>
       <Release_Notes>[THIS IS A DEV BUILD, NOT A FINAL RELEASE]
 * Raspberry Pi / LINX support
-* Metadata tag reading support (ID3v2, ID3v1, Vorbis Comments, RIFF INFO)
+* Support for reading metadata tags (ID3v2, ID3v1, Vorbis Comments, RIFF INFO)
+* Support for reading embedded artwork
 * Advanced device configuration (exclusive mode, period size, num periods)
 * Device volume adjustment (feature request #13)
 * Get the configuration settings of an already configured device
 * Query more detailed device info (default device, native sample rates, native channels, native formats)
 * Warn of duplicate device config
 * Update miniaudio to v0.11.2 (fixes #10)
-* Reduced VIPM package installation time</Release_Notes>
+* Reduced VIPM package installation time
+* (Windows) Fix memory leak when using UTF-16 converted file name</Release_Notes>
     </Description>
     <Destinations>
       <Toolkit_VIs>
@@ -304,7 +307,7 @@
         <Path>..\unnamed</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>7920599E79ABA1CE332FCCFAFEE003F0</GUID>
+      <GUID>487E536D09B713D51ABE9A4EA510EF47</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -465,7 +468,7 @@
         <Path>..\G-Audio\Audio Files\Get Audio File Tags.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>E8AAD6627A54ECEB9F64FCC854527DEA</GUID>
+      <GUID>BB46B7DE6AD78D61F109795BD4F6AB44</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -640,7 +643,7 @@
         <Path>..\G-Audio\Audio Devices\Get Audio Device Configuration.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>98707B7EB15230D4D54BDD3E7EFDC9CF</GUID>
+      <GUID>B594693AE32F9597C45ECA284E0443FB</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -815,7 +818,21 @@
         <Path>..\unnamed</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>E545D7DBF67424C5BF34E3335C9365A1</GUID>
+      <Items_Data>
+        <Type>Item</Type>
+        <Sub_Palette_Index>-1</Sub_Palette_Index>
+        <NameSub_Menu_Name>Audio File Tags Example.vi</NameSub_Menu_Name>
+        <Short_Name/>
+        <is_Merge_VI>false</is_Merge_VI>
+        <Position>
+          <Row>2</Row>
+          <Column>4</Column>
+        </Position>
+        <Icon>00000000</Icon>
+        <Path>..\G-Audio\Examples\Audio File Tags Example.vi</Path>
+        <VI_Title/>
+      </Items_Data>
+      <GUID>25C91D8D5B3B9893BEBAEF68FB21CCBA</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -976,7 +993,7 @@
         <Path>..\G-Audio\Mixer\Mixer\Channel Volume.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>09451675BE20E2D5147DF62D4BDA3527</GUID>
+      <GUID>231905BD7B4A3A3420CD9ED221D7407F</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>3</Parent_Palette_Index>
@@ -1025,7 +1042,7 @@
         <Path>..\G-Audio\Examples\LINX\Sample Pad Example (LINX).vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>F254CF195D29F86417127AE39BF06CCB</GUID>
+      <GUID>7FDBDA4820F4291CC5615EE2BD74FCFF</GUID>
     </Functions_Palette_Data>
   </Library_Palette_Definition>
 </VI_Package_Builder_Settings>
