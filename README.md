@@ -23,6 +23,7 @@ A cross-platform LabVIEW library for audio device playback and capture, and for 
 * Support for reading metadata tags (ID3v2, ID3v1, Vorbis Comments, RIFF INFO)
 * Support for reading embedded artwork
 * Advanced device configuration options
+* Misc. bug fixes
 
 ## <a id="features"></a>Features
 * Support for audio playback and capture, including loopback capture

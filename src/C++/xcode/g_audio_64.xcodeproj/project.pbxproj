@@ -25,6 +25,10 @@
 		3CD6708C26E0D2CB0040E196 /* dr_wav.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CD6708926E0D2CB0040E196 /* dr_wav.h */; };
 		3CD6708D26E0D2CB0040E196 /* dr_flac.h in Headers */ = {isa = PBXBuildFile; fileRef = 3CD6708A26E0D2CB0040E196 /* dr_flac.h */; };
 		3CD6708F26E0D3C80040E196 /* g_audio in Resources */ = {isa = PBXBuildFile; fileRef = 3CD6708E26E0D3C70040E196 /* g_audio */; };
+		E513406328709686005700A8 /* id3tag.h in Headers */ = {isa = PBXBuildFile; fileRef = E513405F28709685005700A8 /* id3tag.h */; };
+		E513406428709686005700A8 /* base64.h in Headers */ = {isa = PBXBuildFile; fileRef = E513406028709686005700A8 /* base64.h */; };
+		E513406528709686005700A8 /* stb_image.h in Headers */ = {isa = PBXBuildFile; fileRef = E513406128709686005700A8 /* stb_image.h */; };
+		E513406628709686005700A8 /* base64.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E513406228709686005700A8 /* base64.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -47,6 +51,10 @@
 		3CD6708926E0D2CB0040E196 /* dr_wav.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dr_wav.h; path = ../dr_wav.h; sourceTree = "<group>"; };
 		3CD6708A26E0D2CB0040E196 /* dr_flac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dr_flac.h; path = ../dr_flac.h; sourceTree = "<group>"; };
 		3CD6708E26E0D3C70040E196 /* g_audio */ = {isa = PBXFileReference; lastKnownFileType = folder; path = g_audio; sourceTree = "<group>"; };
+		E513405F28709685005700A8 /* id3tag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = id3tag.h; path = ../id3tag.h; sourceTree = "<group>"; };
+		E513406028709686005700A8 /* base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = base64.h; path = ../base64.h; sourceTree = "<group>"; };
+		E513406128709686005700A8 /* stb_image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stb_image.h; path = ../stb_image.h; sourceTree = "<group>"; };
+		E513406228709686005700A8 /* base64.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = base64.cpp; path = ../base64.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +71,10 @@
 		3CD6705926E0D1FE0040E196 = {
 			isa = PBXGroup;
 			children = (
+				E513406228709686005700A8 /* base64.cpp */,
+				E513406028709686005700A8 /* base64.h */,
+				E513405F28709685005700A8 /* id3tag.h */,
+				E513406128709686005700A8 /* stb_image.h */,
 				3CD6708E26E0D3C70040E196 /* g_audio */,
 				3CD6708826E0D2CA0040E196 /* dllmain.cpp */,
 				3CD6708A26E0D2CB0040E196 /* dr_flac.h */,
@@ -105,11 +117,14 @@
 				3CD6707926E0D2860040E196 /* stdafx.h in Headers */,
 				3CD6708226E0D2A40040E196 /* minimp3.h in Headers */,
 				3CD6707626E0D2860040E196 /* thread.h in Headers */,
+				E513406428709686005700A8 /* base64.h in Headers */,
 				3CD6707D26E0D2860040E196 /* resource.h in Headers */,
 				3CD6708326E0D2A40040E196 /* minimp3_ex.h in Headers */,
 				3CD6707726E0D2860040E196 /* stb_vorbis.h in Headers */,
 				3CD6707B26E0D2860040E196 /* thread_safety.h in Headers */,
 				3CD6708626E0D2B00040E196 /* g_audio.h in Headers */,
+				E513406328709686005700A8 /* id3tag.h in Headers */,
+				E513406528709686005700A8 /* stb_image.h in Headers */,
 				3CD6708C26E0D2CB0040E196 /* dr_wav.h in Headers */,
 				3CD6706826E0D1FE0040E196 /* xcode.h in Headers */,
 				3CD6707C26E0D2860040E196 /* targetver.h in Headers */,
@@ -188,6 +203,7 @@
 				3CD6707826E0D2860040E196 /* stdafx.cpp in Sources */,
 				3CD6708B26E0D2CB0040E196 /* dllmain.cpp in Sources */,
 				3CD6707A26E0D2860040E196 /* thread_safety.cpp in Sources */,
+				E513406628709686005700A8 /* base64.cpp in Sources */,
 				3CD6708726E0D2B00040E196 /* g_audio.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -246,7 +262,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.16;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -301,7 +317,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.16;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
@@ -326,7 +342,8 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.3.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MARKETING_VERSION = 0.4.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "dataflowg.g-audio";
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -349,7 +366,8 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.3.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MARKETING_VERSION = 0.4.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "dataflowg.g-audio";
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;

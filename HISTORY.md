@@ -1,16 +1,18 @@
 # G-Audio Release History
-### v0.4.0 - 2022-06-xx
+### v0.4.0 - 2022-07-xx
 * Raspberry Pi / LINX support
 * Support for reading metadata tags (ID3v2, ID3v1, Vorbis Comments, RIFF INFO)
 * Support for reading embedded artwork
 * Advanced device configuration (exclusive mode, period size, num periods)
 * Device volume adjustment (feature request #13)
-* Get the configuration settings of an already configured device
-* Query more detailed device info (default device, native sample rates, native channels, native formats)
+* Get the configuration settings of a configured device (compare requested config vs actual config)
+* Query detailed device info (default device, native sample rates, native channels, native formats)
 * Warn of duplicate device config
-* Update miniaudio to v0.11.2 (fixes #10)
-* Reduced VIPM package installation time
-* (Windows) Fix memory leak when using UTF-16 converted file name
+* Update miniaudio (fixes #10)
+* Fix memory leak when using UTF-16 converted file name
+* [VIPM] Reduced package installation time
+* [VIPM] Fix package not listed under macOS and Linux
+* [VIPM] Fix install error 5000 under macOS (#15)
 
 ##### New APIs
 * `Get Audio File Tags.vi`

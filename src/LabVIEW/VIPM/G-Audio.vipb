@@ -1,4 +1,4 @@
-<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2022-06-30 16:33:46" Creator="Dataflow_G" Comments="" ID="161e46b4756ac43950220a4f645d31af">
+<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2022-07-05 06:23:07" Creator="Dataflow_G" Comments="" ID="7739e4a03f52bbda1558eca73103864e">
   <Library_General_Settings>
     <Package_File_Name>Dataflow_G_lib_G_Audio</Package_File_Name>
     <Library_Version>0.3.1.5</Library_Version>
@@ -22,7 +22,7 @@
       <Post-Build_VI/>
       <Pre-Install_VI/>
       <Post-Install_VI>Post-Install Custom Action.vi</Post-Install_VI>
-      <Pre-Uninstall_VI/>
+      <Pre-Uninstall_VI>Pre-Uninstall Custom Action.vi</Pre-Uninstall_VI>
       <Post-Uninstall_VI/>
     </Custom_Action_VIs>
     <VI_Package_Configuration_File>G-Audio.vipc</VI_Package_Configuration_File>
@@ -204,10 +204,10 @@
       <Library_or_Class_Nmae/>
     </Palette_Sets>
     <Install_Requirements>
-      <All_Windows>false</All_Windows>
+      <All_Windows>true</All_Windows>
       <Windows_7>true</Windows_7>
-      <Windows_Vista>false</Windows_Vista>
-      <Windows_XP>false</Windows_XP>
+      <Windows_Vista>true</Windows_Vista>
+      <Windows_XP>true</Windows_XP>
       <Mac_OS>true</Mac_OS>
       <Linux>true</Linux>
       <Built_LV_Version>false</Built_LV_Version>
@@ -307,7 +307,7 @@
         <Path>..\unnamed</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>487E536D09B713D51ABE9A4EA510EF47</GUID>
+      <GUID>692DB80213A30C69519EF283B136356D</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -468,7 +468,7 @@
         <Path>..\G-Audio\Audio Files\Get Audio File Tags.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>BB46B7DE6AD78D61F109795BD4F6AB44</GUID>
+      <GUID>AC46EFBB8A8F2F3A22841411B791F939</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -643,7 +643,7 @@
         <Path>..\G-Audio\Audio Devices\Get Audio Device Configuration.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>B594693AE32F9597C45ECA284E0443FB</GUID>
+      <GUID>66F92724D9F213FB7C63E6396D6A2A2E</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -832,7 +832,7 @@
         <Path>..\G-Audio\Examples\Audio File Tags Example.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>25C91D8D5B3B9893BEBAEF68FB21CCBA</GUID>
+      <GUID>53BD5CAB729C44A3912401BFE4841EA6</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -993,7 +993,7 @@
         <Path>..\G-Audio\Mixer\Mixer\Channel Volume.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>231905BD7B4A3A3420CD9ED221D7407F</GUID>
+      <GUID>DDBD621F603782200A947EE7662D8DF4</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>3</Parent_Palette_Index>
@@ -1042,7 +1042,7 @@
         <Path>..\G-Audio\Examples\LINX\Sample Pad Example (LINX).vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>7FDBDA4820F4291CC5615EE2BD74FCFF</GUID>
+      <GUID>38224AAF9E596B36323B1BC85396F77E</GUID>
     </Functions_Palette_Data>
   </Library_Palette_Definition>
 </VI_Package_Builder_Settings>
