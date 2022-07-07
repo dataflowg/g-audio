@@ -432,6 +432,35 @@ ga_result get_wav_tags(const char* file_name, uint8_t read_pictures, intptr_t* t
 // Ancillary functions //
 /////////////////////////
 
+// Convenience function to be called from LabVIEW. The utf16_string is defined as uint8_t*, but is treated internally as a wchar_t*, so it must have
+// at least twice the length of the utf8_string allocated to it. The output utf16_byte_count is the number of bytes in the utf16_string (not characters).
+// LabVIEW *can* directly call MultiByteToWideChar, but this creates a dependency on kernel32.dll in the calling VI.
+// When this VI is loaded under macOS or Linux, LabVIEW will search for kernel32.dll (even if the CLFN is inside a TARGET_TYPE conditional disable structure).
+// Moving the dependency to g_audio_*.* avoids this search.
+extern "C" LV_DLL_EXPORT ga_result utf8_to_utf16(const char* utf8_string, char* output_string, int32_t* output_byte_count)
+{
+	if (utf8_string == NULL || output_string == NULL)
+		return GA_E_MEMORY;
+
+	int utf8_length = strlen(utf8_string);
+
+#if defined(_WIN32)
+	wchar_t* wide_string = (wchar_t*)output_string;
+	UINT codepage = CP_UTF8; // GetACP();
+	int wide_length = MultiByteToWideChar(codepage, 0, utf8_string, utf8_length, 0, 0);
+	MultiByteToWideChar(codepage, 0, utf8_string, utf8_length, wide_string, wide_length);
+	wide_string[wide_length] = L'\0';
+	*output_byte_count = wide_length * sizeof(wchar_t);
+
+	return GA_SUCCESS;
+#else
+	strncpy(output_string, utf8_string, utf8_length);
+	*output_byte_count = utf8_length;
+
+	return GA_W_UTF8_TO_UTF16;
+#endif
+}
+
 #if defined(_WIN32)
 // https://gist.github.com/xebecnan/6d070c93fb69f40c3673
 // Convert an ASCII / UTF8 string to a UTF-16 LE wide char representation.
