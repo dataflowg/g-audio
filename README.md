@@ -41,17 +41,16 @@ A cross-platform LabVIEW library for audio device playback and capture, and for 
 ## <a id="installation"></a>Installation
 G-Audio is published on [vipm.io](https://www.vipm.io/package/dataflow_g_lib_g_audio/), and can be installed using VI Package Manager (VIPM). The packages are also available as [github releases](https://github.com/dataflowg/g-audio/releases) and can be installed manually using VIPM.
 
+**[macOS and Linux]** It's recommended to restart LabVIEW after installing the package via VIPM.
+
 If you want to include the library directly in your project, download or clone the repo and place the [G-Audio folder](https://github.com/dataflowg/g-audio/tree/main/src/LabVIEW/G-Audio) in your source directory, then add `G-Audio.lvlib` to your LabVIEW project.
 
+**[macOS]** Before adding the library to the project, extract `g_audio_64.framework.zip` located in `src/LabVIEW/G-Audio/lib/`.
+
 ### Raspberry Pi / LINX Installation
-Before beginning, ensure your board has the LINX toolkit installed and SSH is enabled.
+Before beginning, ensure your board has the LINX toolkit installed and SSH is enabled, and G-Audio has been installed on the host computer.
 
-#### 1. Install G-Audio
-Download and install the VIPM package from the github project dev branch:
-
-https://github.com/dataflowg/g-audio/raw/dev/src/LabVIEW/VIPM/dataflow_g_lib_g_audio-0.3.0.2-dev.vip
-
-#### 2. Install ALSA to chroot
+#### 1. Install ALSA to chroot
 SSH into the LINX target (using PuTTy or similar) and run the commands:
 ```
 sudo schroot -r -c lv
@@ -59,7 +58,7 @@ opkg update
 opkg install alsa-lib
 exit
 ```
-#### 3. Copy `g_audio_32.so` to the target
+#### 2. Copy `g_audio_32.so` to the target
 *Note: This library has been compiled for armv7a processors. Other architectures may need to build the library before it can be used. See the [Compiling](#compiling) section.*
 
 SCP / SFTP to the LINX target (using WinSCP or similar) and copy the library file located in `<vi.lib>\Dataflow_G\G-Audio\lib\LINX\g_audio_32.so` to the `/srv/chroot/labview/usr/lib` folder.
@@ -67,10 +66,10 @@ SCP / SFTP to the LINX target (using WinSCP or similar) and copy the library fil
 Alternatively, SSH to the LINX target and download the library direct from github:
 ```
 cd /srv/chroot/labview/usr/lib
-wget https://github.com/dataflowg/g-audio/raw/dev/src/LabVIEW/G-Audio/lib/LINX/g_audio_32.so
+wget https://github.com/dataflowg/g-audio/raw/main/src/LabVIEW/G-Audio/lib/LINX/g_audio_32.so
 ```
 
-#### 4. Make some noise!
+#### 3. Make some noise!
 Copy some audio files to your device using SCP or SFTP and place them in `/home/pi` or your preferred location. Create a LabVIEW project, add your LINX target, then the examples in the Add-ons >> G-Audio >> Examples >> LINX palette.
 
 If you need to adjust the volume output, SSH into the LINX target and run `alsamixer`. Press F6, then select the physical audio device (not Default). Use the up and down arrow keys to adjust the volume, or use numbers 1-9 to set the volume in 10% increments. Press Esc to save and exit the mixer.

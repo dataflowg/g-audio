@@ -454,7 +454,8 @@ extern "C" LV_DLL_EXPORT ga_result utf8_to_utf16(const char* utf8_string, char* 
 
 	return GA_SUCCESS;
 #else
-	strncpy(output_string, utf8_string, utf8_length);
+	memcpy(output_string, utf8_string, utf8_length);
+	output_string[utf8_length] = '\0';
 	*output_byte_count = utf8_length;
 
 	return GA_W_UTF8_TO_UTF16;
