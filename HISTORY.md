@@ -1,5 +1,5 @@
 # G-Audio Release History
-### v0.4.0 - 2022-07-xx
+### v0.4.0 - 2022-07-12
 * Raspberry Pi / LINX support
 * Support for reading metadata tags (ID3v2, ID3v1, Vorbis Comments, RIFF INFO)
 * Support for reading embedded artwork
@@ -11,7 +11,6 @@
 * Update miniaudio (fixes #10)
 * Fix memory leak when using UTF-16 converted file name
 * [VIPM] Reduced package installation time
-* [VIPM] Fix package not listed under macOS and Linux
 * [VIPM] Fix install error 5000 under macOS (#15)
 
 ##### New APIs

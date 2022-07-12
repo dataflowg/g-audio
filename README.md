@@ -11,7 +11,7 @@ A cross-platform LabVIEW library for audio device playback and capture, and for 
     <a href="#features">Features</a> -
     <a href="#installation">Installation</a> -
     <a href="#usage">Usage</a> -
-	<a href="#compiling">Compiling</a> -
+	<a href="#building">Building</a> -
 	<a href="#comparison">Comparison</a> - 
 	<a href="#license">License</a> - 
 	<a href="#acknowledgments">Acknowledgments</a>
@@ -59,7 +59,7 @@ opkg install alsa-lib
 exit
 ```
 #### 2. Copy `g_audio_32.so` to the target
-*Note: This library has been compiled for armv7a processors. Other architectures may need to build the library before it can be used. See the [Compiling](#compiling) section.*
+*Note: This library has been compiled for armv7a processors. Other architectures may need to build the library before it can be used. See the [Building](#building) section.*
 
 SCP / SFTP to the LINX target (using WinSCP or similar) and copy the library file located in `<vi.lib>\Dataflow_G\G-Audio\lib\LINX\g_audio_32.so` to the `/srv/chroot/labview/usr/lib` folder.
 
@@ -107,12 +107,14 @@ COMMENT     | Notes and comments on the track.        | `COMM`, `COM`           
 
 The field / tag mapping is based on the [Tag Mapping article](https://wiki.hydrogenaud.io/index.php?title=Tag_Mapping) on the hydrogenaudio wiki.
 
-## <a id="compiling"></a>Compiling
+## <a id="building"></a>Building
+Detailed build instructions can be found in [BUILDING.md](https://github.com/dataflowg/g-audio/BUILDING.md), and covers development environment configuration, compilation details for each target, and VIPM packaging process.
+
 Under Windows, Microsoft Visual Studio Community 2019 is used to compile and test the DLL called by LabVIEW.
 
-Under macOS, XCode 11.5 is used to compile the shared framework.
+Under macOS, Xcode 11.3.1 is used to compile the shared framework.
 
-Under Linux, run the `make.sh` script to compile the shared object library, or manually compile with the command `g++ -shared -fPIC -o g_audio_64.so *.cpp -lm -lpthread -ldl`.
+Under Linux, run the `make.sh` script to compile the shared object library, or manually compile with the command `g++ -shared -fPIC -o g_audio_64.so *.cpp -lm -lpthread -ldl -O3`.
 
 Under Raspberry Pi / LINX, run the following commands from SSH:
 ```
@@ -127,7 +129,7 @@ opkg install alsa-lib-dev
 git clone https://github.com/dataflowg/g-audio
 cd g-audio/src/C++
 git checkout dev
-g++ -shared -fPIC -o g_audio_32.so *.cpp -lm -lpthread -ldl -std=c++11 -mfpu=neon -mfloat-abi=softfp
+g++ -shared -fPIC -o g_audio_32.so *.cpp -lm -lpthread -ldl -std=c++11 -mfpu=neon -mfloat-abi=softfp -O3
 cp g_audio_32.so /usr/lib
 exit
 ```
