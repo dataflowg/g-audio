@@ -108,7 +108,7 @@ COMMENT     | Notes and comments on the track.        | `COMM`, `COM`           
 The field / tag mapping is based on the [Tag Mapping article](https://wiki.hydrogenaud.io/index.php?title=Tag_Mapping) on the hydrogenaudio wiki.
 
 ## <a id="building"></a>Building
-Detailed build instructions can be found in [BUILDING.md](https://github.com/dataflowg/g-audio/BUILDING.md), and covers development environment configuration, compilation details for each target, and VIPM packaging process.
+Detailed build instructions can be found in [BUILDING.md](BUILDING.md), and covers development environment configuration, compilation details for each target, and VIPM packaging process.
 
 Under Windows, Microsoft Visual Studio Community 2019 is used to compile and test the DLL called by LabVIEW.
 
