@@ -26,9 +26,9 @@ extern "C" LV_DLL_EXPORT int32_t clfn_abort(void* data)
 // LabVIEW Audio File API //
 ////////////////////////////
 
-extern "C" LV_DLL_EXPORT GA_RESULT get_audio_file_info(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, uint32_t* bits_per_sample, ga_codec* codec)
+extern "C" LV_DLL_EXPORT ga_result get_audio_file_info(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, uint32_t* bits_per_sample, ga_codec* codec)
 {
-	GA_RESULT result;
+	ga_result result;
 
 	result = get_audio_file_codec(file_name, codec);
 
@@ -43,14 +43,14 @@ extern "C" LV_DLL_EXPORT GA_RESULT get_audio_file_info(const char* file_name, ui
 		case ga_codec_mp3: return get_mp3_info(file_name, num_frames, channels, sample_rate, bits_per_sample); break;
 		case ga_codec_vorbis: return get_vorbis_info(file_name, num_frames, channels, sample_rate, bits_per_sample); break;
 		case ga_codec_wav: return get_wav_info(file_name, num_frames, channels, sample_rate, bits_per_sample); break;
-		case ga_codec_unsupported: return GA_E_UNSUPPORTED;
+		case ga_codec_unsupported: return GA_E_UNSUPPORTED_CODEC;
 		default: break;
 	}
 
 	return GA_E_GENERIC;
 }
 
-extern "C" LV_DLL_EXPORT int16_t* load_audio_file_s16(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, ga_codec* codec, GA_RESULT* result)
+extern "C" LV_DLL_EXPORT int16_t* load_audio_file_s16(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, ga_codec* codec, ga_result* result)
 {
 	int16_t* sample_data = NULL;
 
@@ -67,7 +67,7 @@ extern "C" LV_DLL_EXPORT int16_t* load_audio_file_s16(const char* file_name, uin
 		case ga_codec_mp3: sample_data = load_mp3(file_name, num_frames, channels, sample_rate, result); break;
 		case ga_codec_vorbis: sample_data = load_vorbis(file_name, num_frames, channels, sample_rate, result); break;
 		case ga_codec_wav: sample_data = load_wav(file_name, num_frames, channels, sample_rate, result); break;
-		case ga_codec_unsupported: *result = GA_E_UNSUPPORTED; break;
+		case ga_codec_unsupported: *result = GA_E_UNSUPPORTED_CODEC; break;
 		default: *result = GA_E_GENERIC; break;
 	}
 
@@ -85,9 +85,9 @@ extern "C" LV_DLL_EXPORT void free_sample_data(int16_t* buffer)
 	free(buffer);
 }
 
-extern "C" LV_DLL_EXPORT GA_RESULT open_audio_file(const char* file_name, int32_t* refnum)
+extern "C" LV_DLL_EXPORT ga_result open_audio_file(const char* file_name, int32_t* refnum)
 {
-	GA_RESULT result;
+	ga_result result;
 	ga_codec codec;
 	audio_file_codec* audio_file = (audio_file_codec*)malloc(sizeof(audio_file_codec));
 	if (audio_file == NULL)
@@ -154,7 +154,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT open_audio_file(const char* file_name, int32_
 		default:
 			free(audio_file);
 			audio_file = NULL;
-			return GA_E_UNSUPPORTED;
+			return GA_E_UNSUPPORTED_CODEC;
 			break;
 	}
 
@@ -189,7 +189,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT open_audio_file(const char* file_name, int32_
 	return GA_SUCCESS;
 }
 
-extern "C" LV_DLL_EXPORT GA_RESULT open_audio_file_write(const char* file_name, uint32_t channels, uint32_t sample_rate, uint32_t bits_per_sample, ga_codec codec, int32_t has_specific_info, void* codec_specific, int32_t* refnum)
+extern "C" LV_DLL_EXPORT ga_result open_audio_file_write(const char* file_name, uint32_t channels, uint32_t sample_rate, uint32_t bits_per_sample, ga_codec codec, int32_t has_specific_info, void* codec_specific, int32_t* refnum)
 {
 	audio_file_codec* audio_file = (audio_file_codec*)malloc(sizeof(audio_file_codec));
 	if (audio_file == NULL)
@@ -218,7 +218,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT open_audio_file_write(const char* file_name, 
 		default:
 			free(audio_file);
 			audio_file = NULL;
-			return GA_E_UNSUPPORTED;
+			return GA_E_UNSUPPORTED_CODEC;
 			break;
 	}
 
@@ -253,9 +253,9 @@ extern "C" LV_DLL_EXPORT GA_RESULT open_audio_file_write(const char* file_name, 
 	return GA_SUCCESS;
 }
 
-extern "C" LV_DLL_EXPORT GA_RESULT get_basic_audio_file_info(int32_t refnum, uint32_t* channels, uint32_t* sample_rate, uint64_t* read_offset)
+extern "C" LV_DLL_EXPORT ga_result get_basic_audio_file_info(int32_t refnum, uint32_t* channels, uint32_t* sample_rate, uint64_t* read_offset)
 {
-	GA_RESULT result = GA_SUCCESS;
+	ga_result result = GA_SUCCESS;
 
 	audio_file_codec* audio_file = (audio_file_codec*)get_reference_data(ga_refnum_audio_file, refnum);
 
@@ -279,9 +279,9 @@ extern "C" LV_DLL_EXPORT GA_RESULT get_basic_audio_file_info(int32_t refnum, uin
 	return result;
 }
 
-extern "C" LV_DLL_EXPORT GA_RESULT seek_audio_file(int32_t refnum, uint64_t offset, uint64_t* new_offset)
+extern "C" LV_DLL_EXPORT ga_result seek_audio_file(int32_t refnum, uint64_t offset, uint64_t* new_offset)
 {
-	GA_RESULT result = GA_SUCCESS;
+	ga_result result = GA_SUCCESS;
 
 	audio_file_codec* audio_file = (audio_file_codec*)get_reference_data(ga_refnum_audio_file, refnum);
 
@@ -305,9 +305,9 @@ extern "C" LV_DLL_EXPORT GA_RESULT seek_audio_file(int32_t refnum, uint64_t offs
 	return result;
 }
 
-extern "C" LV_DLL_EXPORT GA_RESULT read_audio_file(int32_t refnum, uint64_t frames_to_read, ga_data_type audio_type, uint64_t* frames_read, void* output_buffer)
+extern "C" LV_DLL_EXPORT ga_result read_audio_file(int32_t refnum, uint64_t frames_to_read, ga_data_type audio_type, uint64_t* frames_read, void* output_buffer)
 {
-	GA_RESULT result = GA_SUCCESS;
+	ga_result result = GA_SUCCESS;
 
 	audio_file_codec* audio_file = (audio_file_codec*)get_reference_data(ga_refnum_audio_file, refnum);
 
@@ -331,9 +331,9 @@ extern "C" LV_DLL_EXPORT GA_RESULT read_audio_file(int32_t refnum, uint64_t fram
 	return result;
 }
 
-extern "C" LV_DLL_EXPORT GA_RESULT write_audio_file(int32_t refnum, uint64_t frames_to_write, void* input_buffer, uint64_t* frames_written)
+extern "C" LV_DLL_EXPORT ga_result write_audio_file(int32_t refnum, uint64_t frames_to_write, void* input_buffer, uint64_t* frames_written)
 {
-	GA_RESULT result = GA_SUCCESS;
+	ga_result result = GA_SUCCESS;
 
 	audio_file_codec* audio_file = (audio_file_codec*)get_reference_data(ga_refnum_audio_file, refnum);
 
@@ -357,7 +357,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT write_audio_file(int32_t refnum, uint64_t fra
 	return result;
 }
 
-extern "C" LV_DLL_EXPORT GA_RESULT close_audio_file(int32_t refnum)
+extern "C" LV_DLL_EXPORT ga_result close_audio_file(int32_t refnum)
 {
 	audio_file_codec* audio_file = (audio_file_codec*)remove_reference(ga_refnum_audio_file, refnum);
 
@@ -388,20 +388,77 @@ extern "C" LV_DLL_EXPORT GA_RESULT close_audio_file(int32_t refnum)
 	return GA_SUCCESS;
 }
 
-GA_RESULT get_audio_file_codec(const char* file_name, ga_codec* codec)
+extern "C" LV_DLL_EXPORT ga_result get_audio_file_tags(const char* file_name, uint8_t read_pictures, intptr_t* tags, int32_t* tag_count, intptr_t* pictures, int32_t* picture_count)
+{
+	ga_result result;
+	ga_codec codec;
+
+	result = get_audio_file_codec(file_name, &codec);
+
+	if (result != GA_SUCCESS)
+	{
+		return result;
+	}
+
+	switch (codec)
+	{
+		case ga_codec_flac: return get_flac_tags(file_name, read_pictures, tags, tag_count, pictures, picture_count); break;
+		case ga_codec_mp3: return get_id3_tags(file_name, read_pictures, tags, tag_count, pictures, picture_count); break;
+		case ga_codec_vorbis: return get_vorbis_tags(file_name, read_pictures, tags, tag_count, pictures, picture_count); break;
+		case ga_codec_wav: return get_wav_tags(file_name, read_pictures, tags, tag_count, pictures, picture_count); break;
+		case ga_codec_unsupported:
+		default:
+			return GA_E_UNSUPPORTED_TAG;
+			break;
+	}
+
+	return GA_SUCCESS;
+}
+
+ga_result free_audio_file_tags(audio_file_tag_info tag_info)
+{
+	return free_audio_file_tags((intptr_t)tag_info.tags, tag_info.tag_count, (intptr_t)tag_info.pictures, tag_info.picture_count);
+}
+
+extern "C" LV_DLL_EXPORT ga_result free_audio_file_tags(intptr_t tags, int32_t tag_count, intptr_t pictures, int32_t picture_count)
+{
+	audio_file_tag* tags_ptr = (audio_file_tag*)tags;
+	audio_file_picture* pictures_ptr = (audio_file_picture*)pictures;
+
+	if (tags_ptr != NULL)
+	{
+		for (int i = 0; i < tag_count; i++)
+		{
+			free(tags_ptr[i].field);
+			free(tags_ptr[i].value);
+			tags_ptr[i].field = NULL;
+			tags_ptr[i].value = NULL;
+		}
+		free(tags_ptr);
+		tags_ptr = NULL;
+    }
+
+	if (pictures_ptr != NULL)
+	{
+		for (int i = 0; i < picture_count; i++)
+		{
+			STBI_FREE(pictures_ptr[i].data);
+			pictures_ptr[i].data = NULL;
+		}
+		free(pictures_ptr);
+		pictures_ptr = NULL;
+	}
+
+	return GA_SUCCESS;
+}
+
+ga_result get_audio_file_codec(const char* file_name, ga_codec* codec)
 {
 	FILE* pFile;
 
 	*codec = ga_codec_unsupported;
 
-#if defined(_WIN32) && defined(__STDC_WANT_SECURE_LIB__)
-	if (0 != _wfopen_s(&pFile, widen(file_name), L"rb"))
-		pFile = NULL;
-#elif defined(_WIN32)
-	pFile = _wfopen(widen(file_name), L"rb");
-#else
-	pFile = fopen(file_name, "rb");
-#endif
+	pFile = ga_fopen(file_name);
 	if (pFile == NULL)
 	{
 		return GA_E_FILE;
@@ -446,7 +503,7 @@ GA_RESULT get_audio_file_codec(const char* file_name, ga_codec* codec)
 	else
 	{
 		*codec = ga_codec_unsupported;
-		return GA_E_UNSUPPORTED;
+		return GA_E_UNSUPPORTED_CODEC;
 	}
 	return GA_SUCCESS;
 }
@@ -455,7 +512,7 @@ GA_RESULT get_audio_file_codec(const char* file_name, ga_codec* codec)
 // FLAC decoding wrapper //
 ///////////////////////////
 
-inline GA_RESULT convert_flac_result(int32_t result)
+inline ga_result convert_flac_result(int32_t result)
 {
 	switch (result)
 	{
@@ -468,12 +525,14 @@ inline GA_RESULT convert_flac_result(int32_t result)
 	return GA_E_GENERIC;
 }
 
-GA_RESULT get_flac_info(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, uint32_t* bits_per_sample)
+ga_result get_flac_info(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, uint32_t* bits_per_sample)
 {
 	drflac* pFlac = NULL;
 
 #if defined(_WIN32)
-	pFlac = drflac_open_file_w(widen(file_name), NULL);
+	wchar_t* wide_file_name = widen(file_name);
+	pFlac = drflac_open_file_w(wide_file_name, NULL);
+	free(wide_file_name);
 #else
 	pFlac = drflac_open_file(file_name, NULL);
 #endif
@@ -492,7 +551,7 @@ GA_RESULT get_flac_info(const char* file_name, uint64_t* num_frames, uint32_t* c
 	return GA_SUCCESS;
 }
 
-int16_t* load_flac(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, GA_RESULT* result)
+int16_t* load_flac(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, ga_result* result)
 {
 	drflac_uint64 flac_num_frames = 0;
 	drflac_uint32 flac_channels = 0;
@@ -500,7 +559,9 @@ int16_t* load_flac(const char* file_name, uint64_t* num_frames, uint32_t* channe
 	int16_t* sample_data = NULL;
 
 #if defined(_WIN32)
-	sample_data = drflac_open_file_and_read_pcm_frames_s16_w(widen(file_name), &flac_channels, &flac_sample_rate, &flac_num_frames, NULL);
+	wchar_t* wide_file_name = widen(file_name);
+	sample_data = drflac_open_file_and_read_pcm_frames_s16_w(wide_file_name, &flac_channels, &flac_sample_rate, &flac_num_frames, NULL);
+	free(wide_file_name);
 #else
 	sample_data = drflac_open_file_and_read_pcm_frames_s16(file_name, &flac_channels, &flac_sample_rate, &flac_num_frames, NULL);
 #endif
@@ -524,10 +585,12 @@ void free_flac(int16_t* sample_data)
 	drflac_free(sample_data, NULL);
 }
 
-GA_RESULT open_flac_file(const char* file_name, void** decoder)
+ga_result open_flac_file(const char* file_name, void** decoder)
 {
 #if defined(_WIN32)
-	*decoder = (void*)drflac_open_file_w(widen(file_name), NULL);
+	wchar_t* wide_file_name = widen(file_name);
+	*decoder = (void*)drflac_open_file_w(wide_file_name, NULL);
+	free(wide_file_name);
 #else
 	*decoder = (void*)drflac_open_file(file_name, NULL);
 #endif
@@ -540,7 +603,7 @@ GA_RESULT open_flac_file(const char* file_name, void** decoder)
 	return GA_SUCCESS;
 }
 
-GA_RESULT get_basic_flac_file_info(void* decoder, uint32_t* channels, uint32_t* sample_rate, uint64_t* read_offset)
+ga_result get_basic_flac_file_info(void* decoder, uint32_t* channels, uint32_t* sample_rate, uint64_t* read_offset)
 {
 	if (decoder == NULL)
 	{
@@ -554,7 +617,7 @@ GA_RESULT get_basic_flac_file_info(void* decoder, uint32_t* channels, uint32_t* 
 	return GA_SUCCESS;
 }
 
-GA_RESULT seek_flac_file(void* decoder, uint64_t offset, uint64_t* new_offset)
+ga_result seek_flac_file(void* decoder, uint64_t offset, uint64_t* new_offset)
 {
 	if (decoder == NULL)
 	{
@@ -571,7 +634,7 @@ GA_RESULT seek_flac_file(void* decoder, uint64_t offset, uint64_t* new_offset)
 	return GA_SUCCESS;
 }
 
-GA_RESULT read_flac_file(void* decoder, uint64_t frames_to_read, ga_data_type audio_type, uint64_t* frames_read, void* output_buffer)
+ga_result read_flac_file(void* decoder, uint64_t frames_to_read, ga_data_type audio_type, uint64_t* frames_read, void* output_buffer)
 {
 	if (decoder == NULL)
 	{
@@ -618,7 +681,7 @@ GA_RESULT read_flac_file(void* decoder, uint64_t frames_to_read, ga_data_type au
 	return GA_SUCCESS;
 }
 
-GA_RESULT close_flac_file(void* decoder)
+ga_result close_flac_file(void* decoder)
 {
 	if (decoder == NULL)
 	{
@@ -630,12 +693,162 @@ GA_RESULT close_flac_file(void* decoder)
 	return GA_SUCCESS;
 }
 
+void flac_metadata_callback(void* pUserData, drflac_metadata* meta)
+{
+	if (pUserData == NULL)
+	{
+		return;
+	}
+
+	audio_file_tag_info* tag_info = (audio_file_tag_info*)pUserData;
+
+	if (tag_info->result != GA_SUCCESS)
+	{
+		return;
+	}
+
+	switch (meta->type)
+	{
+		case DRFLAC_METADATA_BLOCK_TYPE_VORBIS_COMMENT:
+		{
+			drflac_vorbis_comment_iterator iterator;
+			const char* comment;
+			uint32_t length;
+			int32_t token_offset;
+			int32_t field_length;
+			int32_t value_length;
+
+			tag_info->tag_count = 0;
+			if (meta->data.vorbis_comment.commentCount > 0)
+			{
+				// Use calloc instead of malloc so all char* are set NULL
+				tag_info->tags = (audio_file_tag*)calloc(meta->data.vorbis_comment.commentCount, sizeof(audio_file_tag));
+
+				if (tag_info->tags == NULL)
+				{
+					tag_info->result = GA_E_MEMORY;
+					return;
+				}
+
+				drflac_init_vorbis_comment_iterator(&iterator, meta->data.vorbis_comment.commentCount, meta->data.vorbis_comment.pComments);
+				while ((comment = drflac_next_vorbis_comment(&iterator, &length)) != NULL)
+				{
+					token_offset = ga_find_token(comment, '=');
+
+					if (token_offset > 0)
+					{
+						value_length = length - token_offset;
+						field_length = length - value_length - 1;
+
+						tag_info->tags[tag_info->tag_count].field = (char*)malloc(field_length + 1);
+						tag_info->tags[tag_info->tag_count].value = (char*)malloc(value_length + 1);
+
+						if (tag_info->tags[tag_info->tag_count].field == NULL || tag_info->tags[tag_info->tag_count].value == NULL)
+						{
+							tag_info->result = GA_E_MEMORY;
+							return;
+						}
+
+						memcpy(tag_info->tags[tag_info->tag_count].field, comment, field_length);
+						tag_info->tags[tag_info->tag_count].field[field_length] = '\0';
+						tag_info->tags[tag_info->tag_count].field_length = field_length;
+						memcpy(tag_info->tags[tag_info->tag_count].value, comment + token_offset, value_length);
+						tag_info->tags[tag_info->tag_count].value[value_length] = '\0';
+						tag_info->tags[tag_info->tag_count].value_length = value_length;
+						tag_info->tag_count++;
+					}
+				}
+			}
+			break;
+		}
+		case DRFLAC_METADATA_BLOCK_TYPE_PICTURE:
+		{
+			if (tag_info->read_pictures)
+			{
+				int32_t x, y, n;
+				audio_file_picture* temp_pictures_ptr = tag_info->pictures;
+				tag_info->pictures = (audio_file_picture*)realloc(temp_pictures_ptr, sizeof(audio_file_picture) * (tag_info->picture_count + 1));
+
+				if (tag_info->pictures == NULL)
+				{
+					tag_info->pictures = temp_pictures_ptr;
+					tag_info->result = GA_E_MEMORY;
+					return;
+				}
+
+				tag_info->pictures[tag_info->picture_count].data = stbi_load_from_memory(meta->data.picture.pPictureData, meta->data.picture.pictureDataSize, &x, &y, &n, 4);
+
+				if (tag_info->pictures[tag_info->picture_count].data == NULL)
+				{
+					tag_info->result = GA_E_PICTURE;
+					return;
+				}
+
+				tag_info->pictures[tag_info->picture_count].data_size = sizeof(uint8_t) * x * y * 4;
+				tag_info->pictures[tag_info->picture_count].type = meta->data.picture.type;
+				tag_info->pictures[tag_info->picture_count].width = x;
+				tag_info->pictures[tag_info->picture_count].height = y;
+				tag_info->pictures[tag_info->picture_count].depth = n * 8;
+				tag_info->picture_count++;
+			}
+			break;
+		}
+		default: break;
+	}
+}
+
+ga_result get_flac_tags(const char* file_name, uint8_t read_pictures, intptr_t* tags, int32_t* tag_count, intptr_t* pictures, int32_t* picture_count)
+{
+	drflac* decoder = NULL;
+	audio_file_tag_info* tag_info = (audio_file_tag_info*)malloc(sizeof(audio_file_tag_info));
+
+	if (tag_info == NULL)
+	{
+		return GA_E_MEMORY;
+	}
+	memset(tag_info, 0, sizeof(audio_file_tag_info));
+	tag_info->read_pictures = read_pictures;
+
+#if defined(_WIN32)
+	wchar_t* wide_file_name = widen(file_name);
+	decoder = drflac_open_file_with_metadata_w(wide_file_name, flac_metadata_callback, tag_info, NULL);
+	free(wide_file_name);
+#else
+	decoder = drflac_open_file_with_metadata(file_name, flac_metadata_callback, tag_info, NULL);
+#endif
+
+	if (decoder == NULL)
+	{
+		free(tag_info);
+		return GA_E_TAG;
+	}
+
+	drflac_close(decoder);
+
+	if (tag_info->result != GA_SUCCESS)
+	{
+		ga_result result = tag_info->result;
+		free_audio_file_tags(*tag_info);
+		free(tag_info);
+		return result;
+	}
+
+	*tags = (intptr_t)tag_info->tags;
+	*tag_count = tag_info->tag_count;
+	*pictures = (intptr_t)tag_info->pictures;
+	*picture_count = tag_info->picture_count;
+
+	free(tag_info);
+
+	return GA_SUCCESS;
+}
+
 
 //////////////////////////
 // MP3 decoding wrapper //
 //////////////////////////
 
-inline GA_RESULT convert_mp3_result(int32_t result)
+inline ga_result convert_mp3_result(int32_t result)
 {
 	switch (result)
 	{
@@ -658,14 +871,16 @@ inline GA_RESULT convert_mp3_result(int32_t result)
 	return GA_E_GENERIC;
 }
 
-GA_RESULT get_mp3_info(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, uint32_t* bits_per_sample)
+ga_result get_mp3_info(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, uint32_t* bits_per_sample)
 {
-	GA_RESULT result = GA_SUCCESS;
+	ga_result result = GA_SUCCESS;
 	mp3dec_t mp3d;
 	mp3dec_file_info_t info;
 
 #if defined(_WIN32)
-	result = convert_mp3_result(mp3dec_load_w_no_decode(&mp3d, widen(file_name), &info, NULL, NULL));
+	wchar_t* wide_file_name = widen(file_name);
+	result = convert_mp3_result(mp3dec_load_w_no_decode(&mp3d, wide_file_name, &info, NULL, NULL));
+	free(wide_file_name);
 #else
 	result = convert_mp3_result(mp3dec_load_no_decode(&mp3d, file_name, &info, NULL, NULL));
 #endif
@@ -690,13 +905,15 @@ GA_RESULT get_mp3_info(const char* file_name, uint64_t* num_frames, uint32_t* ch
 	return result;
 }
 
-int16_t* load_mp3(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, GA_RESULT* result)
+int16_t* load_mp3(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, ga_result* result)
 {
 	mp3dec_t mp3d;
 	mp3dec_file_info_t info;
 
 #if defined(_WIN32)
-	*result = convert_mp3_result(mp3dec_load_w(&mp3d, widen(file_name), &info, NULL, NULL));
+	wchar_t* wide_file_name = widen(file_name);
+	*result = convert_mp3_result(mp3dec_load_w(&mp3d, wide_file_name, &info, NULL, NULL));
+	free(wide_file_name);
 #else
 	*result = convert_mp3_result(mp3dec_load(&mp3d, file_name, &info, NULL, NULL));
 #endif
@@ -724,9 +941,9 @@ void free_mp3(int16_t* sample_data)
 	free(sample_data);
 }
 
-GA_RESULT open_mp3_file(const char* file_name, void** decoder)
+ga_result open_mp3_file(const char* file_name, void** decoder)
 {
-	GA_RESULT result = GA_SUCCESS;
+	ga_result result = GA_SUCCESS;
 
 	mp3dec_ex_t* mp3_decoder = (mp3dec_ex_t*)malloc(sizeof(mp3dec_ex_t));
 
@@ -736,7 +953,9 @@ GA_RESULT open_mp3_file(const char* file_name, void** decoder)
 	}
 
 #if defined(_WIN32)
-	result = convert_mp3_result(mp3dec_ex_open_w(mp3_decoder, widen(file_name), MP3D_SEEK_TO_SAMPLE));
+	wchar_t* wide_file_name = widen(file_name);
+	result = convert_mp3_result(mp3dec_ex_open_w(mp3_decoder, wide_file_name, MP3D_SEEK_TO_SAMPLE));
+	free(wide_file_name);
 #else
 	result = convert_mp3_result(mp3dec_ex_open(mp3_decoder, file_name, MP3D_SEEK_TO_SAMPLE));
 #endif
@@ -753,7 +972,7 @@ GA_RESULT open_mp3_file(const char* file_name, void** decoder)
 	return result;
 }
 
-GA_RESULT get_basic_mp3_file_info(void* decoder, uint32_t* channels, uint32_t* sample_rate, uint64_t* read_offset)
+ga_result get_basic_mp3_file_info(void* decoder, uint32_t* channels, uint32_t* sample_rate, uint64_t* read_offset)
 {
 	if (decoder == NULL)
 	{
@@ -767,7 +986,7 @@ GA_RESULT get_basic_mp3_file_info(void* decoder, uint32_t* channels, uint32_t* s
 	return GA_SUCCESS;
 }
 
-GA_RESULT seek_mp3_file(void* decoder, uint64_t offset, uint64_t* new_offset)
+ga_result seek_mp3_file(void* decoder, uint64_t offset, uint64_t* new_offset)
 {
 	if (decoder == NULL)
 	{
@@ -779,7 +998,7 @@ GA_RESULT seek_mp3_file(void* decoder, uint64_t offset, uint64_t* new_offset)
 	return convert_mp3_result(mp3dec_ex_seek((mp3dec_ex_t*)decoder, offset * ((mp3dec_ex_t*)decoder)->info.channels));
 }
 
-GA_RESULT read_mp3_file(void* decoder, uint64_t frames_to_read, ga_data_type audio_type, uint64_t* frames_read, void* output_buffer)
+ga_result read_mp3_file(void* decoder, uint64_t frames_to_read, ga_data_type audio_type, uint64_t* frames_read, void* output_buffer)
 {
 	if (decoder == NULL)
 	{
@@ -849,7 +1068,7 @@ GA_RESULT read_mp3_file(void* decoder, uint64_t frames_to_read, ga_data_type aud
 	return GA_SUCCESS;
 }
 
-GA_RESULT close_mp3_file(void* decoder)
+ga_result close_mp3_file(void* decoder)
 {
 	if (decoder == NULL)
 	{
@@ -862,12 +1081,261 @@ GA_RESULT close_mp3_file(void* decoder)
 	return GA_SUCCESS;
 }
 
+id3tag_t* load_id3_tag(const char* file_name)
+{
+	FILE* pFile;
+	ID3TAG_U8 tag_size_data[10];
+	size_t tag_size;
+	void* tag_data;
+	id3tag_t* id3tag;
+
+	pFile = ga_fopen(file_name);
+	if (pFile == NULL)
+	{
+		return NULL;
+	}
+
+	fseek(pFile, 0, SEEK_SET);
+	fread(&tag_size_data, 1, sizeof(tag_size_data), pFile);
+
+	tag_size = id3tag_size(tag_size_data);
+	// ID3v2 tag found
+	if (tag_size > 0)
+	{
+		tag_data = malloc(tag_size);
+
+		if (tag_data == NULL)
+		{
+			fclose(pFile);
+			return NULL;
+		}
+
+		fseek(pFile, 0, SEEK_SET);
+		fread(tag_data, 1, tag_size, pFile);
+		fclose(pFile);
+		id3tag = id3tag_load(tag_data, tag_size, ID3TAG_ALL_FIELDS, NULL);
+		free(tag_data);
+	}
+	// No ID3V2 tag, try ID3v1
+	else
+	{
+		tag_data = malloc(128);
+
+		if (tag_data == NULL)
+		{
+			fclose(pFile);
+			return NULL;
+		}
+
+		fseek(pFile, -128, SEEK_END);
+		fread(tag_data, 1, 128, pFile);
+		fclose(pFile);
+		id3tag = id3tag_load_id3v1(tag_data, 128, NULL);
+		free(tag_data);
+	}
+
+	return id3tag;
+}
+
+ga_result get_id3_tags(const char* file_name, uint8_t read_pictures, intptr_t* tags, int32_t* tag_count, intptr_t* pictures, int32_t* picture_count)
+{
+	enum fields_t
+	{
+		FIELD_TITLE,
+		FIELD_ARTIST,
+		FIELD_ALBUM_ARTIST,
+		FIELD_ALBUM,
+		FIELD_GENRE,
+		FIELD_YEAR,
+		FIELD_TRACK,
+		FIELD_TRACKS,
+		FIELD_DISC,
+		FIELD_DISCS,
+		FIELD_COMPILATION,
+		FIELD_BPM,
+		FIELD_COMMENT,
+		FIELD_USER_TEXT,
+
+		FIELDCOUNT
+	};
+
+	const char* tag_field_prefix[FIELDCOUNT] =
+	{
+		"TITLE",
+		"ARTIST",
+		"ALBUMARTIST",
+		"ALBUM",
+		"GENRE",
+		"DATE",
+		"TRACKNUMBER",
+		"TRACKTOTAL",
+		"DISCNUMBER",
+		"DISCTOTAL",
+		"COMPILATION",
+		"BPM",
+		"COMMENT"
+	};
+
+	audio_file_tag_info tag_info = {};
+	const char* current_tag = NULL;
+	id3tag_t* id3tag;
+
+	id3tag = load_id3_tag(file_name);
+
+	if (id3tag == NULL)
+	{
+		return GA_E_TAG;
+	}
+
+	tag_info.tag_count = 0;
+	tag_info.tags = (audio_file_tag*)calloc(FIELDCOUNT, sizeof(audio_file_tag));
+
+	if (tag_info.tags == NULL)
+	{
+		free_audio_file_tags(tag_info);
+		id3tag_free(id3tag);
+		return GA_E_MEMORY;
+	}
+
+	for (int field_index = 0; field_index < FIELDCOUNT; field_index++)
+	{
+		current_tag = NULL;
+		switch (field_index)
+		{
+			case FIELD_TITLE:        if (id3tag->title != NULL) { current_tag = id3tag->title; } break;
+			case FIELD_ARTIST:       if (id3tag->artist != NULL) { current_tag = id3tag->artist; } break;
+			case FIELD_ALBUM_ARTIST: if (id3tag->album_artist != NULL) { current_tag = id3tag->album_artist; } break;
+			case FIELD_ALBUM:        if (id3tag->album != NULL) { current_tag = id3tag->album; } break;
+			case FIELD_GENRE:        if (id3tag->genre != NULL) { current_tag = id3tag->genre; } break;
+			case FIELD_YEAR:         if (id3tag->year != NULL) { current_tag = id3tag->year; } break;
+			case FIELD_TRACK:        if (id3tag->track != NULL) { current_tag = id3tag->track; } break;
+			case FIELD_TRACKS:       if (id3tag->tracks != NULL) { current_tag = id3tag->tracks; } break;
+			case FIELD_DISC:         if (id3tag->disc != NULL) { current_tag = id3tag->disc; } break;
+			case FIELD_DISCS:        if (id3tag->discs != NULL) { current_tag = id3tag->discs; } break;
+			case FIELD_COMPILATION:  if (id3tag->compilation != NULL) { current_tag = id3tag->compilation; } break;
+			case FIELD_BPM:          if (id3tag->bpm != NULL) { current_tag = id3tag->bpm; } break;
+			case FIELD_COMMENT:      if (id3tag->comment != NULL) { current_tag = id3tag->comment; } break;
+			default:                 current_tag = NULL; break;
+		}
+
+		if (current_tag != NULL)
+		{
+			int tag_index = tag_info.tag_count;
+
+			tag_info.tags[tag_index].field_length = strlen(tag_field_prefix[field_index]);
+			tag_info.tags[tag_index].value_length = strlen(current_tag);
+
+			tag_info.tags[tag_index].field = (char*)malloc(tag_info.tags[tag_index].field_length + 1); // Add 1 for '\0' terminatation
+			tag_info.tags[tag_index].value = (char*)malloc(tag_info.tags[tag_index].value_length + 1); // Add 1 for '\0' terminatation
+
+			if (tag_info.tags[tag_index].field == NULL || tag_info.tags[tag_index].value == NULL)
+			{
+				free_audio_file_tags(tag_info);
+				id3tag_free(id3tag);
+				return GA_E_MEMORY;
+			}
+
+			memcpy(tag_info.tags[tag_index].field, tag_field_prefix[field_index], tag_info.tags[tag_index].field_length);
+			tag_info.tags[tag_index].field[tag_info.tags[tag_index].field_length] = '\0';
+			memcpy(tag_info.tags[tag_index].value, current_tag, tag_info.tags[tag_index].value_length);
+			tag_info.tags[tag_index].value[tag_info.tags[tag_index].value_length] = '\0';
+			tag_info.tag_count++;
+		}
+
+		if (field_index == FIELD_USER_TEXT && id3tag->user_text != NULL && id3tag->user_text_count > 0)
+		{
+			int tag_offset = tag_info.tag_count;
+			int tag_index = 0;
+			int temp_count = tag_info.tag_count + id3tag->user_text_count;
+			audio_file_tag* temp_tags_ptr = tag_info.tags;
+
+			tag_info.tags = (audio_file_tag*)realloc(temp_tags_ptr, sizeof(audio_file_tag) * temp_count);
+			if (tag_info.tags == NULL)
+			{
+				tag_info.tags = temp_tags_ptr;
+				free_audio_file_tags(tag_info);
+				id3tag_free(id3tag);
+				return GA_E_MEMORY;
+			}
+
+			memset(tag_info.tags + tag_offset, 0, sizeof(audio_file_tag) * id3tag->user_text_count);
+			tag_info.tag_count = temp_count;
+
+			for (int user_text_index = 0; user_text_index < id3tag->user_text_count; user_text_index++)
+			{
+				tag_index = tag_offset + user_text_index;
+
+				tag_info.tags[tag_index].field_length = strlen(id3tag->user_text[user_text_index].desc);
+				tag_info.tags[tag_index].value_length = strlen(id3tag->user_text[user_text_index].value);
+
+				tag_info.tags[tag_index].field = (char*)malloc(tag_info.tags[tag_index].field_length + 1); // Add 1 for '\0' terminatation
+				tag_info.tags[tag_index].value = (char*)malloc(tag_info.tags[tag_index].value_length + 1); // Add 1 for '\0' terminatation
+
+				if (tag_info.tags[tag_index].field == NULL || tag_info.tags[tag_index].value == NULL)
+				{
+					free_audio_file_tags(tag_info);
+					id3tag_free(id3tag);
+					return GA_E_MEMORY;
+				}
+
+				memcpy(tag_info.tags[tag_index].field, id3tag->user_text[user_text_index].desc, tag_info.tags[tag_index].field_length);
+				tag_info.tags[tag_index].field[tag_info.tags[tag_index].field_length] = '\0';
+				memcpy(tag_info.tags[tag_index].value, id3tag->user_text[user_text_index].value, tag_info.tags[tag_index].value_length);
+				tag_info.tags[tag_index].value[tag_info.tags[tag_index].value_length] = '\0';
+			}
+		}
+	}
+
+	if (read_pictures)
+	{
+		int32_t x, y, n;
+		tag_info.pictures = (audio_file_picture*)calloc(id3tag->pics_count, sizeof(audio_file_picture));
+
+		if (tag_info.pictures == NULL)
+		{
+			free_audio_file_tags(tag_info);
+			id3tag_free(id3tag);
+			return GA_E_MEMORY;
+		}
+
+		tag_info.picture_count = 0;
+		for (int i = 0; i < id3tag->pics_count; i++)
+		{
+			tag_info.pictures[i].data = stbi_load_from_memory((stbi_uc*)id3tag->pics[i].data, id3tag->pics[i].size, &x, &y, &n, 4);
+
+			if (tag_info.pictures[i].data == NULL)
+			{
+
+				free_audio_file_tags(tag_info);
+				id3tag_free(id3tag);
+				return GA_E_MEMORY;
+			}
+
+			tag_info.pictures[i].data_size = sizeof(uint8_t) * x * y * 4;
+			tag_info.pictures[i].type = id3tag->pics[i].pic_type;
+			tag_info.pictures[i].width = x;
+			tag_info.pictures[i].height = y;
+			tag_info.pictures[i].depth = n * 8;
+			tag_info.picture_count++;
+		}
+	}
+
+	id3tag_free(id3tag);
+
+	*tags = (intptr_t)tag_info.tags;
+	*tag_count = tag_info.tag_count;
+	*pictures = (intptr_t)tag_info.pictures;
+	*picture_count = tag_info.picture_count;
+
+	return GA_SUCCESS;
+}
+
 
 /////////////////////////////////
 // Ogg Vorbis decoding wrapper //
 /////////////////////////////////
 
-inline GA_RESULT convert_vorbis_result(int32_t result)
+inline ga_result convert_vorbis_result(int32_t result)
 {
 	switch (result)
 	{
@@ -897,14 +1365,16 @@ inline GA_RESULT convert_vorbis_result(int32_t result)
 	return GA_E_GENERIC;
 }
 
-GA_RESULT get_vorbis_info(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, uint32_t* bits_per_sample)
+ga_result get_vorbis_info(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, uint32_t* bits_per_sample)
 {
-	GA_RESULT result = GA_SUCCESS;
+	ga_result result = GA_SUCCESS;
 	int error = 0;
 	stb_vorbis* info;
 
 #if defined(_WIN32)
-	info = stb_vorbis_open_filename_w(widen(file_name), &error, NULL);
+	wchar_t* wide_file_name = widen(file_name);
+	info = stb_vorbis_open_filename_w(wide_file_name, &error, NULL);
+	free(wide_file_name);
 #else
 	info = stb_vorbis_open_filename(file_name, &error, NULL);
 #endif
@@ -927,7 +1397,7 @@ GA_RESULT get_vorbis_info(const char* file_name, uint64_t* num_frames, uint32_t*
 	return result;
 }
 
-int16_t* load_vorbis(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, GA_RESULT* result)
+int16_t* load_vorbis(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, ga_result* result)
 {
 	int ogg_num_frames = 0;
 	int ogg_channels = 0;
@@ -936,7 +1406,9 @@ int16_t* load_vorbis(const char* file_name, uint64_t* num_frames, uint32_t* chan
 	short* sample_data = NULL;
 
 #if defined(_WIN32)
-	ogg_num_frames = stb_vorbis_decode_filename_w(widen(file_name), &ogg_channels, &ogg_sample_rate, &sample_data);
+	wchar_t* wide_file_name = widen(file_name);
+	ogg_num_frames = stb_vorbis_decode_filename_w(wide_file_name, &ogg_channels, &ogg_sample_rate, &sample_data);
+	free(wide_file_name);
 #else
 	ogg_num_frames = stb_vorbis_decode_filename(file_name, &ogg_channels, &ogg_sample_rate, &sample_data);
 #endif
@@ -960,14 +1432,16 @@ void free_vorbis(int16_t* sample_data)
 	free(sample_data);
 }
 
-GA_RESULT open_vorbis_file(const char* file_name, void** decoder)
+ga_result open_vorbis_file(const char* file_name, void** decoder)
 {
-	GA_RESULT result = GA_SUCCESS;
+	ga_result result = GA_SUCCESS;
 	int error = 0;
 	stb_vorbis* vorbis_decoder;
 
 #if defined(_WIN32)
-	vorbis_decoder = stb_vorbis_open_filename_w(widen(file_name), &error, NULL);
+	wchar_t* wide_file_name = widen(file_name);
+	vorbis_decoder = stb_vorbis_open_filename_w(wide_file_name, &error, NULL);
+	free(wide_file_name);
 #else
 	vorbis_decoder = stb_vorbis_open_filename(file_name, &error, NULL);
 #endif
@@ -984,7 +1458,7 @@ GA_RESULT open_vorbis_file(const char* file_name, void** decoder)
 	return result;
 }
 
-GA_RESULT get_basic_vorbis_file_info(void* decoder, uint32_t* channels, uint32_t* sample_rate, uint64_t* read_offset)
+ga_result get_basic_vorbis_file_info(void* decoder, uint32_t* channels, uint32_t* sample_rate, uint64_t* read_offset)
 {
 	if (decoder == NULL)
 	{
@@ -998,7 +1472,7 @@ GA_RESULT get_basic_vorbis_file_info(void* decoder, uint32_t* channels, uint32_t
 	return GA_SUCCESS;
 }
 
-GA_RESULT seek_vorbis_file(void* decoder, uint64_t offset, uint64_t* new_offset)
+ga_result seek_vorbis_file(void* decoder, uint64_t offset, uint64_t* new_offset)
 {
 	if (decoder == NULL)
 	{
@@ -1013,7 +1487,7 @@ GA_RESULT seek_vorbis_file(void* decoder, uint64_t offset, uint64_t* new_offset)
 	return convert_vorbis_result(stb_vorbis_get_error((stb_vorbis*)decoder));
 }
 
-GA_RESULT read_vorbis_file(void* decoder, uint64_t frames_to_read, ga_data_type audio_type, uint64_t* frames_read, void* output_buffer)
+ga_result read_vorbis_file(void* decoder, uint64_t frames_to_read, ga_data_type audio_type, uint64_t* frames_read, void* output_buffer)
 {
 	if (decoder == NULL)
 	{
@@ -1066,7 +1540,7 @@ GA_RESULT read_vorbis_file(void* decoder, uint64_t frames_to_read, ga_data_type 
 	return convert_vorbis_result(stb_vorbis_get_error((stb_vorbis*)decoder));
 }
 
-GA_RESULT close_vorbis_file(void* decoder)
+ga_result close_vorbis_file(void* decoder)
 {
 	if (decoder == NULL)
 	{
@@ -1078,12 +1552,116 @@ GA_RESULT close_vorbis_file(void* decoder)
 	return GA_SUCCESS;
 }
 
+ga_result get_vorbis_tags(const char* file_name, uint8_t read_pictures, intptr_t* tags, int32_t* tag_count, intptr_t* pictures, int32_t* picture_count)
+{
+	ga_result result = GA_SUCCESS;
+	int error = 0;
+	stb_vorbis* vorbis_decoder;
+	audio_file_tag_info tag_info = {};
+	int32_t length;
+	int32_t token_offset;
+	int32_t field_length;
+	int32_t value_length;
+
+#if defined(_WIN32)
+	wchar_t* wide_file_name = widen(file_name);
+	vorbis_decoder = stb_vorbis_open_filename_w(wide_file_name, &error, NULL);
+	free(wide_file_name);
+#else
+	vorbis_decoder = stb_vorbis_open_filename(file_name, &error, NULL);
+#endif
+
+	result = convert_vorbis_result(error);
+
+	if (vorbis_decoder == NULL || result != GA_SUCCESS)
+	{
+		return GA_E_TAG;
+	}
+
+	tag_info.tag_count = 0;
+	if (vorbis_decoder->comment_list_length > 0)
+	{
+		tag_info.tags = (audio_file_tag*)calloc(vorbis_decoder->comment_list_length, sizeof(audio_file_tag));
+
+		if (tag_info.tags == NULL)
+		{
+			free_audio_file_tags(tag_info);
+			stb_vorbis_close(vorbis_decoder);
+			return GA_E_MEMORY;
+		}
+
+		for (int i = 0; i < vorbis_decoder->comment_list_length; i++)
+		{
+			token_offset = ga_find_token(vorbis_decoder->comment_list[i], '=');
+
+			if (token_offset > 0)
+			{
+				length = strlen(vorbis_decoder->comment_list[i]);
+				value_length = length - token_offset;
+				field_length = length - value_length - 1;
+
+				if (strncmp(vorbis_decoder->comment_list[i], "METADATA_BLOCK_PICTURE", field_length) == 0)
+				{
+					if (read_pictures)
+					{
+						audio_file_picture* temp_pictures_ptr = tag_info.pictures;
+						tag_info.pictures = (audio_file_picture*)realloc(temp_pictures_ptr, sizeof(audio_file_picture) * (tag_info.picture_count + 1));
+
+						if (tag_info.pictures == NULL)
+						{
+							tag_info.pictures = temp_pictures_ptr;
+							free_audio_file_tags(tag_info);
+							stb_vorbis_close(vorbis_decoder);
+							return GA_E_MEMORY;
+						}
+
+						int32_t block_size;
+						const uint8_t* picture_block = (const uint8_t*)base64_dec_malloc(vorbis_decoder->comment_list[i] + token_offset, &block_size);
+						parse_metadata_block_picture(picture_block, block_size, tag_info.pictures + tag_info.picture_count);
+						tag_info.picture_count++;
+						free((void*)picture_block);
+					}
+				}
+				else
+				{
+					tag_info.tags[tag_info.tag_count].field = (char*)malloc(field_length + 1);
+					tag_info.tags[tag_info.tag_count].value = (char*)malloc(value_length + 1);
+
+					if (tag_info.tags[tag_info.tag_count].field == NULL || tag_info.tags[tag_info.tag_count].value == NULL)
+					{
+						free_audio_file_tags(tag_info);
+						stb_vorbis_close(vorbis_decoder);
+						return GA_E_MEMORY;
+					}
+
+					memcpy(tag_info.tags[tag_info.tag_count].field, vorbis_decoder->comment_list[i], field_length);
+					tag_info.tags[tag_info.tag_count].field[field_length] = '\0';
+					tag_info.tags[tag_info.tag_count].field_length = field_length;
+					memcpy(tag_info.tags[tag_info.tag_count].value, vorbis_decoder->comment_list[i] + token_offset, value_length);
+					tag_info.tags[tag_info.tag_count].value[value_length] = '\0';
+					tag_info.tags[tag_info.tag_count].value_length = value_length;
+					tag_info.tag_count++;
+				}
+			}
+		}
+	}
+
+	stb_vorbis_close(vorbis_decoder);
+
+	*tags = (intptr_t)tag_info.tags;
+	*tag_count = tag_info.tag_count;
+	*pictures = (intptr_t)tag_info.pictures;
+	*picture_count = tag_info.picture_count;
+
+	return result;
+}
+
 
 //////////////////////////
 // WAV decoding wrapper //
 //////////////////////////
 
-inline GA_RESULT convert_wav_result(int32_t result)
+inline ga_result convert_wav_result(int32_t result)
 {
 	switch (result)
 	{
@@ -1096,13 +1674,15 @@ inline GA_RESULT convert_wav_result(int32_t result)
 	return GA_E_GENERIC;
 }
 
-GA_RESULT get_wav_info(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, uint32_t* bits_per_sample)
+ga_result get_wav_info(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, uint32_t* bits_per_sample)
 {
 	drwav pWav;
 	drwav_bool32 init_ok = DRWAV_FALSE;
 
 #if defined(_WIN32)
-	init_ok = drwav_init_file_w(&pWav, widen(file_name), NULL);
+	wchar_t* wide_file_name = widen(file_name);
+	init_ok = drwav_init_file_w(&pWav, wide_file_name, NULL);
+	free(wide_file_name);
 #else
 	init_ok = drwav_init_file(&pWav, file_name, NULL);
 #endif
@@ -1122,7 +1702,7 @@ GA_RESULT get_wav_info(const char* file_name, uint64_t* num_frames, uint32_t* ch
 	return GA_SUCCESS;
 }
 
-int16_t* load_wav(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, GA_RESULT* result)
+int16_t* load_wav(const char* file_name, uint64_t* num_frames, uint32_t* channels, uint32_t* sample_rate, ga_result* result)
 {
 	drwav_uint64 wav_num_frames = 0;
 	drwav_uint32 wav_channels = 0;
@@ -1130,7 +1710,9 @@ int16_t* load_wav(const char* file_name, uint64_t* num_frames, uint32_t* channel
 	int16_t* sample_data = NULL;
 
 #if defined(_WIN32)
-	sample_data = drwav_open_file_and_read_pcm_frames_s16_w(widen(file_name), &wav_channels, &wav_sample_rate, &wav_num_frames, NULL);
+	wchar_t* wide_file_name = widen(file_name);
+	sample_data = drwav_open_file_and_read_pcm_frames_s16_w(wide_file_name, &wav_channels, &wav_sample_rate, &wav_num_frames, NULL);
+	free(wide_file_name);
 #else
 	sample_data = drwav_open_file_and_read_pcm_frames_s16(file_name, &wav_channels, &wav_sample_rate, &wav_num_frames, NULL);
 #endif
@@ -1153,7 +1735,7 @@ void free_wav(int16_t* sample_data)
 	drwav_free((void*)sample_data, NULL);
 }
 
-GA_RESULT open_wav_file(const char* file_name, void** decoder)
+ga_result open_wav_file(const char* file_name, void** decoder)
 {
 	drwav_bool32 result = DRWAV_FALSE;
 	drwav* wav_decoder = (drwav*)malloc(sizeof(drwav));
@@ -1164,7 +1746,9 @@ GA_RESULT open_wav_file(const char* file_name, void** decoder)
 	}
 
 #if defined(_WIN32)
-	result = drwav_init_file_w(wav_decoder, widen(file_name), NULL);
+	wchar_t* wide_file_name = widen(file_name);
+	result = drwav_init_file_w(wav_decoder, wide_file_name, NULL);
+	free(wide_file_name);
 #else
 	result = drwav_init_file(wav_decoder, file_name, NULL);
 #endif
@@ -1181,7 +1765,7 @@ GA_RESULT open_wav_file(const char* file_name, void** decoder)
 	return GA_SUCCESS;
 }
 
-GA_RESULT open_wav_file_write(const char* file_name, uint32_t channels, uint32_t sample_rate, uint32_t bits_per_sample, void* codec_specific, void** encoder)
+ga_result open_wav_file_write(const char* file_name, uint32_t channels, uint32_t sample_rate, uint32_t bits_per_sample, void* codec_specific, void** encoder)
 {
 	drwav_bool32 result = DRWAV_FALSE;
 	drwav* wav_encoder = (drwav*)malloc(sizeof(drwav));
@@ -1208,7 +1792,9 @@ GA_RESULT open_wav_file_write(const char* file_name, uint32_t channels, uint32_t
 	}
 
 #if defined(_WIN32)
-	result = drwav_init_file_write_w(wav_encoder, widen(file_name), &format, NULL);
+	wchar_t* wide_file_name = widen(file_name);
+	result = drwav_init_file_write_w(wav_encoder, wide_file_name, &format, NULL);
+	free(wide_file_name);
 #else
 	result = drwav_init_file_write(wav_encoder, file_name, &format, NULL);
 #endif
@@ -1225,7 +1811,7 @@ GA_RESULT open_wav_file_write(const char* file_name, uint32_t channels, uint32_t
 	return GA_SUCCESS;
 }
 
-GA_RESULT get_basic_wav_file_info(void* decoder, uint32_t* channels, uint32_t* sample_rate, uint64_t* read_offset)
+ga_result get_basic_wav_file_info(void* decoder, uint32_t* channels, uint32_t* sample_rate, uint64_t* read_offset)
 {
 	if (decoder == NULL)
 	{
@@ -1239,7 +1825,7 @@ GA_RESULT get_basic_wav_file_info(void* decoder, uint32_t* channels, uint32_t* s
 	return GA_SUCCESS;
 }
 
-GA_RESULT seek_wav_file(void* decoder, uint64_t offset, uint64_t* new_offset)
+ga_result seek_wav_file(void* decoder, uint64_t offset, uint64_t* new_offset)
 {
 	if (decoder == NULL)
 	{
@@ -1254,7 +1840,7 @@ GA_RESULT seek_wav_file(void* decoder, uint64_t offset, uint64_t* new_offset)
 	return GA_SUCCESS;
 }
 
-GA_RESULT read_wav_file(void* decoder, uint64_t frames_to_read, ga_data_type audio_type, uint64_t* frames_read, void* output_buffer)
+ga_result read_wav_file(void* decoder, uint64_t frames_to_read, ga_data_type audio_type, uint64_t* frames_read, void* output_buffer)
 {
 	if (decoder == NULL)
 	{
@@ -1301,7 +1887,7 @@ GA_RESULT read_wav_file(void* decoder, uint64_t frames_to_read, ga_data_type aud
 	return GA_SUCCESS;
 }
 
-GA_RESULT write_wav_file(void* encoder, uint64_t frames_to_write, void* input_buffer, uint64_t* frames_written)
+ga_result write_wav_file(void* encoder, uint64_t frames_to_write, void* input_buffer, uint64_t* frames_written)
 {
 	if (encoder == NULL)
 	{
@@ -1323,7 +1909,7 @@ GA_RESULT write_wav_file(void* encoder, uint64_t frames_to_write, void* input_bu
 	return GA_SUCCESS;
 }
 
-GA_RESULT close_wav_file(void* decoder)
+ga_result close_wav_file(void* decoder)
 {
 	drwav_result result = DRWAV_SUCCESS;
 
@@ -1343,7 +1929,114 @@ GA_RESULT close_wav_file(void* decoder)
 	return GA_SUCCESS;
 }
 
+ga_result get_wav_tags(const char* file_name, uint8_t read_pictures, intptr_t* tags, int32_t* tag_count, intptr_t* pictures, int32_t* picture_count)
+{
+	enum fields_t
+	{
+		FIELD_TITLE,
+		FIELD_ARTIST,
+		FIELD_ALBUM,
+		FIELD_GENRE,
+		FIELD_YEAR,
+		FIELD_TRACK,
+		FIELD_COMMENT,
 
+		FIELD_COUNT
+	};
+
+	const char* tag_field_prefix[FIELD_COUNT] =
+	{
+		"TITLE",
+		"ARTIST",
+		"ALBUM",
+		"GENRE",
+		"DATE",
+		"TRACKNUMBER",
+		"COMMENT"
+	};
+
+	audio_file_tag_info tag_info = {};
+	drwav_bool32 result = DRWAV_FALSE;
+	drwav wav_decoder = {};
+	int field_index = -1;
+
+#if defined(_WIN32)
+	wchar_t* wide_file_name = widen(file_name);
+	result = drwav_init_file_with_metadata_w(&wav_decoder, wide_file_name, 0, NULL);
+	free(wide_file_name);
+#else
+	result = drwav_init_file_with_metadata(&wav_decoder, file_name, 0, NULL);
+#endif
+
+	if (result == DRWAV_FALSE)
+	{
+		return GA_E_GENERIC;
+	}
+
+	tag_info.tag_count = 0;
+	tag_info.tags = (audio_file_tag*)calloc(FIELD_COUNT, sizeof(audio_file_tag));
+
+	if (tag_info.tags == NULL)
+	{
+		free_audio_file_tags(tag_info);
+		drwav_uninit(&wav_decoder);
+		return GA_E_MEMORY;
+	}
+
+	for (int i = 0; i < wav_decoder.metadataCount; i++)
+	{
+		field_index = -1;
+		switch (wav_decoder.pMetadata[i].type)
+		{
+			case drwav_metadata_type_list_info_title:       field_index = FIELD_TITLE; break;
+			case drwav_metadata_type_list_info_artist:      field_index = FIELD_ARTIST; break;
+			case drwav_metadata_type_list_info_album:       field_index = FIELD_ALBUM; break;
+			case drwav_metadata_type_list_info_genre:       field_index = FIELD_GENRE; break;
+			case drwav_metadata_type_list_info_date:        field_index = FIELD_YEAR; break;
+			case drwav_metadata_type_list_info_tracknumber: field_index = FIELD_TRACK; break;
+			case drwav_metadata_type_list_info_comment:     field_index = FIELD_COMMENT; break;
+			default: field_index = -1; break;
+		}
+
+		if (field_index >= 0)
+		{
+			int tag_index = tag_info.tag_count;
+
+			tag_info.tags[tag_index].field_length = strlen(tag_field_prefix[field_index]);
+			tag_info.tags[tag_index].value_length = wav_decoder.pMetadata[i].data.infoText.stringLength;
+
+			tag_info.tags[tag_index].field = (char*)malloc(tag_info.tags[tag_index].field_length + 1); // Add 1 for '\0' termination
+			tag_info.tags[tag_index].value = (char*)malloc(tag_info.tags[tag_index].value_length + 1); // Add 1 for '\0' termination
+
+			if (tag_info.tags == NULL)
+			{
+				free_audio_file_tags(tag_info);
+				drwav_uninit(&wav_decoder);
+				return GA_E_MEMORY;
+			}
+
+			memcpy(tag_info.tags[tag_index].field, tag_field_prefix[field_index], tag_info.tags[tag_index].field_length);
+			tag_info.tags[tag_index].field[tag_info.tags[tag_index].field_length] = '\0';
+			memcpy(tag_info.tags[tag_index].value, wav_decoder.pMetadata[i].data.infoText.pString, tag_info.tags[tag_index].value_length);
+			tag_info.tags[tag_index].value[tag_info.tags[tag_index].value_length] = '\0';
+			tag_info.tag_count++;
+		}
+	}
+
+	drwav_uninit(&wav_decoder);
+
+	*tags = (intptr_t)tag_info.tags;
+	*tag_count = tag_info.tag_count;
+	*pictures = 0;
+	*picture_count = 0;
+
+	if (read_pictures)
+	{
+		return GA_W_EMBEDDED_ARTWORK;
+	}
+
+	return GA_SUCCESS;
+}
 
 
 
@@ -1351,7 +2044,7 @@ GA_RESULT close_wav_file(void* decoder)
 // LabVIEW Audio Device API //
 //////////////////////////////
 
-extern "C" LV_DLL_EXPORT GA_RESULT query_audio_backends(uint16_t* backends, uint16_t* num_backends)
+extern "C" LV_DLL_EXPORT ga_result query_audio_backends(uint16_t* backends, uint16_t* num_backends)
 {
 	ma_context context;
 	*num_backends = 0;
@@ -1376,32 +2069,38 @@ extern "C" LV_DLL_EXPORT GA_RESULT query_audio_backends(uint16_t* backends, uint
 	return GA_SUCCESS;
 }
 
-extern "C" LV_DLL_EXPORT GA_RESULT query_audio_devices(uint16_t* backend, uint8_t* playback_device_ids, int32_t* num_playback_devices, uint8_t* capture_device_ids, int32_t* num_capture_devices)
+extern "C" LV_DLL_EXPORT ga_result query_audio_devices(uint16_t* backend_in, uint8_t* playback_device_ids, int32_t* num_playback_devices, uint8_t* capture_device_ids, int32_t* num_capture_devices)
 {
 	ma_context context;
+	ma_context_config context_config;
 	ma_device_info* pPlaybackDeviceInfos;
 	ma_uint32 playbackDeviceCount;
 	ma_device_info* pCaptureDeviceInfos;
 	ma_uint32 captureDeviceCount;
-	ma_result result;
+	ga_combined_result result;
 	uint32_t iDevice;
+	ma_backend backend = (ma_backend)*backend_in;
+
+	context_config = ma_context_config_init();
+	// TODO: Only set this flag on Raspberry Pi
+	context_config.alsa.useVerboseDeviceEnumeration = MA_TRUE;
 
 	// Thread safety - ma_context_init, ma_context_get_devices, ma_context_uninit are unsafe
 	lock_ga_mutex(ga_mutex_context);
 	// Can safely pass 1 as backendCount, as it's ignored when backends is NULL.
 	// The backends enum in LabVIEW adds Default after Null
-	result = ma_context_init((*backend > ma_backend_null ? NULL : (ma_backend*)backend), 1, NULL, &context);
-	if (result != MA_SUCCESS)
+	result.ma = ma_context_init((*backend_in > ma_backend_null ? NULL : &backend), 1, &context_config, &context);
+	if (result.ma != MA_SUCCESS)
 	{
 		unlock_ga_mutex(ga_mutex_context);
-		return result + MA_ERROR_OFFSET;
+		return ga_return_code(result);
 	}
 
-	result = ma_context_get_devices(&context, &pPlaybackDeviceInfos, &playbackDeviceCount, &pCaptureDeviceInfos, &captureDeviceCount);
-	if (result != MA_SUCCESS)
+	result.ma = ma_context_get_devices(&context, &pPlaybackDeviceInfos, &playbackDeviceCount, &pCaptureDeviceInfos, &captureDeviceCount);
+	if (result.ma != MA_SUCCESS)
 	{
 		unlock_ga_mutex(ga_mutex_context);
-		return result + MA_ERROR_OFFSET;
+		return ga_return_code(result);
 	}
 
 	// playback_device_ids and capture_device_ids are 1D arrays, allocated in LabVIEW as MAX_DEVICE_COUNT * 256 bytes, where the 256 bytes holds an ma_device_id union.
@@ -1426,7 +2125,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT query_audio_devices(uint16_t* backend, uint8_
 		memcpy(&capture_device_ids[iDevice * sizeof(ma_device_id)], &pCaptureDeviceInfos[iDevice].id, sizeof(ma_device_id));
 	}
 
-	*backend = (uint16_t)context.backend;
+	*backend_in = (uint16_t)context.backend;
 	*num_playback_devices = playbackDeviceCount;
 	*num_capture_devices = captureDeviceCount;
 
@@ -1437,33 +2136,45 @@ extern "C" LV_DLL_EXPORT GA_RESULT query_audio_devices(uint16_t* backend, uint8_
 	return GA_SUCCESS;
 }
 
-extern "C" LV_DLL_EXPORT GA_RESULT get_audio_device_info(uint16_t backend_in, const uint8_t* device_id, uint16_t device_type, char* device_name)
+extern "C" LV_DLL_EXPORT ga_result get_audio_device_info(uint16_t backend_in, const uint8_t* device_id, uint16_t device_type, char* device_name, uint32_t* device_default,
+                                                         uint32_t* device_native_data_format_count, uint16_t* device_native_data_format, uint32_t* device_native_data_channels,
+                                                         uint32_t* device_native_data_sample_rate, uint32_t* device_native_data_exclusive_mode)
 {
 	ma_context context;
+	ma_context_config context_config;
 	ma_device_id deviceId;
 	ma_device_info deviceInfo;
-	ma_result result;
+	ga_combined_result result;
 	ma_backend backend = (ma_backend)backend_in;
 
+	if ((ma_device_type)device_type == ma_device_type_duplex)
+	{
+		return GA_E_UNSUPPORTED_DEVICE;
+	}
+
 	memcpy(&deviceId, device_id, sizeof(ma_device_id));
+
+	context_config = ma_context_config_init();
+	// TODO: Only set this flag on Raspberry Pi
+	context_config.alsa.useVerboseDeviceEnumeration = MA_TRUE;
 
 	// Thread safety - ma_context_init, ma_context_uninit are unsafe
 	lock_ga_mutex(ga_mutex_context);
 	// Can safely pass 1 as backendCount, as it's ignored when backends is NULL.
 	// The backends enum in LabVIEW adds Default after Null
-	result = ma_context_init((backend_in > ma_backend_null ? NULL : &backend), 1, NULL, &context);
-	if (result != MA_SUCCESS)
+	result.ma = ma_context_init((backend_in > ma_backend_null ? NULL : &backend), 1, &context_config, &context);
+	if (result.ma != MA_SUCCESS)
 	{
 		unlock_ga_mutex(ga_mutex_context);
-		return result + MA_ERROR_OFFSET;
+		return ga_return_code(result);
 	}
 
-	result = ma_context_get_device_info(&context, (ma_device_type)device_type, &deviceId, ma_share_mode_shared, &deviceInfo);
-	if (result != MA_SUCCESS)
+	result.ma = ma_context_get_device_info(&context, (ma_device_type)device_type, &deviceId, &deviceInfo);
+	if (result.ma != MA_SUCCESS)
 	{
 		ma_context_uninit(&context);
 		unlock_ga_mutex(ga_mutex_context);
-		return result + MA_ERROR_OFFSET;
+		return ga_return_code(result);
 	}
 
 #if defined(_WIN32)
@@ -1473,6 +2184,16 @@ extern "C" LV_DLL_EXPORT GA_RESULT get_audio_device_info(uint16_t backend_in, co
 	device_name[sizeof(deviceInfo.name)-1] = '\0';
 #endif
 
+	*device_default = deviceInfo.isDefault;
+	*device_native_data_format_count = deviceInfo.nativeDataFormatCount;
+	for (int i = 0; i < deviceInfo.nativeDataFormatCount; i++)
+	{
+		device_native_data_format[i]         = deviceInfo.nativeDataFormats[i].format;
+		device_native_data_channels[i]       = deviceInfo.nativeDataFormats[i].channels;
+		device_native_data_sample_rate[i]    = deviceInfo.nativeDataFormats[i].sampleRate;
+		device_native_data_exclusive_mode[i] = deviceInfo.nativeDataFormats[i].flags & MA_DATA_FORMAT_FLAG_EXCLUSIVE_MODE;
+	}
+
 	ma_context_uninit(&context);
 
 	unlock_ga_mutex(ga_mutex_context);
@@ -1480,18 +2201,21 @@ extern "C" LV_DLL_EXPORT GA_RESULT get_audio_device_info(uint16_t backend_in, co
 	return GA_SUCCESS;
 }
 
-extern "C" LV_DLL_EXPORT GA_RESULT configure_audio_device(uint16_t backend_in, const uint8_t* device_id, uint16_t device_type, uint32_t channels, uint32_t sample_rate, uint16_t format, uint8_t exclusive_mode, int32_t buffer_size, int32_t* refnum)
+extern "C" LV_DLL_EXPORT ga_result configure_audio_device(uint16_t backend_in, const uint8_t* device_id, uint16_t device_type, uint32_t channels, uint32_t sample_rate, uint16_t format, uint8_t exclusive_mode, uint32_t period_size, uint32_t num_periods, int32_t buffer_size, int32_t* refnum)
 {
-	ma_result result;
+	ga_combined_result result;
 	ma_device_id deviceId;
 	ma_format device_format_init;
 	ma_uint32 device_channels_init;
 	ma_uint32 device_internal_buffer_size = 0;
 	ma_backend backend = (ma_backend)backend_in;
-
 	uint8_t blank_device_id[sizeof(ma_device_id)] = { 0 };
-
 	audio_device* pDevice = NULL;
+
+	if ((ma_device_type)device_type == ma_device_type_duplex)
+	{
+		return GA_E_UNSUPPORTED_DEVICE;
+	}
 
 	memcpy(&deviceId, device_id, sizeof(ma_device_id));
 
@@ -1510,16 +2234,18 @@ extern "C" LV_DLL_EXPORT GA_RESULT configure_audio_device(uint16_t backend_in, c
 		ma_context_config context_config = ma_context_config_init();
 		// TODO: Make this configurable. Don't set it for now.
 		//context_config.threadPriority = ma_thread_priority_realtime;
+		// TODO: Only set this flag on Raspberry Pi
+		context_config.alsa.useVerboseDeviceEnumeration = MA_TRUE;
 
 		// Can safely pass 1 as backendCount, as it's ignored when backends is NULL.
 		// The backends enum in LabVIEW adds Default after Null
-		result = ma_context_init((backend_in > ma_backend_null ? NULL : &backend), 1, &context_config, global_context);
-		if (result != MA_SUCCESS)
+		result.ma = ma_context_init((backend_in > ma_backend_null ? NULL : &backend), 1, &context_config, global_context);
+		if (result.ma != MA_SUCCESS)
 		{
 			free(global_context);
 			global_context = NULL;
 			unlock_ga_mutex(ga_mutex_context);
-			return result + MA_ERROR_OFFSET;
+			return ga_return_code(result);
 		}
 	}
 	else if ((backend_in <= ma_backend_null) && (global_context->backend != backend))
@@ -1544,6 +2270,8 @@ extern "C" LV_DLL_EXPORT GA_RESULT configure_audio_device(uint16_t backend_in, c
 		device_config.capture.channelMixMode = ma_channel_mix_mode_simple;
 		//config.wasapi.noAutoConvertSRC = true; // Enable low latency shared mode
 		device_config.capture.shareMode = exclusive_mode ? ma_share_mode_exclusive : ma_share_mode_shared;
+		device_config.periodSizeInFrames = period_size;
+		device_config.periods = num_periods;
 		break;
 	default:
 		device_config.playback.format = (ma_format)format;   // Set to ma_format_unknown to use the device's native format.
@@ -1555,6 +2283,8 @@ extern "C" LV_DLL_EXPORT GA_RESULT configure_audio_device(uint16_t backend_in, c
 		device_config.playback.channelMixMode = ma_channel_mix_mode_simple;
 		//config.wasapi.noAutoConvertSRC = true; // Enable low latency shared mode
 		device_config.playback.shareMode = exclusive_mode ? ma_share_mode_exclusive : ma_share_mode_shared;
+		device_config.periodSizeInFrames = period_size;
+		device_config.periods = num_periods;
 		break;
 	}
 
@@ -1564,15 +2294,17 @@ extern "C" LV_DLL_EXPORT GA_RESULT configure_audio_device(uint16_t backend_in, c
 		return GA_E_MEMORY;
 	}
 
-	result = ma_device_init(global_context, &device_config, &pDevice->device);
-	if (result != MA_SUCCESS)
+	result.ma = ma_device_init(global_context, &device_config, &pDevice->device);
+	if (result.ma != MA_SUCCESS)
 	{
 		free(pDevice);
 		pDevice = NULL;
-		return result + MA_ERROR_OFFSET;
+		return ga_return_code(result);
 	}
 
 	pDevice->buffer_size = buffer_size;
+	// Store the device ID used to configure this device. Will be zeroed, or device ID.
+	pDevice->device_id = deviceId;
 
 	switch (device_config.deviceType)
 	{
@@ -1589,13 +2321,13 @@ extern "C" LV_DLL_EXPORT GA_RESULT configure_audio_device(uint16_t backend_in, c
 		break;
 	}
 
-	result = ma_pcm_rb_init(device_format_init, device_channels_init, buffer_size, NULL, NULL, &pDevice->buffer);
-	if (result != MA_SUCCESS)
+	result.ma = ma_pcm_rb_init(device_format_init, device_channels_init, buffer_size, NULL, NULL, &pDevice->buffer);
+	if (result.ma != MA_SUCCESS)
 	{
 		ma_device_uninit(&pDevice->device);
 		free(pDevice);
 		pDevice = NULL;
-		return result + MA_ERROR_OFFSET;
+		return ga_return_code(result);
 	}
 
 	// Store the ring buffer with the device, so the callback routine can access it
@@ -1620,7 +2352,87 @@ extern "C" LV_DLL_EXPORT GA_RESULT configure_audio_device(uint16_t backend_in, c
 	return GA_SUCCESS;
 }
 
-extern "C" LV_DLL_EXPORT GA_RESULT get_configured_audio_device_info(int32_t refnum, uint32_t* sample_rate, uint32_t* channels, uint16_t* format, uint8_t* exclusive_mode)
+extern "C" LV_DLL_EXPORT ga_result get_configured_backend(uint16_t* backend)
+{
+	if (global_context == NULL)
+	{
+		*backend = ma_backend_null;
+	}
+	else
+	{
+		*backend = global_context->backend;
+	}
+
+	return GA_SUCCESS;
+}
+
+extern "C" LV_DLL_EXPORT ga_result get_configured_audio_devices(int32_t* playback_refnums, int32_t* num_playback_refnums, int32_t* capture_refnums, int32_t* num_capture_refnums, int32_t* loopback_refnums, int32_t* num_loopback_refnums)
+{
+	audio_device* pDevice;
+	std::vector<int32_t> refnums = get_all_references(ga_refnum_audio_device);
+
+	for (int i = 0; i < refnums.size(); i++)
+	{
+		pDevice = (audio_device*)get_reference_data(ga_refnum_audio_device, refnums[i]);
+
+		if (pDevice != NULL)
+		{
+			switch (pDevice->device.type)
+			{
+				case ma_device_type_playback:
+					playback_refnums[*num_playback_refnums] = refnums[i];
+					(*num_playback_refnums)++;
+					break;
+				case ma_device_type_capture:
+					capture_refnums[*num_capture_refnums] = refnums[i];
+					(*num_capture_refnums)++;
+					break;
+				case ma_device_type_loopback:
+					loopback_refnums[*num_loopback_refnums] = refnums[i];
+					(*num_loopback_refnums)++;
+					break;
+				default:
+					break;
+			}
+		}
+	}
+
+	return GA_SUCCESS;
+}
+
+extern "C" LV_DLL_EXPORT ga_result get_configured_audio_device_info(int32_t refnum, uint8_t* config_device_id, uint8_t* actual_device_id)
+{
+	audio_device* pDevice = (audio_device*)get_reference_data(ga_refnum_audio_device, refnum);
+
+	if (pDevice == NULL)
+	{
+		return GA_E_REFNUM;
+	}
+
+	// There are two device IDs returned.
+	// config_device_id is the device ID specified at configuration time (all zeros if default).
+	// actual_device_id is the device ID after configuration. miniaudio states this should be the same as the configured id, but does differ if it was default and WASAPI is the backend.
+
+	memcpy(config_device_id, (void*)&pDevice->device_id, sizeof(ma_device_id));
+
+	switch (pDevice->device.type)
+	{
+	case ma_device_type_playback:
+		memcpy(actual_device_id, (void*)&pDevice->device.playback.id, sizeof(ma_device_id));
+		break;
+	case ma_device_type_capture:
+	case ma_device_type_loopback:
+		memcpy(actual_device_id, (void*)&pDevice->device.capture.id, sizeof(ma_device_id));
+		break;
+	default:
+		return GA_E_UNSUPPORTED_DEVICE;
+		break;
+	}
+
+	return GA_SUCCESS;
+}
+
+extern "C" LV_DLL_EXPORT ga_result get_audio_device_configuration(int32_t refnum, uint32_t* sample_rate, uint32_t* channels, uint16_t* format, uint8_t* exclusive_mode, uint32_t* period_size, uint32_t* num_periods)
 {
 	audio_device* pDevice = (audio_device*)get_reference_data(ga_refnum_audio_device, refnum);
 
@@ -1637,19 +2449,61 @@ extern "C" LV_DLL_EXPORT GA_RESULT get_configured_audio_device_info(int32_t refn
 		*channels = pDevice->device.capture.channels;
 		*sample_rate = pDevice->device.sampleRate;
 		*exclusive_mode = pDevice->device.capture.shareMode;
+		*period_size = pDevice->device.capture.internalPeriodSizeInFrames;
+		*num_periods = pDevice->device.capture.internalPeriods;
 		break;
 	default:
 		*format = pDevice->device.playback.format;
 		*channels = pDevice->device.playback.channels;
 		*sample_rate = pDevice->device.sampleRate;
-		*exclusive_mode = pDevice->device.capture.shareMode;
+		*exclusive_mode = pDevice->device.playback.shareMode;
+		*period_size = pDevice->device.playback.internalPeriodSizeInFrames;
+		*num_periods = pDevice->device.playback.internalPeriods;
 		break;
 	}
 
 	return GA_SUCCESS;
 }
 
-extern "C" LV_DLL_EXPORT GA_RESULT start_audio_device(int32_t refnum)
+extern "C" LV_DLL_EXPORT ga_result get_audio_device_volume(int32_t refnum, float* volume)
+{
+	ga_combined_result result;
+	audio_device* pDevice = (audio_device*)get_reference_data(ga_refnum_audio_device, refnum);
+
+	if (pDevice == NULL)
+	{
+		return GA_E_REFNUM;
+	}
+
+	result.ma = ma_device_get_master_volume(&pDevice->device, volume);
+	if (result.ma != MA_SUCCESS)
+	{
+		return ga_return_code(result);
+	}
+    
+	return GA_SUCCESS;
+}
+
+extern "C" LV_DLL_EXPORT ga_result set_audio_device_volume(int32_t refnum, float volume)
+{
+	ga_combined_result result;
+	audio_device* pDevice = (audio_device*)get_reference_data(ga_refnum_audio_device, refnum);
+
+	if (pDevice == NULL)
+	{
+		return GA_E_REFNUM;
+	}
+
+	result.ma = ma_device_set_master_volume(&pDevice->device, volume);
+	if (result.ma != MA_SUCCESS)
+	{
+		return ga_return_code(result);
+	}
+
+	return GA_SUCCESS;
+}
+
+extern "C" LV_DLL_EXPORT ga_result start_audio_device(int32_t refnum)
 {
 	audio_device* pDevice = (audio_device*)get_reference_data(ga_refnum_audio_device, refnum);
 
@@ -1661,9 +2515,9 @@ extern "C" LV_DLL_EXPORT GA_RESULT start_audio_device(int32_t refnum)
 	return check_and_start_audio_device(&pDevice->device);
 }
 
-extern "C" LV_DLL_EXPORT GA_RESULT playback_audio(int32_t refnum, void* buffer, int32_t num_frames, uint32_t channels, ga_data_type audio_type)
+extern "C" LV_DLL_EXPORT ga_result playback_audio(int32_t refnum, void* buffer, int32_t num_frames, uint32_t channels, ga_data_type audio_type)
 {
-	ma_result result;
+	ga_combined_result result;
 	ma_uint32 framesToWrite = num_frames;
 	ma_uint32 pcmFramesProcessed = 0;
 	ma_uint32 bufferOffset = 0;
@@ -1760,21 +2614,21 @@ extern "C" LV_DLL_EXPORT GA_RESULT playback_audio(int32_t refnum, void* buffer, 
 		ma_channel_converter converter;
 		ma_channel_converter_config converter_config = ma_channel_converter_config_init(pDevice->device.playback.format, channels, NULL, pDevice->device.playback.channels, NULL, ma_channel_mix_mode_default);
 
-		result = ma_channel_converter_init(&converter_config, &converter);
-		if (result != MA_SUCCESS)
+		result.ma = ma_channel_converter_init(&converter_config, NULL, &converter);
+		if (result.ma != MA_SUCCESS)
 		{
 			if (!passthrough)
 			{
 			    free(output_buffer);
 				output_buffer = NULL;
 			}
-			return result + MA_ERROR_OFFSET;
+			return ga_return_code(result);
 		}
 
 		channel_conversion_buffer = malloc(num_frames * ma_get_bytes_per_frame(pDevice->device.playback.format, pDevice->device.playback.channels));
 		if (channel_conversion_buffer == NULL)
 		{
-			ma_channel_converter_uninit(&converter);
+			ma_channel_converter_uninit(&converter, NULL);
 			if (!passthrough)
 			{
 				free(output_buffer);
@@ -1783,10 +2637,10 @@ extern "C" LV_DLL_EXPORT GA_RESULT playback_audio(int32_t refnum, void* buffer, 
 			return GA_E_MEMORY;
 		}
 
-		result = ma_channel_converter_process_pcm_frames(&converter, channel_conversion_buffer, output_buffer, num_frames);
-		if (result != MA_SUCCESS)
+		result.ma = ma_channel_converter_process_pcm_frames(&converter, channel_conversion_buffer, output_buffer, num_frames);
+		if (result.ma != MA_SUCCESS)
 		{
-			ma_channel_converter_uninit(&converter);
+			ma_channel_converter_uninit(&converter, NULL);
 			free(channel_conversion_buffer);
 			channel_conversion_buffer = NULL;
 			if (!passthrough)
@@ -1794,10 +2648,10 @@ extern "C" LV_DLL_EXPORT GA_RESULT playback_audio(int32_t refnum, void* buffer, 
 				free(output_buffer);
 				output_buffer = NULL;
 			}
-			return result + MA_ERROR_OFFSET;
+			return ga_return_code(result);
 		}
 
-		ma_channel_converter_uninit(&converter);
+		ma_channel_converter_uninit(&converter, NULL);
 		if (!passthrough)
 		{
 			free(output_buffer);
@@ -1807,10 +2661,10 @@ extern "C" LV_DLL_EXPORT GA_RESULT playback_audio(int32_t refnum, void* buffer, 
 		passthrough = MA_FALSE;
 	}
 
-	result = check_and_start_audio_device(&pDevice->device);
-	if (result != GA_SUCCESS)
+	result.ga = check_and_start_audio_device(&pDevice->device);
+	if (result.ga != GA_SUCCESS)
 	{
-		return result;
+		return ga_return_code(result);
 	}
 
 	while ((ma_pcm_rb_available_write(&pDevice->buffer) < num_frames) && ma_device_is_started(&pDevice->device))
@@ -1827,19 +2681,19 @@ extern "C" LV_DLL_EXPORT GA_RESULT playback_audio(int32_t refnum, void* buffer, 
 
 		framesToWrite = num_frames - pcmFramesProcessed;
 
-		result = ma_pcm_rb_acquire_write(&pDevice->buffer, &framesToWrite, &pWriteBuffer);
-		if (result != MA_SUCCESS)
+		result.ma = ma_pcm_rb_acquire_write(&pDevice->buffer, &framesToWrite, &pWriteBuffer);
+		if (result.ma != MA_SUCCESS)
 		{
-			return result + MA_ERROR_OFFSET;
+			return ga_return_code(result);
 		}
 		{
 			bytesToWrite = framesToWrite * ma_get_bytes_per_frame(pDevice->device.playback.format, pDevice->device.playback.channels);
 			memcpy(pWriteBuffer, (ma_uint8*)output_buffer + bufferOffset, bytesToWrite);
 		}
-		result = ma_pcm_rb_commit_write(&pDevice->buffer, framesToWrite, pWriteBuffer);
-		if (!((result == MA_SUCCESS) || (result == MA_AT_END)))
+		result.ma = ma_pcm_rb_commit_write(&pDevice->buffer, framesToWrite);
+		if (!((result.ma == MA_SUCCESS) || (result.ma == MA_AT_END)))
 		{
-			return result + MA_ERROR_OFFSET;
+			return ga_return_code(result);
 		}
 		pcmFramesProcessed += framesToWrite;
 		bufferOffset += bytesToWrite;
@@ -1854,9 +2708,9 @@ extern "C" LV_DLL_EXPORT GA_RESULT playback_audio(int32_t refnum, void* buffer, 
 	return GA_SUCCESS;
 }
 
-extern "C" LV_DLL_EXPORT GA_RESULT capture_audio(int32_t refnum, void* buffer, int32_t* num_frames, ga_data_type audio_type)
+extern "C" LV_DLL_EXPORT ga_result capture_audio(int32_t refnum, void* buffer, int32_t* num_frames, ga_data_type audio_type)
 {
-	ma_result result;
+	ga_combined_result result;
 	ma_uint32 framesToRead;
 	ma_uint32 numFrames;
 	ma_uint32 pcmFramesProcessed = 0;
@@ -1889,10 +2743,10 @@ extern "C" LV_DLL_EXPORT GA_RESULT capture_audio(int32_t refnum, void* buffer, i
 		return GA_E_MEMORY;
 	}
 
-	result = check_and_start_audio_device(&pDevice->device);
-	if (result != GA_SUCCESS)
+	result.ga = check_and_start_audio_device(&pDevice->device);
+	if (result.ga != GA_SUCCESS)
 	{
-		return result;
+		return ga_return_code(result);
 	}
 
 	while ((ma_pcm_rb_available_read(&pDevice->buffer) < numFrames) && ma_device_is_started(&pDevice->device))
@@ -1909,19 +2763,19 @@ extern "C" LV_DLL_EXPORT GA_RESULT capture_audio(int32_t refnum, void* buffer, i
 
 		framesToRead = numFrames - pcmFramesProcessed;
 
-		result = ma_pcm_rb_acquire_read(&pDevice->buffer, &framesToRead, &pReadBuffer);
-		if (result != MA_SUCCESS)
+		result.ma = ma_pcm_rb_acquire_read(&pDevice->buffer, &framesToRead, &pReadBuffer);
+		if (result.ma != MA_SUCCESS)
 		{
-			return result + MA_ERROR_OFFSET;
+			return ga_return_code(result);
 		}
 		{
 			bytesToRead = framesToRead * ma_get_bytes_per_frame(pDevice->device.capture.format, pDevice->device.capture.channels);
 			memcpy((ma_uint8*)conversion_buffer + bufferOffset, pReadBuffer, bytesToRead);
 		}
-		result = ma_pcm_rb_commit_read(&pDevice->buffer, framesToRead, pReadBuffer);
-		if (!((result == MA_SUCCESS) || (result == MA_AT_END)))
+		result.ma = ma_pcm_rb_commit_read(&pDevice->buffer, framesToRead);
+		if (!((result.ma == MA_SUCCESS) || (result.ma == MA_AT_END)))
 		{
-			return result + MA_ERROR_OFFSET;
+			return ga_return_code(result);
 		}
 		pcmFramesProcessed += framesToRead;
 		bufferOffset += bytesToRead;
@@ -1975,7 +2829,7 @@ extern "C" LV_DLL_EXPORT GA_RESULT capture_audio(int32_t refnum, void* buffer, i
 	return GA_SUCCESS;
 }
 
-extern "C" LV_DLL_EXPORT GA_RESULT playback_wait(int32_t refnum)
+extern "C" LV_DLL_EXPORT ga_result playback_wait(int32_t refnum)
 {
 	audio_device* pDevice = (audio_device*)get_reference_data(ga_refnum_audio_device, refnum);
 
@@ -1997,9 +2851,9 @@ extern "C" LV_DLL_EXPORT GA_RESULT playback_wait(int32_t refnum)
 	return GA_SUCCESS;
 }
 
-extern "C" LV_DLL_EXPORT GA_RESULT stop_audio_device(int32_t refnum)
+extern "C" LV_DLL_EXPORT ga_result stop_audio_device(int32_t refnum)
 {
-	ma_result result;
+	ga_combined_result result;
 
 	audio_device* pDevice = (audio_device*)get_reference_data(ga_refnum_audio_device, refnum);
 
@@ -2010,24 +2864,24 @@ extern "C" LV_DLL_EXPORT GA_RESULT stop_audio_device(int32_t refnum)
 
 	switch (ma_device_get_state(&pDevice->device))
 	{
-		case MA_STATE_STOPPING:
-		case MA_STATE_STOPPED:
+		case ma_device_state_stopping:
+		case ma_device_state_stopped:
 			return GA_SUCCESS;
 			break;
 		default:
 			break;
 	}
 
-	result = ma_device_stop(&pDevice->device);
-	if (result != MA_SUCCESS)
+	result.ma = ma_device_stop(&pDevice->device);
+	if (result.ma != MA_SUCCESS)
 	{
-		return result + MA_ERROR_OFFSET;
+		return ga_return_code(result);
 	}
 
 	return GA_SUCCESS;
 }
 
-extern "C" LV_DLL_EXPORT GA_RESULT clear_audio_device(int32_t refnum)
+extern "C" LV_DLL_EXPORT ga_result clear_audio_device(int32_t refnum)
 {
 	audio_device* pDevice = (audio_device*)remove_reference(ga_refnum_audio_device, refnum);
 
@@ -2044,9 +2898,9 @@ extern "C" LV_DLL_EXPORT GA_RESULT clear_audio_device(int32_t refnum)
 	return GA_SUCCESS;
 }
 
-extern "C" LV_DLL_EXPORT GA_RESULT clear_audio_backend()
+extern "C" LV_DLL_EXPORT ga_result clear_audio_backend()
 {
-	ma_result result;
+	ga_combined_result result = {};
 
 	std::vector<int32_t> refnums = get_all_references(ga_refnum_audio_device);
 
@@ -2058,15 +2912,15 @@ extern "C" LV_DLL_EXPORT GA_RESULT clear_audio_backend()
 	lock_ga_mutex(ga_mutex_context);
 	if (global_context != NULL)
 	{
-		result = ma_context_uninit(global_context);
+		result.ma = ma_context_uninit(global_context);
 		free(global_context);
 		global_context = NULL;
 	}
 	unlock_ga_mutex(ga_mutex_context);
 
-	if (result != GA_SUCCESS)
+	if (result.ma != MA_SUCCESS)
 	{
-		return result + MA_ERROR_OFFSET;
+		return ga_return_code(result);
 	}
 
 	return GA_SUCCESS;
@@ -2094,7 +2948,7 @@ void playback_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma
 			{
 				memcpy(pRunningOutput, pReadBuffer, framesToRead * ma_get_bytes_per_frame(pDevice->playback.format, pDevice->playback.channels));
 			}
-			ma_pcm_rb_commit_read((ma_pcm_rb*)pDevice->pUserData, framesToRead, pReadBuffer);
+			ma_pcm_rb_commit_read((ma_pcm_rb*)pDevice->pUserData, framesToRead);
 
 			pRunningOutput += framesToRead * ma_get_bytes_per_frame(pDevice->playback.format, pDevice->playback.channels);
 			pcmFramesProcessed += framesToRead;
@@ -2136,7 +2990,7 @@ void capture_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_
 			{
 				memcpy(pWriteBuffer, pRunningInput, framesToWrite * ma_get_bytes_per_frame(pDevice->capture.format, pDevice->capture.channels));
 			}
-			ma_pcm_rb_commit_write((ma_pcm_rb*)pDevice->pUserData, framesToWrite, pWriteBuffer);
+			ma_pcm_rb_commit_write((ma_pcm_rb*)pDevice->pUserData, framesToWrite);
 
 			pRunningInput += framesToWrite * ma_get_bytes_per_frame(pDevice->capture.format, pDevice->capture.channels);
 			pcmFramesProcessed += framesToWrite;
@@ -2163,14 +3017,14 @@ void stop_callback(ma_device* pDevice)
 
 inline ma_bool32 device_is_started(ma_device* pDevice)
 {
-	ma_uint32 state;
+	ma_device_state state;
 	state = ma_device_get_state(pDevice);
-	return (state == MA_STATE_STARTED) || (state == MA_STATE_STARTING);
+	return (state == ma_device_state_started) || (state == ma_device_state_starting);
 }
 
-inline GA_RESULT check_and_start_audio_device(ma_device* pDevice)
+inline ga_result check_and_start_audio_device(ma_device* pDevice)
 {
-	ma_result result;
+	ga_combined_result result;
 
 	if (pDevice == NULL)
 	{
@@ -2179,10 +3033,10 @@ inline GA_RESULT check_and_start_audio_device(ma_device* pDevice)
 
 	if (!device_is_started(pDevice))
 	{
-		result = ma_device_start(pDevice);
-		if (result != MA_SUCCESS)
+		result.ma = ma_device_start(pDevice);
+		if (result.ma != MA_SUCCESS)
 		{
-			return result + MA_ERROR_OFFSET;
+			return ga_return_code(result);
 		}
 	}
 
@@ -2193,26 +3047,26 @@ inline GA_RESULT check_and_start_audio_device(ma_device* pDevice)
 ////////////////////////////
 // LabVIEW Audio Data API //
 ////////////////////////////
-extern "C" LV_DLL_EXPORT GA_RESULT channel_converter(ga_data_type audio_type, uint64_t num_frames, void* audio_buffer_in, uint32_t channels_in, void* audio_buffer_out, uint32_t channels_out)
+extern "C" LV_DLL_EXPORT ga_result channel_converter(ga_data_type audio_type, uint64_t num_frames, void* audio_buffer_in, uint32_t channels_in, void* audio_buffer_out, uint32_t channels_out)
 {
-	ma_result result;
+	ga_combined_result result;
 	ma_channel_converter converter;
 	ma_channel_converter_config converter_config = ma_channel_converter_config_init(ga_data_type_to_ma_format(audio_type), channels_in, NULL, channels_out, NULL, ma_channel_mix_mode_default);
 
-	result = ma_channel_converter_init(&converter_config, &converter);
-	if (result != MA_SUCCESS)
+	result.ma = ma_channel_converter_init(&converter_config, NULL, &converter);
+	if (result.ma != MA_SUCCESS)
 	{
-		return result + MA_ERROR_OFFSET;
+		return ga_return_code(result);
 	}
 
-	result = ma_channel_converter_process_pcm_frames(&converter, audio_buffer_out, audio_buffer_in, num_frames);
-	if (result != MA_SUCCESS)
+	result.ma = ma_channel_converter_process_pcm_frames(&converter, audio_buffer_out, audio_buffer_in, num_frames);
+	if (result.ma != MA_SUCCESS)
 	{
-		ma_channel_converter_uninit(&converter);
-		return result + MA_ERROR_OFFSET;
+		ma_channel_converter_uninit(&converter, NULL);
+		return ga_return_code(result);
 	}
 
-	ma_channel_converter_uninit(&converter);
+	ma_channel_converter_uninit(&converter, NULL);
 
 	return GA_SUCCESS;
 }

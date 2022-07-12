@@ -1,10 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
    LastUpgradeVersion = "1150"
-   version = "1.3">
+   version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
       buildImplicitDependencies = "YES">
+      <PostActions>
+         <ExecutionAction
+            ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
+            <ActionContent
+               title = "Run Script"
+               scriptText = "# Type a script or drag a script file from your workspace to insert its path.&#10;cd $BUILT_PRODUCTS_DIR&#10;rm -f g_audio_64.framework.zip&#10;zip --symlinks -r g_audio_64.framework.zip g_audio_64.framework&#10;cp -R g_audio_64.framework $PROJECT_DIR/../../LabVIEW/G-Audio/lib/&#10;mv g_audio_64.framework.zip $PROJECT_DIR/../../LabVIEW/G-Audio/lib/&#10;">
+               <EnvironmentBuildable>
+                  <BuildableReference
+                     BuildableIdentifier = "primary"
+                     BlueprintIdentifier = "3CD6706226E0D1FE0040E196"
+                     BuildableName = "g_audio_64.framework"
+                     BlueprintName = "g_audio_64"
+                     ReferencedContainer = "container:g_audio_64.xcodeproj">
+                  </BuildableReference>
+               </EnvironmentBuildable>
+            </ActionContent>
+         </ExecutionAction>
+      </PostActions>
       <BuildActionEntries>
          <BuildActionEntry
             buildForTesting = "YES"
