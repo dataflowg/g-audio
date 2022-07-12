@@ -1,7 +1,7 @@
-<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2022-07-07 15:46:42" Creator="Dataflow_G" Comments="" ID="f6ef93cb1ad8676b86adad897e1292c4">
+<VI_Package_Builder_Settings Version="2020.1" Created_Date="2021-01-03 14:27:19" Modified_Date="2022-07-12 07:57:15" Creator="Dataflow_G" Comments="" ID="1f5a7eff3cd9a4e2f33a8a15982d29df">
   <Library_General_Settings>
     <Package_File_Name>Dataflow_G_lib_G_Audio</Package_File_Name>
-    <Library_Version>0.3.1.5</Library_Version>
+    <Library_Version>0.4.0.2</Library_Version>
     <Auto_Increment_Version>false</Auto_Increment_Version>
     <Library_Source_Folder>..</Library_Source_Folder>
     <Library_Output_Folder>.</Library_Output_Folder>
@@ -54,7 +54,6 @@
 * Update miniaudio (fixes #10)
 * Fix memory leak when using UTF-16 converted file name
 * [VIPM] Reduced package installation time
-* [VIPM] Fix package not listed under macOS and Linux
 * [VIPM] Fix install error 5000 under macOS (#15)</Release_Notes>
     </Description>
     <Destinations>
@@ -308,7 +307,7 @@
         <Path>..\unnamed</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>4AE33A5887A2792902E8CD3BA38E7BB6</GUID>
+      <GUID>9009938A40A39A464C43393988D2196A</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -469,7 +468,7 @@
         <Path>..\G-Audio\Audio Files\Get Audio File Tags.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>7FAE0E654606F45CC7766236E5449796</GUID>
+      <GUID>F65839E823CD8D9BE08E673D38CBA89C</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -644,7 +643,7 @@
         <Path>..\G-Audio\Audio Devices\Get Audio Device Configuration.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>82B2FFA8A9E4C0724031A1E47B1B4716</GUID>
+      <GUID>EA47053A23CF33D62671751C03812772</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -833,7 +832,7 @@
         <Path>..\G-Audio\Examples\Audio File Tags Example.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>1961BA216C1D414B1CBDAC348D416AE0</GUID>
+      <GUID>92B51890A101265C86641DE47050623E</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>0</Parent_Palette_Index>
@@ -994,7 +993,7 @@
         <Path>..\G-Audio\Mixer\Mixer\Channel Volume.vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>76A630867029E899D41549CBCF1129F3</GUID>
+      <GUID>3062E02FB16C8A95C078BADB88382563</GUID>
     </Functions_Palette_Data>
     <Functions_Palette_Data>
       <Parent_Palette_Index>3</Parent_Palette_Index>
@@ -1043,7 +1042,7 @@
         <Path>..\G-Audio\Examples\LINX\Sample Pad Example (LINX).vi</Path>
         <VI_Title/>
       </Items_Data>
-      <GUID>395E0FDC9BC1110CC4FE4FE4CAE233B8</GUID>
+      <GUID>CAD8B64953F9B2EAB06020CD0778DD59</GUID>
     </Functions_Palette_Data>
   </Library_Palette_Definition>
 </VI_Package_Builder_Settings>
