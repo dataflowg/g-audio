@@ -41,11 +41,12 @@ A cross-platform LabVIEW library for audio device playback and capture, and for 
 ## <a id="installation"></a>Installation
 G-Audio is published on [vipm.io](https://www.vipm.io/package/dataflow_g_lib_g_audio/), and can be installed using VI Package Manager (VIPM). The packages are also available as [github releases](https://github.com/dataflowg/g-audio/releases) and can be installed manually using VIPM.
 
-**[macOS and Linux]** It's recommended to restart LabVIEW after installing the package via VIPM.
+* **[macOS and Linux]** It's recommended to restart LabVIEW after installing the package via VIPM.
+* **[macOS 10.14 and newer]** LabVIEW will require permission to access recording devices when performing audio capture. Make sure to enable this in the Security & Privacy settings. See [instructions here](https://support.apple.com/guide/mac-help/control-access-to-the-microphone-on-mac-mchla1b1e1fe/mac) on how to enable this setting.
 
 If you want to include the library directly in your project, download or clone the repo and place the [G-Audio folder](https://github.com/dataflowg/g-audio/tree/main/src/LabVIEW/G-Audio) in your source directory, then add `G-Audio.lvlib` to your LabVIEW project.
 
-**[macOS]** Before adding the library to the project, extract `g_audio_64.framework.zip` located in `src/LabVIEW/G-Audio/lib/`.
+* **[macOS]** Before adding the library to the project, extract `g_audio_64.framework.zip` located in `src/LabVIEW/G-Audio/lib/`.
 
 ### Raspberry Pi / LINX Installation
 Before beginning, ensure your board has the LINX toolkit installed and SSH is enabled, and G-Audio has been installed on the host computer.
@@ -78,6 +79,8 @@ If you need to adjust the volume output, SSH into the LINX target and run `alsam
 See the example VIs in [Examples](src/LabVIEW/G-Audio/Examples) to write, read, playback, and capture audio files.
 
 Unit tests are included and can be run individually, or with the [AST Unit Tester](https://www.autosofttech.net/documents/ast-unit-tester).
+
+* **[macOS 10.14 and newer]** LabVIEW will require permission to access recording devices when performing audio capture. Make sure to enable this in the Security & Privacy settings. See [instructions here](https://support.apple.com/guide/mac-help/control-access-to-the-microphone-on-mac-mchla1b1e1fe/mac) on how to enable this setting.
 
 ### Supported Data Types
 The `Playback Audio`, `Capture Audio`, `Audio File Read`, and `Audio File Write` VIs are malleable, and accept waveform arrays, waveforms, 2D arrays, and 1D arrays with types U8, I16, I32, SGL, and DBL (20 combinations in total). All audio data is processed in its native format, and then converted to the requested format if necessary. For WAV and FLAC files, any conversions are considered lossy, so check the file format before loading to ensure everything is lossless.
