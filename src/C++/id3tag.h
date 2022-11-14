@@ -770,11 +770,12 @@ id3tag_t* id3tag_load( void const* data, size_t size, ID3TAG_U32 fields, void* m
             // 1 byte encoding, 3 bytes language
             int offset = 4;
             // Skip content description
-            while( !( ptr[ offset ] == 0 && ptr[ offset+1 ] == 0 ) )
+            while( !( ptr[ offset ] == 0 ) )
                 {
                 offset++;
                 }
-            offset += 2;
+            offset++;
+            if ( ptr[offset] == 0 ) offset++;
             if( !tag->tag.comment ) tag->tag.comment = id3tag_internal_get_string( *ptr, ptr + offset, frame_size - offset, memctx, NULL );
             fields_found[ FIELD_COMMENT ] = true;
             }

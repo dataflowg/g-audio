@@ -5128,19 +5128,21 @@ stb_vorbis * stb_vorbis_open_memory(const unsigned char *data, int len, int *err
 #define PLAYBACK_LEFT     2
 #define PLAYBACK_RIGHT    4
 
-#define L  (PLAYBACK_LEFT  | PLAYBACK_MONO)
-#define C  (PLAYBACK_LEFT  | PLAYBACK_RIGHT | PLAYBACK_MONO)
-#define R  (PLAYBACK_RIGHT | PLAYBACK_MONO)
+// NOTE: L definition here conflicts with C++'s L string prefix for wchar_t strings
+// Changes to LC, CC and RC, where the C indicates Channel
+#define LC  (PLAYBACK_LEFT  | PLAYBACK_MONO)
+#define CC  (PLAYBACK_LEFT  | PLAYBACK_RIGHT | PLAYBACK_MONO)
+#define RC  (PLAYBACK_RIGHT | PLAYBACK_MONO)
 
 static int8 channel_position[7][6] =
 {
    { 0 },
-   { C },
-   { L, R },
-   { L, C, R },
-   { L, R, L, R },
-   { L, C, R, L, R },
-   { L, C, R, L, R, C },
+   { CC },
+   { LC, RC },
+   { LC, CC, RC },
+   { LC, RC, LC, RC },
+   { LC, CC, RC, LC, RC },
+   { LC, CC, RC, LC, RC, CC },
 };
 
 

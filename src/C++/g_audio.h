@@ -316,7 +316,7 @@ extern "C" LV_DLL_EXPORT ga_result query_audio_devices(uint16_t* backend, uint8_
 // Get audio device info for a given backend. Set backend greater than ma_backend_null to query the default backend.
 extern "C" LV_DLL_EXPORT ga_result get_audio_device_info(uint16_t backend_in, const uint8_t * device_id, uint16_t device_type, char* device_name, uint32_t * device_default, uint32_t * device_native_data_format_count, uint16_t * device_native_data_format, uint32_t * device_native_data_channels, uint32_t * device_native_data_sample_rate, uint32_t * device_native_data_exclusive_mode);
 // Configure an audio device ready for playback. Will setup the context, device, audio buffers, and callbacks.
-extern "C" LV_DLL_EXPORT ga_result configure_audio_device(uint16_t backend, const uint8_t* device_id, uint16_t device_type, uint32_t channels, uint32_t sample_rate, uint16_t format, uint8_t exclusive_mode, uint32_t period_size, uint32_t num_periods, int32_t buffer_size, int32_t* refnum);
+extern "C" LV_DLL_EXPORT ga_result configure_audio_device(uint16_t backend, const uint8_t* device_id, uint16_t device_type, uint32_t channels, uint32_t sample_rate, uint16_t format, uint8_t exclusive_mode, uint8_t optimize_latency, uint32_t period_size, uint32_t num_periods, int32_t buffer_size, int32_t* refnum);
 // Get the currently configured backend
 extern "C" LV_DLL_EXPORT ga_result get_configured_backend(uint16_t* backend);
 // Get all of the configured audio device refnums
@@ -1365,6 +1365,11 @@ ga_result parse_metadata_block_picture(const uint8_t* block, int32_t block_size,
 	if (picture->data == NULL)
 	{
 		return GA_E_MEMORY;
+	}
+
+	if (n < 3)
+	{
+		n = 3;
 	}
 
 	picture->data_size = sizeof(uint8_t) * x * y * 4;

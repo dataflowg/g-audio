@@ -784,6 +784,11 @@ void flac_metadata_callback(void* pUserData, drflac_metadata* meta)
 					return;
 				}
 
+				if (n < 3)
+				{
+					n = 3;
+				}
+
 				tag_info->pictures[tag_info->picture_count].data_size = sizeof(uint8_t) * x * y * 4;
 				tag_info->pictures[tag_info->picture_count].type = meta->data.picture.type;
 				tag_info->pictures[tag_info->picture_count].width = x;
@@ -1309,6 +1314,11 @@ ga_result get_id3_tags(const char* file_name, uint8_t read_pictures, intptr_t* t
 				free_audio_file_tags(tag_info);
 				id3tag_free(id3tag);
 				return GA_E_MEMORY;
+			}
+
+			if (n < 3)
+			{
+				n = 3;
 			}
 
 			tag_info.pictures[i].data_size = sizeof(uint8_t) * x * y * 4;
@@ -2201,7 +2211,7 @@ extern "C" LV_DLL_EXPORT ga_result get_audio_device_info(uint16_t backend_in, co
 	return GA_SUCCESS;
 }
 
-extern "C" LV_DLL_EXPORT ga_result configure_audio_device(uint16_t backend_in, const uint8_t* device_id, uint16_t device_type, uint32_t channels, uint32_t sample_rate, uint16_t format, uint8_t exclusive_mode, uint32_t period_size, uint32_t num_periods, int32_t buffer_size, int32_t* refnum)
+extern "C" LV_DLL_EXPORT ga_result configure_audio_device(uint16_t backend_in, const uint8_t* device_id, uint16_t device_type, uint32_t channels, uint32_t sample_rate, uint16_t format, uint8_t exclusive_mode, uint8_t optimize_latency, uint32_t period_size, uint32_t num_periods, int32_t buffer_size, int32_t* refnum)
 {
 	ga_combined_result result;
 	ma_device_id deviceId;
@@ -2233,7 +2243,7 @@ extern "C" LV_DLL_EXPORT ga_result configure_audio_device(uint16_t backend_in, c
 
 		ma_context_config context_config = ma_context_config_init();
 		// TODO: Make this configurable. Don't set it for now.
-		//context_config.threadPriority = ma_thread_priority_realtime;
+		context_config.threadPriority = optimize_latency ? ma_thread_priority_realtime : ma_thread_priority_default;
 		// TODO: Only set this flag on Raspberry Pi
 		context_config.alsa.useVerboseDeviceEnumeration = MA_TRUE;
 
@@ -2268,10 +2278,11 @@ extern "C" LV_DLL_EXPORT ga_result configure_audio_device(uint16_t backend_in, c
 		device_config.dataCallback = capture_callback;
 		device_config.stopCallback = stop_callback;
 		device_config.capture.channelMixMode = ma_channel_mix_mode_simple;
-		//config.wasapi.noAutoConvertSRC = true; // Enable low latency shared mode
 		device_config.capture.shareMode = exclusive_mode ? ma_share_mode_exclusive : ma_share_mode_shared;
 		device_config.periodSizeInFrames = period_size;
 		device_config.periods = num_periods;
+		device_config.wasapi.noAutoConvertSRC = optimize_latency; // Enable low latency shared mode by using miniaudio's lower quality internal resampler
+		device_config.wasapi.usage = optimize_latency ? ma_wasapi_usage_pro_audio : ma_wasapi_usage_default;
 		break;
 	default:
 		device_config.playback.format = (ma_format)format;   // Set to ma_format_unknown to use the device's native format.
@@ -2281,10 +2292,11 @@ extern "C" LV_DLL_EXPORT ga_result configure_audio_device(uint16_t backend_in, c
 		device_config.dataCallback = playback_callback;
 		device_config.stopCallback = stop_callback;
 		device_config.playback.channelMixMode = ma_channel_mix_mode_simple;
-		//config.wasapi.noAutoConvertSRC = true; // Enable low latency shared mode
 		device_config.playback.shareMode = exclusive_mode ? ma_share_mode_exclusive : ma_share_mode_shared;
 		device_config.periodSizeInFrames = period_size;
 		device_config.periods = num_periods;
+		device_config.wasapi.noAutoConvertSRC = optimize_latency; // Enable low latency shared mode by using miniaudio's lower quality internal resampler
+		device_config.wasapi.usage = optimize_latency ? ma_wasapi_usage_pro_audio : ma_wasapi_usage_default;
 		break;
 	}
 
