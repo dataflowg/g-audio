@@ -5,6 +5,9 @@
 <p align="center">
 A cross-platform LabVIEW library for audio device playback and capture, and for reading and writing audio files.
 </p>
+<p align="center">
+<a href="https://www.vipm.io/package/dataflow_g_lib_g_audio/"> <img src="https://www.vipm.io/package/dataflow_g_lib_g_audio/badge.svg?metric=installs"></a> <a href="https://www.vipm.io/package/dataflow_g_lib_g_audio/"><img src="https://www.vipm.io/package/dataflow_g_lib_g_audio/badge.svg?metric=stars"></a>
+</p>
 
 <p align="center">
     <a href="#whats-new">What's New?</a> -
