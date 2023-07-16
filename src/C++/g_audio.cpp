@@ -19,6 +19,7 @@ ma_context* global_context = NULL;
 extern "C" LV_DLL_EXPORT int32_t clfn_abort(void* data)
 {
 	clear_audio_backend();
+	close_all_audio_files();
 	return 0;
 }
 
@@ -386,6 +387,16 @@ extern "C" LV_DLL_EXPORT ga_result close_audio_file(int32_t refnum)
 	audio_file = NULL;
 
 	return GA_SUCCESS;
+}
+
+void close_all_audio_files()
+{
+	std::vector<int32_t> refnums = get_all_references(ga_refnum_audio_file);
+
+	for (int i = 0; i < refnums.size(); i++)
+	{
+		close_audio_file(refnums[i]);
+	}
 }
 
 extern "C" LV_DLL_EXPORT ga_result get_audio_file_tags(const char* file_name, uint8_t read_pictures, intptr_t* tags, int32_t* tag_count, intptr_t* pictures, int32_t* picture_count)
@@ -2318,6 +2329,15 @@ extern "C" LV_DLL_EXPORT ga_result configure_audio_device(uint16_t backend_in, c
 	// Store the device ID used to configure this device. Will be zeroed, or device ID.
 	pDevice->device_id = deviceId;
 
+	thread_mutex_init(&pDevice->device_mutex);
+	if (strlen(pDevice->device_mutex.data) == 0)
+	{
+		ma_device_uninit(&pDevice->device);
+		free(pDevice);
+		pDevice = NULL;
+		return GA_E_GENERIC;
+	}
+
 	switch (device_config.deviceType)
 	{
 	case ma_device_type_capture:
@@ -2336,6 +2356,7 @@ extern "C" LV_DLL_EXPORT ga_result configure_audio_device(uint16_t backend_in, c
 	result.ma = ma_pcm_rb_init(device_format_init, device_channels_init, buffer_size, NULL, NULL, &pDevice->buffer);
 	if (result.ma != MA_SUCCESS)
 	{
+		thread_mutex_term(&pDevice->device_mutex);
 		ma_device_uninit(&pDevice->device);
 		free(pDevice);
 		pDevice = NULL;
@@ -2349,6 +2370,7 @@ extern "C" LV_DLL_EXPORT ga_result configure_audio_device(uint16_t backend_in, c
 	if (*refnum < 0)
 	{
 		ma_pcm_rb_uninit(&pDevice->buffer);
+		thread_mutex_term(&pDevice->device_mutex);
 		ma_device_uninit(&pDevice->device);
 		free(pDevice);
 		pDevice = NULL;
@@ -2884,7 +2906,9 @@ extern "C" LV_DLL_EXPORT ga_result stop_audio_device(int32_t refnum)
 			break;
 	}
 
+	thread_mutex_lock(&pDevice->device_mutex);
 	result.ma = ma_device_stop(&pDevice->device);
+	thread_mutex_unlock(&pDevice->device_mutex);
 	if (result.ma != MA_SUCCESS)
 	{
 		return ga_return_code(result);
@@ -2902,8 +2926,11 @@ extern "C" LV_DLL_EXPORT ga_result clear_audio_device(int32_t refnum)
 		return GA_E_REFNUM;
 	}
 
+	thread_mutex_lock(&pDevice->device_mutex);
 	ma_device_uninit(&pDevice->device);
 	ma_pcm_rb_uninit(&pDevice->buffer);
+	thread_mutex_unlock(&pDevice->device_mutex);
+	thread_mutex_term(&pDevice->device_mutex);
 	free(pDevice);
 	pDevice = NULL;
 

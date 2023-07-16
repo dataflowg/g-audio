@@ -775,7 +775,8 @@ id3tag_t* id3tag_load( void const* data, size_t size, ID3TAG_U32 fields, void* m
                 offset++;
                 }
             offset++;
-            if ( ptr[offset] == 0 ) offset++;
+            // UTF-16 has two byte terminating NULL, skip second byte if needed
+            if ( (int)*ptr == 1 || (int)*ptr == 2 ) offset++;
             if( !tag->tag.comment ) tag->tag.comment = id3tag_internal_get_string( *ptr, ptr + offset, frame_size - offset, memctx, NULL );
             fields_found[ FIELD_COMMENT ] = true;
             }

@@ -70,6 +70,7 @@ For more information, please refer to <http://unlicense.org/>
 #include <stdint.h>
 #if defined(_WIN32)
 #include <stringapiset.h>
+#include <debugapi.h>
 #else
 #include <unistd.h>
 #define Sleep(x) usleep((x)*1000)
@@ -231,6 +232,7 @@ typedef struct
 	ma_device_id device_id;
 	ma_pcm_rb buffer;
 	ma_int32 buffer_size;
+	thread_mutex_t device_mutex;
 } audio_device;
 
 // NOTE: This struct is replicated as a cluster in LabVIEW.
@@ -296,6 +298,8 @@ extern "C" LV_DLL_EXPORT ga_result read_audio_file(int32_t refnum, uint64_t fram
 extern "C" LV_DLL_EXPORT ga_result write_audio_file(int32_t refnum, uint64_t frames_to_write, void* input_buffer, uint64_t* frames_written);
 // Close the audio file and release any resources allocated in the refnum.
 extern "C" LV_DLL_EXPORT ga_result close_audio_file(int32_t refnum);
+// Close all audio files. To be called if VI aborted.
+void close_all_audio_files();
 
 // Get the tag data for the associated file.
 extern "C" LV_DLL_EXPORT ga_result get_audio_file_tags(const char* file_name, uint8_t read_pictures, intptr_t* tags, int32_t* tag_count, intptr_t* pictures, int32_t* picture_count);

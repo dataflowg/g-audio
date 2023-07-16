@@ -60,6 +60,7 @@ https://github.com/dataflowg/g-audio</Property>
 		<Item Name="Write Audio File.vim" Type="VI" URL="../Audio Files/Write Audio File.vim"/>
 	</Item>
 	<Item Name="Audio Processing" Type="Folder">
+		<Item Name="BPM Detection.vi" Type="VI" URL="../Audio Processing/BPM Detection.vi"/>
 		<Item Name="Channel Conversion.vim" Type="VI" URL="../Audio Processing/Channel Conversion.vim"/>
 	</Item>
 	<Item Name="Controls" Type="Folder">

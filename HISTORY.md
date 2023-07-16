@@ -1,4 +1,21 @@
 # G-Audio Release History
+### v0.5.0 - 2023-07-xx
+* New `Optimize Latency` config flag for audio devices, to help avoid dropouts with smaller buffer sizes. Setting enables:
+    * Realtime thread priority for audio worker thread
+    * "Pro Audio" thread characteristic on WASAPI backend
+* New `Latency Loopback Example.vi` demonstrating latency reduction techniques
+    * See `README.md` for additional info on reducing latency
+* Automatically close any open audio files on VI abort
+* Fix hang when clearing audio device while it is in process of stopping (#20)
+* Fix for parsing empty ID3v2 comment
+* Fix loading 8-bit jpeg album art
+
+##### API Changes
+* `Configure Audio Device.vi`:
+    * `Audio Device Advanced Config.ctl` adds _Optimize Latency_ flag
+
+
+
 ### v0.4.0 - 2022-07-12
 * Raspberry Pi / LINX support
 * Support for reading metadata tags (ID3v2, ID3v1, Vorbis Comments, RIFF INFO)

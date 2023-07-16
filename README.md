@@ -18,12 +18,14 @@ A cross-platform LabVIEW library for audio device playback and capture, and for 
 </p>
 
 ## <a id="whats-new"></a>What's New?
-* Raspberry Pi / LINX support!
-    * See the [Installation](#installation) section to get started.
-* Support for reading metadata tags (ID3v2, ID3v1, Vorbis Comments, RIFF INFO)
-* Support for reading embedded artwork
-* Advanced device configuration options
-* Misc. bug fixes
+* New `Optimize Latency` config flag for audio devices, to help avoid dropouts with smaller buffer sizes. Setting enables:
+    * Realtime thread priority for audio worker thread
+    * "Pro Audio" thread characteristic on WASAPI backend
+* New `Latency Loopback Example.vi` demonstrating latency reduction techniques
+* Automatically close any open audio files on VI abort
+* Fix hang when clearing audio device while it is in process of stopping (#20)
+* Fix for parsing empty ID3v2 comment tag
+* Fix loading 8-bit jpeg album art
 
 ## <a id="features"></a>Features
 * Support for audio playback and capture, including loopback capture
@@ -109,6 +111,32 @@ BPM         | Beats Per Minute of the track.          | `TBPM`, `TBP`           
 COMMENT     | Notes and comments on the track.        | `COMM`, `COM`               | Comment[0-27] | `ICMT`
 
 The field / tag mapping is based on the [Tag Mapping article](https://wiki.hydrogenaud.io/index.php?title=Tag_Mapping) on the hydrogenaudio wiki.
+
+### Reducing Audio Latency
+Audio latency refers to the amount of time it takes between audio entering and exiting a signal chain (audio data playback through to speakers, or microphone input to captured audio data). There can be many steps in the signal chain which contribute to latency, so it's important to reduce or eliminate them where possible.
+
+_The best (minimal) audio latencies under Windows are usually achieved using an audio interface with ASIO drivers. G-Audio does not yet have ASIO support, but very good latencies can still be achieved using the WASAPI backend. Check out [WaveIO](https://www.zeitnitz.eu/scms/waveio) for a LabVIEW library with ASIO support._
+
+Latency reduction tips:
+1. Use smaller data buffers.
+    * The size of the data buffer directly affects the latency, where smaller size = lower latency. This has the single biggest impact on latency.
+    * Be careful with very small buffer sizes, as they can lead to audible drop-outs.
+2. Set the buffer size to (a multiple of) the device's _period size_.
+    * During playback and capture, a callback is used to copy data from the data buffer to/from the audio device. This callback usually runs when the audio device requires a _period size_ block of data.
+	* If the data buffer and _period size_ are the same (or multiple of), this data transfer can occur immediately as the required amount of data is buffered and ready to transfer.
+3. Configure the audio device to use its native data format (data type, sample rate).
+    * Audio data not in the same format will be converted and/or resampled, requiring additional processing time.
+    * Check the device's native data format(s) using `Query Audio Devices.vi`
+4. Read/write data in the device's configured audio format.
+    * The `Playback Audio.vim` and `Capture Audio.vim` functions accept many different input types for convenience, but if the data differs from the audio device configuration it will require conversion.
+    * If the audio device is configured with a non-native format (say I16/44.1kHz, where native is float/96kHz), and the data being written/read differs to the configured data format (say double/44.1kHz), data will be converted twice (double -> I16 -> float).
+5. Set the exclusive mode flag (WASAPI only)
+    * This can have a noticeable effect on latency, as the WASAPI backend doesn't have to manage and mix audio from other sources when in exclusive mode.
+6. Set the optimize latency flag
+    * This doesn't directly control latency, but does configure audio threads to run at the highest priority possible.
+	* Higher priority threads may be able to process audio data more frequently, allowing smaller buffers while reducing chances of audio drop-outs.
+
+The `Latency Round Trip Example.vi` demonstration can be used to view and configure all of a device's parameters, and experiment with finding the lowest latency configuration for your hardware. The example captures audio and immediately plays it back. With a hardware configuration similar to the one pictured the round trip time of the audio signal can be measured.
 
 ## <a id="building"></a>Building
 Detailed build instructions can be found in [BUILDING.md](BUILDING.md), and covers development environment configuration, compilation details for each target, and VIPM packaging process.

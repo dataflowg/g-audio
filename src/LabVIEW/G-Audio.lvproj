@@ -67,19 +67,18 @@
 		<Property Name="server.vi.propertiesEnabled" Type="Bool">true</Property>
 		<Property Name="specify.custom.address" Type="Bool">false</Property>
 		<Item Name="Examples" Type="Folder">
-			<Item Name="Latency Test" Type="Folder">
-				<Item Name="Latency Test Config.ctl" Type="VI" URL="../G-Audio/Examples/Latency Test/Latency Test Config.ctl"/>
-				<Item Name="Latency Test Device Config.ctl" Type="VI" URL="../G-Audio/Examples/Latency Test/Latency Test Device Config.ctl"/>
-				<Item Name="Latency Test Example.vi" Type="VI" URL="../G-Audio/Examples/Latency Test/Latency Test Example.vi"/>
-				<Item Name="Latency Test Loopback State.ctl" Type="VI" URL="../G-Audio/Examples/Latency Test/Latency Test Loopback State.ctl"/>
-				<Item Name="Latency Test Loopback.vi" Type="VI" URL="../G-Audio/Examples/Latency Test/Latency Test Loopback.vi"/>
-				<Item Name="Latency Test Message.ctl" Type="VI" URL="../G-Audio/Examples/Latency Test/Latency Test Message.ctl"/>
+			<Item Name="Controls" Type="Folder">
+				<Item Name="Latency Test Config.ctl" Type="VI" URL="../G-Audio/Examples/Controls/Latency Test Config.ctl"/>
+				<Item Name="Latency Test Device Config.ctl" Type="VI" URL="../G-Audio/Examples/Controls/Latency Test Device Config.ctl"/>
+				<Item Name="Latency Test Loopback State.ctl" Type="VI" URL="../G-Audio/Examples/Controls/Latency Test Loopback State.ctl"/>
+				<Item Name="Latency Test Message.ctl" Type="VI" URL="../G-Audio/Examples/Controls/Latency Test Message.ctl"/>
 			</Item>
 			<Item Name="LINX" Type="Folder">
 				<Item Name="Audio Playback Example (LINX).vi" Type="VI" URL="../G-Audio/Examples/LINX/Audio Playback Example (LINX).vi"/>
 				<Item Name="Sample Pad Example (LINX).vi" Type="VI" URL="../G-Audio/Examples/LINX/Sample Pad Example (LINX).vi"/>
 			</Item>
 			<Item Name="SubVIs" Type="Folder">
+				<Item Name="Capture and Playback Audio.vi" Type="VI" URL="../G-Audio/Examples/SubVIs/Capture and Playback Audio.vi"/>
 				<Item Name="Generate Signal Components.vim" Type="VI" URL="../G-Audio/Examples/SubVIs/Generate Signal Components.vim"/>
 				<Item Name="Music Visualizer (Queue Only).vi" Type="VI" URL="../G-Audio/Examples/SubVIs/Music Visualizer (Queue Only).vi"/>
 			</Item>
@@ -88,6 +87,7 @@
 			<Item Name="Audio Loopback Example.vi" Type="VI" URL="../G-Audio/Examples/Audio Loopback Example.vi"/>
 			<Item Name="Audio Playback Example.vi" Type="VI" URL="../G-Audio/Examples/Audio Playback Example.vi"/>
 			<Item Name="IEEE Float Compare Example.vi" Type="VI" URL="../G-Audio/Examples/IEEE Float Compare Example.vi"/>
+			<Item Name="Latency Round Trip Example.vi" Type="VI" URL="../G-Audio/Examples/Latency Round Trip Example.vi"/>
 			<Item Name="Media Player Example.vi" Type="VI" URL="../G-Audio/Examples/Media Player Example.vi"/>
 			<Item Name="Minimize Memory Example.vi" Type="VI" URL="../G-Audio/Examples/Minimize Memory Example.vi"/>
 			<Item Name="Mixer Example.vi" Type="VI" URL="../G-Audio/Examples/Mixer Example.vi"/>
@@ -266,47 +266,6 @@
 			<Item Name="lvanlys.dll" Type="Document" URL="/&lt;resource&gt;/lvanlys.dll"/>
 			<Item Name="lvsound2.dll" Type="Document" URL="/&lt;resource&gt;/lvsound2.dll"/>
 		</Item>
-		<Item Name="Build Specifications" Type="Build">
-			<Item Name="Latency Test Example" Type="EXE">
-				<Property Name="App_copyErrors" Type="Bool">true</Property>
-				<Property Name="App_INI_aliasGUID" Type="Str">{11FFA4EF-6E26-4BC0-A3EE-AEC0BE1E33D9}</Property>
-				<Property Name="App_INI_GUID" Type="Str">{9143B7BF-4003-48A2-B87B-6141754B7B92}</Property>
-				<Property Name="App_serverConfig.httpPort" Type="Int">8002</Property>
-				<Property Name="App_serverType" Type="Int">0</Property>
-				<Property Name="Bld_autoIncrement" Type="Bool">true</Property>
-				<Property Name="Bld_buildCacheID" Type="Str">{CDF74139-9B83-4A3A-894B-EDE3C5731893}</Property>
-				<Property Name="Bld_buildSpecName" Type="Str">Latency Test Example</Property>
-				<Property Name="Bld_excludeInlineSubVIs" Type="Bool">true</Property>
-				<Property Name="Bld_excludeLibraryItems" Type="Bool">true</Property>
-				<Property Name="Bld_excludePolymorphicVIs" Type="Bool">true</Property>
-				<Property Name="Bld_localDestDir" Type="Path">../builds/NI_AB_PROJECTNAME/Latency Test Example</Property>
-				<Property Name="Bld_localDestDirType" Type="Str">relativeToCommon</Property>
-				<Property Name="Bld_modifyLibraryFile" Type="Bool">true</Property>
-				<Property Name="Bld_previewCacheID" Type="Str">{D3010B0F-16ED-43A7-9523-A99CFBAD6CD3}</Property>
-				<Property Name="Bld_version.build" Type="Int">6</Property>
-				<Property Name="Bld_version.major" Type="Int">1</Property>
-				<Property Name="Destination[0].destName" Type="Str">Latency Test Example.exe</Property>
-				<Property Name="Destination[0].path" Type="Path">../builds/NI_AB_PROJECTNAME/Latency Test Example/Latency Test Example.exe</Property>
-				<Property Name="Destination[0].preserveHierarchy" Type="Bool">true</Property>
-				<Property Name="Destination[0].type" Type="Str">App</Property>
-				<Property Name="Destination[1].destName" Type="Str">Support Directory</Property>
-				<Property Name="Destination[1].path" Type="Path">../builds/NI_AB_PROJECTNAME/Latency Test Example/data</Property>
-				<Property Name="DestinationCount" Type="Int">2</Property>
-				<Property Name="Source[0].itemID" Type="Str">{5F87EBB9-6F45-4E1F-B2DD-5571DB24D7EF}</Property>
-				<Property Name="Source[0].type" Type="Str">Container</Property>
-				<Property Name="Source[1].destinationIndex" Type="Int">0</Property>
-				<Property Name="Source[1].itemID" Type="Ref">/My Computer/Examples/Latency Test/Latency Test Example.vi</Property>
-				<Property Name="Source[1].sourceInclusion" Type="Str">TopLevel</Property>
-				<Property Name="Source[1].type" Type="Str">VI</Property>
-				<Property Name="SourceCount" Type="Int">2</Property>
-				<Property Name="TgtF_fileDescription" Type="Str">Latency Test Example</Property>
-				<Property Name="TgtF_internalName" Type="Str">Latency Test Example</Property>
-				<Property Name="TgtF_legalCopyright" Type="Str">Copyright © 2022 </Property>
-				<Property Name="TgtF_productName" Type="Str">Latency Test Example</Property>
-				<Property Name="TgtF_targetfileGUID" Type="Str">{690C38FC-7168-4171-B9C2-B2655F57D74F}</Property>
-				<Property Name="TgtF_targetfileName" Type="Str">Latency Test Example.exe</Property>
-				<Property Name="TgtF_versionIndependent" Type="Bool">true</Property>
-			</Item>
-		</Item>
+		<Item Name="Build Specifications" Type="Build"/>
 	</Item>
 </Project>
