@@ -767,16 +767,21 @@ id3tag_t* id3tag_load( void const* data, size_t size, ID3TAG_U32 fields, void* m
 
         if( ( fields & ID3TAG_FIELD_COMMENT) && ( strcmp( frame_id, "COMM" ) == 0 || strcmp( frame_id, "COM" ) == 0 ) )
             {
+            int encoding = (int)*ptr;
             // 1 byte encoding, 3 bytes language
             int offset = 4;
-            // Skip content description
-            while( !( ptr[ offset ] == 0 ) )
+            // 2-byte char
+            if (encoding == 1 || encoding == 2)
                 {
+                while ( ptr[ offset ] != 0 && ptr[ offset + 1 ] != 0 ) { offset += 2; }
+                offset += 2;
+                }
+            // 1-byte char
+            else
+                {
+                while ( ptr[ offset ] != 0 ) { offset++; }
                 offset++;
                 }
-            offset++;
-            // UTF-16 has two byte terminating NULL, skip second byte if needed
-            if ( (int)*ptr == 1 || (int)*ptr == 2 ) offset++;
             if( !tag->tag.comment ) tag->tag.comment = id3tag_internal_get_string( *ptr, ptr + offset, frame_size - offset, memctx, NULL );
             fields_found[ FIELD_COMMENT ] = true;
             }
